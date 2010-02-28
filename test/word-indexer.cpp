@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
     }
 
     string s;
-    const int n = read_file_data(argv[1], s);
+    int n = read_file_data(argv[1], s);
 
     if (n == -1) {
         cerr << "Failed to open " << argv[1] << " for reading.\n";
@@ -40,17 +40,21 @@ int main(int argc, char *argv[]) {
     oodles::DistinctItemVector<string> words;
     string::const_iterator i = s.begin(), j = s.end();
 
-    while (i != j) {
+    for (n = 0 ; i != j ; ++i) {
         if (isspace(*i)) {
             if (!word.empty()) {
                 cout << "Appended '" << word << "' at index "
                      << words.append_item(word) << endl;
                 word.clear();
+                ++n;
             }
         } else
             word += *i;
+    }
 
-        i++;
+    if (n != static_cast<int>(words.sequence_count())) {
+        cerr << "Total no. items appended not equal to no. of input items.\n";
+        return 1;
     }
 
     for (uint32_t p = 0 ; p < words.sequence_count() ; ++p) {
