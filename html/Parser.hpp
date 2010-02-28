@@ -2,7 +2,7 @@
 #define OODLES_HTML_PARSER_H
 
 // oodles
-#include "document.h" // Our HTML document structures
+#include "document.hpp" // Our HTML document structures
 
 // Boost.spirit
 #include <boost/spirit/include/qi.hpp>

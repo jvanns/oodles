@@ -1,6 +1,6 @@
 // oodles
-#include "html/Parser.h"
-#include "utility/file-ops.h"
+#include "html/Parser.hpp"
+#include "utility/file-ops.hpp"
 
 // Boost.foreach
 #include <boost/foreach.hpp>
