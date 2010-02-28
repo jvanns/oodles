@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Safari - Performance</title>
+	<script type="text/javascript" charset="utf-8">
+		window.location.replace('/uk/macosx/');
+	</script>
+	<script type="text/javascript">	
+		new AC.ViewMaster.Viewer(null, 'overlay-performance-swap', 'overlay-performance-swap', { initialId:'ibenchhtml', silentTriggers:true });
+		new AC.ViewMaster.Viewer(null, 'ibench-html-swap', 'ibench-html', { initialId:'ibenchhtmlwindows', silentTriggers:true });
+		new AC.ViewMaster.Viewer(null, 'ibench-js-swap', 'ibench-js', { initialId:'ibenchjswindows', silentTriggers:true });
+		new AC.ViewMaster.Viewer(null, 'sunspider-js-swap', 'sunspider-js', { initialId:'sunspiderjswindows', silentTriggers:true });
+	</script>
+</head>
+<body>
+
+<div class="overlay-performance">
+	<div class="padder">
+
+		<h2>Safari Performance</h2>
+		<ul>
+			<li><a class="overlay-performance-swap" href="performance.html#ibenchhtml">i-Bench HTML</a></li>
+			<li><a class="overlay-performance-swap" href="performance.html#ibenchjs">i-Bench JavaScript</a></li>
+			<li><a class="overlay-performance-swap" href="performance.html#sunspiderjs">SunSpider JavaScript</a></li>
+		</ul>
+
+		<div id="overlay-performance-swap"></div>
+
+		<div id="ibenchhtml" class="tab">
+			<h3>i-Bench HTML <sub>(in seconds)</sub></h3>
+			<ul>
+				<li><a class="ibench-html" href="performance_html_mac.html#ibenchhtmlmac">Mac</a></li>
+				<li><a class="ibench-html" href="performance_html_windows.html#ibenchhtmlwindows">Windows</a></li>
+
+			</ul>
+			<div id="ibench-html-swap"></div>
+		</div>
+
+		<div id="ibenchjs" class="tab">
+			<h3>i-Bench JavaScript <sub>(in seconds)</sub></h3>
+			<ul>
+				<li><a class="ibench-js" href="performance_js_mac.html#ibenchjsmac">Mac</a></li>
+
+				<li><a class="ibench-js" href="performance_js_windows.html#ibenchjswindows">Windows</a></li>
+			</ul>
+			<div id="ibench-js-swap"></div>
+		</div>
+
+		<div id="sunspiderjs" class="tab">
+			<h3>SunSpider JavaScript <sub>(in milliseconds)</sub></h3>
+
+			<ul>
+				<li><a class="sunspider-js" href="performance_ssjs_mac.html#sunspiderjsmac">Mac</a></li>
+				<li><a class="sunspider-js" href="performance_ssjs_windows.html#sunspiderjswindows">Windows</a></li>
+			</ul>
+			<div id="sunspider-js-swap"></div>
+		</div>
+
+	</div>
+
+</div>
+
+</body>
+</html>

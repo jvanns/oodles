@@ -1,0 +1,562 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en-gb">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="pics-label" content='(pics-1.1 "http://www.icra.org/ratingsv02.html" l gen true for "http://www.apple.com" r (cz 1 lz 1 nz 1 oz 1 vz 1) "http://www.rsac.org/ratingsv01.html" l gen true for "http://www.apple.com" r (n 0 s 0 v 0 l 0))'>
+	<meta name="Author" content="Apple Inc.">
+	<meta name="viewport" content="width=1024">
+	<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+
+	<title>Apple (United Kingdom) - Mac OS X Snow Leopard - Technical specifications</title>
+	<meta name="omni_page" content="Mac OS X - Tech Specs">
+	<meta name="Category" content="products,macs">
+	<meta name="Description" content="View the technical specifications and system requirements for Mac OS X Snow Leopard.">
+	<script src="http://images.apple.com/euro/global/scripts/0607/lib/prototype.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://images.apple.com/euro/global/scripts/0607/lib/scriptaculous.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://images.apple.com/euro/global/scripts/0607/browserdetect.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://images.apple.com/euro/global/scripts/0607/apple_core.js" type="text/javascript" charset="utf-8"></script>
+<script src="http://images.apple.com/euro/global/scripts/0607/search_decorator.js" type="text/javascript" charset="utf-8"></script>
+
+	<link rel="stylesheet" href="http://images.apple.com/uk/global/styles/base.css" type="text/css" charset="utf-8">
+	<link rel="stylesheet" href="http://images.apple.com/euro/global/styles/blackout.css" type="text/css" charset="utf-8">
+	<link rel="stylesheet" href="http://images.apple.com/uk/macosx/styles/macosx.css" type="text/css" charset="utf-8">
+	<style type="text/css" media="all">
+		#main #content #specifications { margin-top:-22px; }
+		#main #content #specifications strong {font-size: 13px; font-weight: bold; color: #000; line-height: 20px; }
+		#main #content #specifications p.small {margin-left:0; font-size: 11px; font-weight: bold; color: #000; line-height: 18px;}
+		#main #content #specifications h2 { color: #000; font-size: 16px; font-weight:bold; }
+		#main #content #specifications .column.first h2 { width:281px; }
+
+		#main .grid3col { margin-top: 16px; }
+		#specs #main #specifications .grid3col h3 { margin-bottom: 0; }
+		#specs #main .grid3col h3 { font-size: 1em; }
+		#main .grid3col .column { width:265px; margin:0 0 20px 25px; padding-top:16px; margin-top: 3px; border-top:1px solid #D4D4D4; }
+		#main .grid3col .column p { font-size: 11px; line-height: 20px; }
+		#main .grid3col .column p.clear { clear: both; }
+		#main .grid3col .column.first { padding-left: 0;  width: 281px; float: left; }
+		#main .grid3col .column.last { float: right; padding:39px 0 0 44px; margin:0; _padding-left:16px; _margin-right:16px; }
+
+		#main img.left {margin-left: 10px; }
+		#main img.intel {margin-top: 18px;}
+		#main h4 {color: #000; font-size: 13px; font-weight: bold; margin-bottom: 5px; }
+
+		#main ul.square { margin-left: 25px; font-size: 11px; line-height: 18px; }
+		#main ul.leading li { padding-bottom:11px; }
+		#main ul.notop { margin-left: 25px; font-size: 11px; line-height: 18px; margin-top: -18px; }
+		
+		#main #specifications .graybox {
+			background-color: #f4f3f3;
+			-webkit-border-radius:5px; -moz-border-radius:5px; -o-border-radius:5px; -khtml-border-radius:5px;
+			border-top: none;
+			width: 233px;
+			padding: 20px 25px 10px;
+		}
+		
+		#main a.lessismore {background:none; padding-right:10px;}
+		#main a.lessismore2 {background:transparent url(http://images.apple.com/euro/global/elements/arrows/morearrow_08c.gif) no-repeat scroll 100% 50%; padding-right:10px;}
+	</style>
+
+</head>
+<body class="specs" id="specs">
+	<script src="http://images.apple.com/global/nav/scripts/shortcuts.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">var searchSection = 'global'; var searchCountry = 'uk';</script>
+<div id="globalheader">
+	<!--googleoff: all-->
+	<ul id="globalnav">
+		<li id="gn-apple"><a href="http://www.apple.com/uk/">Apple</a></li>
+		<li id="gn-store"><a href="http://store.apple.com/uk">Store</a></li>
+		<li id="gn-mac"><a href="http://www.apple.com/uk/mac/">Mac</a></li>
+		<li id="gn-ipoditunes"><a href="http://www.apple.com/uk/itunes/">iPod + iTunes</a></li>
+		<li id="gn-iphone"><a href="http://www.apple.com/uk/iphone/">iPhone</a></li>
+		<li id="gn-downloads"><a href="http://www.apple.com/uk/downloads/">Downloads</a></li>
+		<li id="gn-support"><a href="http://www.apple.com/uk/support/">Support</a></li>
+	</ul>
+	<!--googleon: all-->
+	<div id="globalsearch">
+		<form action="http://searchcgi.apple.com/cgi-bin/sp/nph-searchpre11.pl" method="POST" class="search" id="g-search">
+			<input type="hidden" value="utf-8" name="oe" id="search-oe">
+			<input type="hidden" value="p" name="access" id="search-access">
+			<input type="hidden" value="uk_only" name="site" id="search-site">
+			<input type="hidden" value="lang_en" name="lr" id="search-lr">
+			<label for="sp-searchtext"><span class="prettyplaceholder">Search</span><input type="search" name="q" id="sp-searchtext" class="g-prettysearch applesearch" accesskey="s"></label>
+		</form>
+		<div id="sp-results"><div class="inside"></div></div>
+	</div>
+</div>
+
+	<div id="top">
+<!-- SiteCatalyst code version: H.8. Copyright 1997-2006 Omniture, Inc. -->
+<script type="text/javascript">
+/* RSID: */
+var s_account="applezaglobal"
+</script>
+
+
+<script type="text/javascript" src="http://images.apple.com/global/metrics/js/s_code_h.js"></script>
+
+<script type="text/javascript">
+s.pageName=AC.Tracking.pageName()+" (ZA)";
+s.server=""
+s.channel="www.za.macosx"
+s.pageType=""
+s.prop1=""
+s.prop2=""
+s.prop3=""
+s.prop4=document.URL;
+s.prop5=""
+
+/* E-commerce Variables */
+s.campaign=""
+s.state=""
+s.zip=""
+s.events=""
+s.products=""
+s.purchaseID=""
+s.eVar1=""
+s.eVar2=""
+s.eVar3=""
+s.eVar4=""
+s.eVar5=""
+
+/************* DO NOT ALTER ANYTHING BELOW THIS LINE ! **************/
+var s_code=s.t();if(s_code)document.write(s_code)</script>
+<!-- End SiteCatalyst code version: H.8. -->
+</div>
+
+	<div id="productheader">
+	<h2><a href="index.html"><img src="http://images.apple.com/euro/macosx/images/product_title_20090824.png" alt="Mac OS X" width="118" height="25" /></a></h2>
+	<ul>
+		<li id="pn-whatsnew"><a href="refinements/index.html">What’s New</a></li>
+		<li id="pn-whatis"><a href="what-is-macosx/index.html">What is Mac OS X?</a></li>
+		<li id="pn-security"><a href="security/index.html">Security</a></li>
+		<li id="pn-compatibility"><a href="compatibility/index.html">Compatibility</a></li>
+		<li id="pn-accessibility"><a href="accessibility/index.html">Accessibility</a></li>
+		<li id="pn-developers"><a href="developers/index.html">Developers</a></li>
+		<li id="pn-specs"><a href="specs.html">Tech Specs</a></li>
+		<li><a class="buynow" href="http://store.apple.com/uk/go/snowleopard/">Buy Mac OS X Snow Leopard now.</a></li>
+	</ul>
+</div>
+
+	<div id="main">
+		<div class="maincap top"></div>
+			<div id="content">
+				<div id="specifications">
+					<h1><img src="http://images.apple.com/uk/macosx/images/specs_header20090608.gif" alt="Technical Specifications" width="255" height="24" border="0" class="header"></h1>
+					<div class="grid3col">
+						<div class="column first">
+							<h2>General requirements</h2>
+							<img src="http://images.apple.com/euro/macosx/images/specs_intel20090608.jpg" alt="Intel Core 2 Due" width="69" height="86" border="0" class="right intel">
+							<ul class="square leading">
+									<li>Mac computer with an Intel processor</li>
+									<li>1GB of memory</li>
+									<li>5GB of free disk space</li>
+									<li>DVD drive for installation</li>
+									<li>Some features require a compatible Internet service provider; fees may apply.</li>
+									<li>Some features require Apple’s <a href="http://www.apple.com/uk/mobileme/">MobileMe</a> service; fees and terms apply.</li>
+							</ul>
+						</div>
+
+						<div class="column">
+							<h2>Feature-specific requirements</h2>
+							<img src="http://images.apple.com/euro/macosx/images/specs_timemachine20090608.jpg" alt="Time Machine" width="54" height="75" border="0" class="left">
+
+							<h3>Time Machine</h3>
+							<p>requires an additional hard drive or <a href="http://www.apple.com/uk/timecapsule/">Time Capsule</a> (sold separately).</p>
+							
+							<h3 class="clear">Photo Booth</h3>
+							<p>requires an iSight camera (built in or external), USB video class (UVC) camera or FireWire DV camcorder. Backdrop effects when using a DV camcorder require fixed focus, exposure and white balance.</p>
+							<h3>Boot Camp</h3>
+							<p>requires Windows XP with Service Pack 2 or Windows Vista (sold separately).</p>
+							<h3>Screen sharing</h3>
+							<p>in iChat and the Finder requires a 128-Kbps Internet connection (300 Kbps recommended).</p>
+							<h3>DVD Player</h3>
+							<p>requires a 1.6GHz processor or faster for improved deinterlacing.</p>
+							
+							<h3>iChat</h3>
+								<ul class="square">
+									<li>Audio chats require a microphone and a 56-Kbps Internet connection.</li>
+									<li>Video chats require an iSight camera (built in or external), USB video class (UVC) camera or FireWire DV camcorder; and a 128-Kbps upstream and downstream Internet connection.</li>
+									<li>Backdrop effects when using a DV camcorder require fixed focus, exposure and white balance.</li>
+									<li>Some iChat features offer better performance and quality with higher system capabilities. <a href="http://docs.info.apple.com/article.html?artnum=306687">More details</a></li>
+								</ul>
+							
+							<h3>Exchange Support</h3>
+							<p>requires Microsoft Exchange Server 2007 Service Pack 1 Update Rollup 4. Auto-setup requires enabling the Autodiscovery feature of Microsoft Exchange Server.</p>
+							
+							<h3>QuickTime X movie capture </h3>
+							<p>requires iSight camera (built-in or external), USB video class (UVC) camera or FireWire DV camcorder.</p>
+							
+							<h3>QuickTime H.264 hardware acceleration </h3>
+							<p>requires a Mac with a NVIDIA 9400M graphics processor.</p>
+							
+							<h3>Developer tools</h3>
+							<p>require 1GB of memory and an additional 3GB of available disk space.</p>
+							
+							<h3>OpenCL</h3>
+							<p>requires one of the following graphics cards or graphics processors:</p>
+								<ul class="square">
+									<li>NVIDIA Geforce 8600M GT, GeForce 8800 GT, GeForce 8800 GTS, Geforce 9400M, GeForce 9600M GT, GeForce GT 120, GeForce GT 130.</li>
+									<li>ATI Radeon HD 4670, ATI Radeon HD 4850, Radeon HD 4870</li>
+								</ul>
+								
+							<h3>64-bit support</h3>
+							<p>requires a Mac with a 64-bit processor.</p>
+							
+							<h3>Grand Central Dispatch</h3>
+							<p>requires a Mac with a multicore processor.</p>
+							
+							
+							
+							
+						</div>
+						<div class="graybox column">
+							<h2>How to get Mac OS X<br>
+							Snow Leopard.</h2>
+							
+							<h3>With every new Mac.</h3>
+							<p>Beginning August 28th 2009, every new Mac computer comes with Mac OS X Snow Leopard.</p>
+							
+							
+							<h3>Upgrading from Mac OS X v10.5 Leopard.</h3>
+							<p>If your Intel-based Mac is running Mac OS X v10.5 Leopard, just purchase Mac OS X v10.6 Snow Leopard and follow the simple installation instructions.</p>
+							
+							<h3>Upgrading from Mac OS X v10.4 Tiger.</h3>
+							<p>If your Intel-based Mac is running Mac OS X v10.4 Tiger, purchase the Mac Box Set, which is a single, affordable package that includes Mac OS X v10.6 Snow Leopard; iLife, with the latest versions of iPhoto, iMovie, GarageBand, iWeb and iDVD; and iWork, Apple’s productivity suite for home and office including Pages, Numbers and Keynote.</p>
+
+						</div>
+
+					</div>
+				</div><!--/specifications-->
+
+				<div class="grid3col" id="inthebox">
+					<div class="column first">
+						<h2>What’s in the Box</h2>
+						<img src="http://images.apple.com/euro/macosx/images/specs_snow_box_20090824.jpg" alt="Mac OSX Leopard Box" width="169" heigh="215" border="0">
+						<ul class="square notop">
+							<li>Installation DVD</li>
+							<li>Welcome to Mac OS X Snow<br>
+							Leopard User’s Guide</li>
+						</ul>
+						<h3>Applications</h3>
+						<ul class="square">
+							<li><a href="what-is-macosx/mail-ical-contacts-apps.html">Address Book</a></li>
+							<li>Automator</li>
+							<li>Calculator</li>
+							<li>Chess</li>
+							<li>Dashboard</li>
+							<li>Dictionary</li>
+							<li>DVD Player</li>
+							<li>Font Book</li>
+							<li>Front Row</li>
+							<li><a href="what-is-macosx/mail-ical-contacts-apps.html">iCal</a></li>
+							<li><a href="what-is-macosx/ichat.html">iChat</a></li>
+							<li>Image Capture</li>
+							<li>iSync (<a href="http://support.apple.com/kb/HT2824">supported devices</a>)</li>
+							<li><a href="what-is-macosx/itunes.html">iTunes</a></li>
+							<li><a href="what-is-macosx/mail-ical-contacts-apps.html">Mail</a></li>
+							<li>Photo Booth</li>
+							<li>Preview</li>
+							<li>QuickTime Player</li>
+							<li><a href="what-is-macosx/safari.html">Safari</a></li>
+							<li>Stickies</li>
+							<li>System Preferences</li>
+							<li>TextEdit</li>
+							<li><a href="what-is-macosx/time-machine.html">Time Machine</a></li>
+						</ul>
+					</div>
+
+					<div class="column">
+						<h3>Utilities</h3>
+						<ul class="square">
+							<li>Activity Monitor</li>
+							<li>AirPort Utility</li>
+							
+							<li>Audio MIDI Setup</li>
+							<li>Bluetooth File Exchange</li>
+							<li>Boot Camp Assistant</li>
+							<li>ColorSync Utility</li>
+							<li>Console</li>
+							<li>DigitalColor Meter</li>
+							<li>Disk Utility</li>
+							<li><a href="what-is-macosx/expose.html">Expos&eacute;</a>
+							<li>Grab</li>
+							<li>Grapher</li>
+							<li>Java Preferences</li>
+							<li>Keychain Access</li>
+							<li>Migration Assistant</li>
+							<li>Network Utility</li>
+							<li>Podcast Capture</li>
+							<li>Script Utility</li>
+							<li>RAID Utility</li>
+							<li>Script Editor</li>
+							<li>Setup Assistant</li>
+							<li>Spaces</li>
+							<li>System Profiler</li>
+							<li>Terminal</li>
+							<li>VoiceOver Utility</li>
+							<li>X11</li>
+						</ul>
+						
+						<h3>Key Technologies</h3>
+						<ul class="square">
+							<li>AppleScript</li>
+							<li>Aqua</li>
+							<li>Bonjour</li>
+							<li>CDSA security architecture</li>
+							<li>Cocoa, Carbon and Java</li>
+							<li>ColorSync</li>
+							<li>Core Animation</li>
+							<li>Core Audio</li>
+							<li>Core Image</li>
+							<li>Core Video</li>
+							<li><a href="technology/index.html#grandcentral">Grand Central Dispatch</a></li>
+							<li>H.264</li>
+							<li>Inkwell</li>
+							<li><a href="technology/index.html#opencl">OpenCL</a></li>
+							<li>OpenGL</li>
+							<li>PDF</li>
+							<li>Quartz Extreme</li>
+							<li><a href="technology/index.html#quicktime">QuickTime X</a></li>
+							<li><a href="technology/index.html#64bit">64-bit computing</a></li>
+							<li>Sync</li>
+							<li>Unicode 5.1</li>
+							<li><a href="accessibility/index.html">Universal Access</a></li>
+							<li>UNIX</li>
+							<li>USB and FireWire peripheral support</li>
+							<li>Xgrid</li>
+						</ul>
+					</div>
+					<div class="column">
+						<h3>Development</h3>
+						<ul class="square">
+							<li>Xcode 3 IDE with Interface Builder 3</li>
+							<li>Instruments </li>
+							<li>Dashcode </li>
+							<li>AppleScript Studio</li>
+							<li>Automator 2</li>
+							<li>Shark</li>
+							<li>GCC compiler and toolset (original project by FSF.org)</li>
+							<li>DTrace (original project by Sun)</li>
+							<li>Complete Java JDK, including javac, javadoc, ANT and Maven tools</li>
+							<li>Apache web server</li>
+							<li>AppleScript</li>
+							<li>Ruby and the Ruby on Rails frameworks</li>
+							<li>Python</li>
+							<li>Perl</li>
+							<li>PHP</li>
+							<li>SQLite</li>
+						</ul>
+						
+						<h3>Languages</h3>
+						<ul class="square">
+							<li>English</li>
+							<li>Japanese</li>
+							<li>French</li>
+							<li>German</li>
+							<li>Spanish</li>
+							<li>Italian</li>
+							<li>Dutch</li>
+							<li>Swedish</li>
+							<li>Danish</li>
+							<li>Norwegian</li>
+							<li>Finnish</li>
+							<li>Traditional Chinese</li>
+							<li>Simplified Chinese</li>
+							<li>Korean</li>
+							<li>Brazilian Portuguese</li>
+							<li>Portuguese (Portugal)</li>
+							<li>Russian</li>
+							<li>Polish</li>
+						</ul>
+						
+						<p><a href="what-is-macosx/apps-and-utilities.html" class="more">Learn more about all applications and utilities</a></p>
+					</div>
+				</div> <!-- /inthebox -->
+			</div><!--/content-->
+		<div class="maincap bottom"></div>
+	</div><!--/main-->
+
+	<div id="promofooter">
+		<ul id="promos">
+			<li class="promo">
+	<h4><a href="what-is-macosx/index.html"><img src="http://images.apple.com/uk/promos/2009/macosx_whatis/header20090608.png" alt="What is Mac OS X? It's what makes a Mac a Mac." width="214" height="17"></a></h4>
+	<p><a href="what-is-macosx/index.html">It's what makes a Mac a Mac.</a></p>
+	<a class="image" href="what-is-macosx/index.html"><img src="http://images.apple.com/euro/promos/2009/macosx_whatis/image20090608.png" alt="What is Mac OS X? It's what makes a Mac a Mac" width="244" height="180"></a>
+</li>
+
+			<li class="promo">
+	<h4><a href="http://www.apple.com/uk/macpro/"><img src="http://images.apple.com/euro/promos/2009/mac_pro/header20090303.png" alt="The new Mac Pro" width="214" height="17"></a></h4>
+	<p><a href="http://www.apple.com/uk/macpro/">Beauty outside. Beast inside.</a></p>
+	<a class="image" href="http://www.apple.com/uk/macpro/"><img src="http://images.apple.com/euro/promos/2009/mac_pro/image20090303.png" alt=" Mac Pro" width="244" height="180"></a>
+</li>
+
+			<li class="promo">
+	<h4><a href="http://www.apple.com/uk/server/macosx/"><img src="http://images.apple.com/uk/promos/2009/server_introducing/header_20090824.png" alt="Server Snow Leopard" width="214" height="17"></a></h4>
+	<p><a href="http://www.apple.com/uk/server/macosx/">New features. New core technologies. Simpler than ever.</a></p>
+	<a class="image" href="http://www.apple.com/uk/server/macosx/"><img src="http://images.apple.com/uk/promos/2009/server_introducing/image_20090824.png" alt="" width="244" height="180"></a>
+</li>
+
+			<li class="promo buy">
+	<h4><a href="http://store.apple.com/uk/go/snowleopard/"><img src="http://images.apple.com/euro/macosx/images/promo_notify_header20090608.png" alt="Mac OS X Snow Leopard." width="180" height="17" /></a></h4>
+	<a href="http://store.apple.com/uk/go/snowleopard/"><img src="http://images.apple.com/euro/macosx/images/promo_box_20090824.png" alt="Snow Leopard box." width="110" height="122" class="product" /></a>
+	<p><a href="http://store.apple.com/uk/go/snowleopard/">Now available.<br />Upgrade just £25.</a></p>
+	<a href="http://store.apple.com/uk/go/snowleopard/" title="Buy Mac OS X Snow Leopard now."><img src="http://images.apple.com/uk/global/elements/buttons/buynow.png" class="button" alt="Buy now." width="72" height="25" /></a>
+</li>
+
+		</ul>
+	</div>	
+
+	<div id="globalfooter">
+		<div id="breadory">
+			<ol id="breadcrumbs">
+				<li class="home"><a href="http://www.apple.com/uk/">Home</a></li><li><a href="index.html">Mac OS X</a></li><li>Tech Specs</li>
+			</ol><!--/breadcrumbs-->
+			<div id="directorynav" class="mac">
+	<div id="dn-cola" class="column first">
+		<h3>Considering a Mac</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/getamac/whymac/">Why you&#146;ll love a Mac</a></li>
+			<li><a href="http://www.apple.com/uk/getamac/whichmac/">Which Mac are you?</a></li>
+			<li><a href="http://www.apple.com/uk/getamac/faq/">FAQs</a></li>
+			<!--<li><a href="/uk/getamac/movetomac/">How to move to Mac</a></li>-->
+		</ul>
+		<h3>Find out how</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/findouthow/mac/">Mac Basics</a></li>
+			<li><a href="http://www.apple.com/uk/findouthow/photos/">Photos</a></li>
+			<li><a href="http://www.apple.com/uk/findouthow/movies/">Movies</a></li>
+			<li><a href="http://www.apple.com/uk/findouthow/web/">Web</a></li>
+			<li><a href="http://www.apple.com/uk/findouthow/music/">Music</a></li>
+			<li><a href="http://www.apple.com/uk/findouthow/iwork/">iWork</a></li>
+			<li><a href="http://www.apple.com/uk/findouthow/mobileme/">MobileMe</a></li>
+		</ul>
+	</div><!--/dn-cola-->
+	<div id="dn-colb" class="column">
+		<h3>Macs</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/macpro/">Mac Pro</a></li>
+			<li><a href="http://www.apple.com/uk/macmini/">Mac mini</a></li>
+			<li><a href="http://www.apple.com/uk/macbook/">MacBook</a></li>
+			<li><a href="http://www.apple.com/uk/macbookpro/">MacBook Pro</a></li>
+			<li><a href="http://www.apple.com/uk/macbookair/">MacBook Air</a></li>
+			
+			
+			<li><a href="http://www.apple.com/uk/imac/">iMac</a></li>
+		</ul>
+	
+	<h3 style="padding-top:2px;">Accessories</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/magicmouse/">Magic Mouse</a></li>
+			<li><a href="http://www.apple.com/uk/keyboard/">Keyboard</a></li>
+			<li><a href="http://www.apple.com/uk/displays/">LED Cinema Display</a></li>
+			
+		</ul>
+	</div><!--/dn-colb-->
+	<div id="dn-colc" class="column">
+		
+		
+		<h3>Wi-Fi Base Stations</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/airportexpress/">AirPort Express</a></li>
+			<li><a href="http://www.apple.com/uk/airportextreme/">AirPort Extreme</a></li>
+			<li><a href="http://www.apple.com/uk/timecapsule/">Time Capsule</a></li>
+			<li><a href="http://www.apple.com/uk/wifi/">Which Wi-Fi are you?</a></li>
+		</ul>
+		
+		<h3 style="padding-top:2px;">Servers</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/server/">Servers Overview</a></li>
+			<li><a href="http://www.apple.com/uk/xserve/">Xserve</a></li>
+			<li><a href="http://www.apple.com/uk/xsan/">Xsan</a></li>
+			<li><a href="http://www.apple.com/uk/server/macosx/">Mac OS X Server</a></li>
+		</ul>
+	</div><!--/dn-colc-->
+	<div id="dn-cold" class="column">
+		<h3>MobileMe</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/mobileme/">Learn more</a></li>
+		</ul>
+		<h3 style="padding-top:2px;">Mac OS X</h3>
+		<ul>
+			<li><a href="index.html">10.6 Snow Leopard</a></li>
+		</ul>
+		<h3 style="padding-top:2px;">QuickTime</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/trailers/">Movie Trailers</a></li>
+			<li><a href="http://www.apple.com/uk/quicktime/player/">QuickTime Player</a></li>
+			<li><a href="http://www.apple.com/uk/quicktime/pro/">QuickTime Pro</a></li>
+		</ul>
+		<h3>Safari</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/safari/">Learn more</a></li>
+		</ul>
+	</div><!--/dn-cold-->
+	<div id="dn-cole" class="column">
+		<h3>Applications</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/ilife/">iLife</a></li>
+			<li><a href="http://www.apple.com/uk/iwork/">iWork</a></li>
+			<li><a href="http://www.apple.com/uk/aperture/">Aperture</a></li>
+			<li><a href="http://www.apple.com/uk/finalcutstudio/">Final Cut Studio</a></li>
+			<li><a href="http://www.apple.com/uk/finalcutserver/">Final Cut Server</a></li>	
+			<li><a href="http://www.apple.com/uk/finalcutexpress/">Final Cut Express</a></li>
+			<li><a href="http://www.apple.com/uk/logicstudio/">Logic Studio</a></li>
+			<li><a href="http://www.apple.com/uk/logicexpress/">Logic Express</a></li>
+			
+			<li><a href="http://www.apple.com/uk/remotedesktop/">Remote Desktop</a></li>
+		</ul>
+	</div><!--/dn-cole-->
+	<div id="dn-colf" class="column">
+		<h3>Developer</h3>
+		<ul>
+			<li><a href="http://developer.apple.com/">Developer Connection</a></li>
+			<li><a href="http://developer.apple.com/products/">Membership Info</a></li>
+			<li><a href="http://guide.apple.com/uk/">Products Guide</a></li>
+		</ul>
+		<h3 style="padding-top:2px;">Markets</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/pro/">Creative Pro</a></li>
+			<li><a href="http://www.apple.com/uk/education/">Education</a></li>
+			<li><a href="http://www.apple.com/uk/science/">Science</a></li>
+			<li><a href="http://www.apple.com/uk/business/">Business</a></li>
+			<!--<li><a href="/uk/itpro/">IT Pro</a></li>-->
+		</ul>
+	</div><!--/dn-colf-->
+	<div id="dn-colg" class="column last">
+		<h3>Support</h3>
+		<ul>
+			<li><a href="http://www.apple.com/uk/buy/">Where can I buy a Mac?</a></li>
+			<li><a href="http://www.apple.com/uk/support/products/">AppleCare</a></li>
+			<li><a href="http://www.apple.com/uk/support/">Online Support</a></li>
+			<li><a href="http://www.apple.com/uk/retail/personalshopping/">Personal Shopping</a></li>
+			<li><a href="http://www.apple.com/uk/retail/geniusbar/">Genius Bar</a></li>
+			<li><a href="http://www.apple.com/uk/retail/workshops/">Workshops</a></li>
+			<li><a href="http://www.apple.com/uk/retail/onetoone/">One to One</a></li>
+			<li><a href="http://www.apple.com/uk/retail/procare/">ProCare</a></li>
+		</ul>
+	</div><!--/dn-colg-->
+	<div class="capbottom"></div>
+</div><!--/directorynav-->
+
+		</div>
+		<p class="gf-buy">Shop the <a href="http://store.apple.com/uk">Apple Online Store</a>, call 0800 048 0408, visit an <a href="http://www.apple.com/uk/retail/">Apple Retail Store</a> or find a <a href="http://www.apple.com/uk/buy/">retailer</a>.</p>
+
+<ul class="gf-links piped">
+	<li><a href="http://www.apple.com/uk/sitemap/" class="first">Site Map</a></li>
+	<li><a href="http://www.apple.com/uk/hotnews/">Hot News</a></li>
+	<li><a href="http://www.apple.com/uk/rss/">RSS Feeds</a></li>
+	<li><a href="http://www.apple.com/uk/contact/" class="contact_us">Contact Us</a></li>
+	<li><a href="http://www.apple.com/choose-your-country/" class="choose" title="Choose your country or region."><img src="http://images.apple.com/uk/home/elements/ukicon.png" alt="United Kingdom" width="22" height="22"></a></li>
+</ul>
+
+<div class="gf-sosumi">
+	<p>Copyright © 2010 Apple Inc. All rights reserved.</p>
+	<ul class="piped">
+		<li><a href="http://www.apple.com/legal/terms/site.html" class="first">Terms of Use</a></li>
+		<li><a href="http://www.apple.com/uk/legal/privacy/">Privacy Policy</a></li>
+	</ul>
+</div>
+
+	</div><!--/globalfooter-->
+</body>
+</html>
