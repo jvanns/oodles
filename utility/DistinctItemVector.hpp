@@ -13,16 +13,18 @@ template<class T>
 class DistinctItemVector
 {
     public:
-        uint32_t item_count() const;
-        uint32_t sequence_count() const;
-        uint32_t append_item(const T &item);
-        bool retrieve_item(uint32_t index, T &item) const;
+        typedef uint32_t index_t;
+    public:
+        index_t item_count() const;
+        index_t sequence_count() const;
+        index_t append_item(const T &item);
+        bool retrieve_item(index_t index, T &item) const;
     private:
         struct Item {
             T data;
-            uint32_t index;
+            index_t index;
 
-            Item(const T &x, uint32_t i = 0) : data(x), index(i) {}
+            Item(const T &x, index_t i = 0) : data(x), index(i) {}
             bool operator< (const Item &rhs) const { return data < rhs.data; }
         };
 

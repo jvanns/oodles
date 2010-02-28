@@ -4,21 +4,21 @@
 namespace oodles {
 
 template<class T>
-uint32_t
+typename DistinctItemVector<T>::index_t
 DistinctItemVector<T>::item_count() const
 {
     return items.count();
 }
 
 template<class T>
-uint32_t
+typename DistinctItemVector<T>::index_t
 DistinctItemVector<T>::sequence_count() const
 {
     return indicies.size();
 }
 
 template<class T>
-uint32_t
+typename DistinctItemVector<T>::index_t
 DistinctItemVector<T>::append_item(const T &item)
 {
     Item i(item, locations.size());
@@ -37,7 +37,7 @@ DistinctItemVector<T>::append_item(const T &item)
 
 template<class T>
 bool
-DistinctItemVector<T>::retrieve_item(uint32_t index, T &item) const
+DistinctItemVector<T>::retrieve_item(index_t index, T &item) const
 {
     if (index > indicies.size())
         return false;
