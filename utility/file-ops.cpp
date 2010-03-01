@@ -1,5 +1,6 @@
 // oodles
 #include "file-ops.hpp"
+#include "common/Exceptions.hpp"
 
 // STL
 #include <fstream>
@@ -18,12 +19,16 @@ using std::copy;
 // Containers
 using std::string;
 
+using oodles::ReadError;
+
 int read_file_data(const string &path, string &output)
 {
     ifstream input(path.c_str());
 
     if (!input)
-        return -1;
+        throw ReadError("read_file_data", errno,
+                        "Failed to open %s for reading.",
+                        path.c_str());
 
     /* Calculate file size and reserve that no. of bytes in RAM */
     input.seekg(0, ios::end);

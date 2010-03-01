@@ -37,16 +37,17 @@ LDLIBS += $(LDLIBS_BOOST)
 
 # Compile object files
 UTILITY_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard utility/*.cpp))
+COMMON_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard common/*.cpp))
 TEST_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard test/*.cpp))
 
 # Binary targets
 TESTS = test/html-parser \
 	test/word-indexer
 
-test/html-parser: test/html-parser.o $(UTILITY_OBJECTS)
+test/html-parser: test/html-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
-test/word-indexer: test/word-indexer.o $(UTILITY_OBJECTS)
+test/word-indexer: test/word-indexer.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Make targets/rules
