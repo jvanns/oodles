@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 
     try {
         string s;
-        const int n = read_file_data(argv[1], s);
+        const int n = oodles::read_file_data(argv[1], s);
 
         if (n != static_cast<int>(s.size())) {
             cout << "No. bytes read into buffer not equal to size of input.\n";

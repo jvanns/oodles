@@ -19,7 +19,7 @@ using std::copy;
 // Containers
 using std::string;
 
-using oodles::ReadError;
+namespace oodles {
 
 int read_file_data(const string &path, string &output)
 {
@@ -49,3 +49,6 @@ int read_file_data(const string &path, string &output)
 
     return i;
 }
+
+} // oodles
+

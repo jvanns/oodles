@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 
     try {
         string s;
-        int n = read_file_data(argv[1], s);
+        int n = oodles::read_file_data(argv[1], s);
 
         if (n != static_cast<int>(s.size())) {
             cerr << "No. bytes read into buffer not equal to size of input.\n";
