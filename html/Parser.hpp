@@ -132,7 +132,11 @@ struct Parser : qi::grammar<Iterator,
 
     bool parse(Iterator &begin, Iterator &end)
     {
-        return qi::phrase_parse(begin, end, *this, ascii::space, ast);
+        if (qi::phrase_parse(begin, end, *this, ascii::space, ast))
+            if (begin == end) // Great. We parsed the whole document :)
+                return true;
+
+        return false;
     }
 
     const Element& document() const { return ast; } // Return the AST

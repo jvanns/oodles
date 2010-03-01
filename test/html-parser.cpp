@@ -109,9 +109,7 @@ int main(int argc, char *argv[]) {
     oodles::html::Parser<string::const_iterator> p; // Our parser
 
     // Parse the document!
-    bool rc = p.parse(b, e);
-
-    if (rc && b == e) {
+    if (p.parse(b, e)) {
         cout << "Document parsed successfully and in full.\n";
         oodles::Element_printer()(p.document());
         return 0;
