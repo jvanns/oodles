@@ -44,10 +44,10 @@ TESTS = test/html-parser \
 	test/word-indexer
 
 test/html-parser: test/html-parser.o $(UTILITY_OBJECTS)
-	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 test/word-indexer: test/word-indexer.o $(UTILITY_OBJECTS)
-	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Make targets/rules
 default: all
@@ -55,4 +55,5 @@ default: all
 all: $(TESTS)
 
 clean:
-	-rm -f $(TESTS) */*.o */*.d
+	-rm -f */*.o */*.d
+	-rm -f bin/*/*
