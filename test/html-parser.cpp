@@ -16,6 +16,9 @@ using std::endl;
 // Containers
 using std::string;
 
+// STL exception
+using std::exception;
+
 static
 void
 tab(uint16_t indent)
@@ -90,32 +93,32 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    string s;
-    const int n = read_file_data(argv[1], s);
+    try {
+        string s;
+        const int n = read_file_data(argv[1], s);
 
-    if (n == -1) {
-        cerr << "Failed to open " << argv[1] << " for reading.\n";
-        return 1;
-    }
+        if (n != static_cast<int>(s.size())) {
+            cout << "No. bytes read into buffer not equal to size of input.\n";
+            return 1;
+        }
 
-    if (n != static_cast<int>(s.size())) {
-        cout << "No. bytes read into buffer not equal to size of input.\n";
-        return 1;
-    }
+        cout << "Read " << n << " bytes from " << argv[1] << ".\n";
 
-    cout << "Read " << n << " bytes from " << argv[1] << ".\n";
+        string::const_iterator b = s.begin(), e = s.end(); // Input iterators
+        oodles::html::Parser<string::const_iterator> p; // Our parser
 
-    string::const_iterator b = s.begin(), e = s.end(); // Input iterators
-    oodles::html::Parser<string::const_iterator> p; // Our parser
-
-    // Parse the document!
-    if (p.parse(b, e)) {
+        // Parse the document!
+        if (!p.parse(b, e)) {
+            cerr << "Failed to parse document.\n";
+            return 1;
+        }
+        
         cout << "Document parsed successfully and in full.\n";
         oodles::Element_printer()(p.document());
-        return 0;
+    } catch (const exception &e) {
+        cerr << e.what() << endl;
+        return 1;
     }
 
-    cout << "Failed to parse document.\n";
-
-    return 1;
+    return 0;
 }
