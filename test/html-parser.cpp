@@ -87,38 +87,51 @@ Node_printer::operator() (const html::Element &e) const
 
 } // oodles
 
-int main(int argc, char *argv[]) {
-    if (!argv[1]) {
-        cerr << "Provide the location (file path) to an HTML document.\n";
-        return 1;
-    }
-
+static
+bool
+parse_html_document(const string &path)
+{
     try {
         string s;
-        const int n = oodles::read_file_data(argv[1], s);
+        const int n = oodles::read_file_data(path, s);
 
-        if (n != static_cast<int>(s.size())) {
-            cout << "No. bytes read into buffer not equal to size of input.\n";
-            return 1;
-        }
-
-        cout << "Read " << n << " bytes from " << argv[1] << ".\n";
+        if (n != static_cast<int>(s.size()))
+            return false;
 
         string::const_iterator b = s.begin(), e = s.end(); // Input iterators
         oodles::html::Parser<string::const_iterator> p; // Our parser
 
         // Parse the document!
-        if (!p.parse(b, e)) {
-            cerr << "Failed to parse document.\n";
-            return 1;
-        }
-        
-        cout << "Document parsed successfully and in full.\n";
-        oodles::Element_printer()(p.document());
+        if (!p.parse(b, e))
+            return false;
     } catch (const exception &e) {
         cerr << e.what() << endl;
+        return false;
+    }
+
+    return true;
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        cerr << "Provide the location (file path) to an HTML document.\n";
         return 1;
     }
 
-    return 0;
+    int rc = 0;
+
+    for (int i = 1 ; i < argc ; ++i) {
+        cout << "html::Parser test#" << i << " (" << argv[i] << ")...";
+
+        if (parse_html_document(argv[i])) {
+            cout << "PASS.";
+        } else {
+           cout << "FAIL.";
+            rc = 1;
+        }
+
+        cout << endl;
+    }
+
+    return rc;
 }
