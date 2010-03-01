@@ -10,7 +10,8 @@
 
 namespace oodles {
 
-class Exception : public std::exception {
+class Exception : public std::exception
+{
     protected:
         int error; // The error number
         va_list list; // The argument list
@@ -32,20 +33,20 @@ class Exception : public std::exception {
 /*
  * Use FatalException to terminate the application.
  */
-class FatalException : public Exception {
-    public:
-        FatalException();
-        ~FatalException() throw();
+struct FatalException : public Exception
+{
+    FatalException();
+    ~FatalException() throw();
 };
 
 /*
  * Use NonFatalException for localised exceptions such as terminating
  * individual threads or recoverable failures (i.e. network etc.).
  */
-class NonFatalException : public Exception {
-    public:
-        NonFatalException();
-        virtual ~NonFatalException() throw();
+struct NonFatalException : public Exception
+{
+    NonFatalException();
+    virtual ~NonFatalException() throw();
 };
 
 } // oodles

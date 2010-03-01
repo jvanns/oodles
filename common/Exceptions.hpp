@@ -8,7 +8,7 @@ namespace oodles {
 
 struct ReadError : public NonFatalException
 {
-    ReadError (const std::string &from, int error, const char *format, ...);
+    ReadError(const std::string &from, int error, const char *format, ...);
 };
 
 } // oodles
