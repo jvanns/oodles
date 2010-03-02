@@ -24,9 +24,9 @@ tokenise_words(const string &path)
 {
     try {
         string s;
-        int n = oodles::read_file_data(path, s);
+        size_t n = oodles::read_file_data(path, s);
 
-        if (n != static_cast<int>(s.size()))
+        if (n != s.size())
             return false;
 
         string word;
@@ -44,7 +44,7 @@ tokenise_words(const string &path)
                 word += *i;
         }
 
-        if (n != static_cast<int>(words.sequence_count()))
+        if (words.sequence_count() != n)
             return false;
     } catch (const exception &e) {
         cerr << e.what() << endl;

@@ -93,9 +93,9 @@ parse_html_document(const string &path)
 {
     try {
         string s;
-        const int n = oodles::read_file_data(path, s);
+        size_t n = oodles::read_file_data(path, s);
 
-        if (n != static_cast<int>(s.size()))
+        if (n != s.size())
             return false;
 
         string::const_iterator b = s.begin(), e = s.end(); // Input iterators

@@ -21,7 +21,7 @@ using std::string;
 
 namespace oodles {
 
-int read_file_data(const string &path, string &output)
+size_t read_file_data(const string &path, string &output)
 {
     ifstream input(path.c_str());
 

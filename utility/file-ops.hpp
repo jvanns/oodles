@@ -14,9 +14,9 @@ namespace oodles {
  * Read-in (appending if necessary) data from the file
  * located at path input the string referenced by output. 
  *
- * Returns -1 on failure or the no. of bytes read from path
+ * Returns no. of bytes read from path.
  */
-int read_file_data(const std::string &path, std::string &output);
+size_t read_file_data(const std::string &path, std::string &output);
 
 } // oodles
 
