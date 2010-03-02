@@ -1,6 +1,5 @@
 // oodles
 #include "file-ops.hpp"
-#include "common/Exceptions.hpp"
 
 // STL
 #include <fstream>
@@ -21,7 +20,9 @@ using std::string;
 
 namespace oodles {
 
-size_t read_file_data(const string &path, string &output)
+size_t
+read_file_data(const string &path, string &output)
+throw(ReadError)
 {
     ifstream input(path.c_str());
 

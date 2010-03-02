@@ -5,6 +5,9 @@
  * Generic file operations such as reading, writing, renaming etc.
  */
 
+// oodles
+#include "common/Exceptions.hpp"
+
 // STL
 #include <string>
 
@@ -16,7 +19,9 @@ namespace oodles {
  *
  * Returns no. of bytes read from path.
  */
-size_t read_file_data(const std::string &path, std::string &output);
+size_t
+read_file_data(const std::string &path, std::string &output)
+throw(ReadError);
 
 } // oodles
 
