@@ -1,5 +1,5 @@
-#ifndef FILE_OPS_H
-#define FILE_OPS_H
+#ifndef OODLES_FILE_OPS_H
+#define OODLES_FILE_OPS_H
 
 /*
  * Generic file operations such as reading, writing, renaming etc.
