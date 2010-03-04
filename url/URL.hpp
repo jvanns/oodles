@@ -21,6 +21,7 @@ class URL
 {
     public:
         URL(const std::string &url);
+
         bool operator== (const URL &rhs) const;
         bool operator!= (const URL &rhs) const;
 
