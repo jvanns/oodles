@@ -8,6 +8,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
 
 namespace oodles {
 
@@ -25,11 +26,17 @@ class URL
         bool operator== (const URL &rhs) const;
         bool operator!= (const URL &rhs) const;
 
+        std::string to_string() const;
+        std::ostream& print(std::ostream &stream) const;
+
         Iterator begin() { return Iterator(this, Iterator::Begin); }
         Iterator end() { return Iterator(this, Iterator::End); }
     public:
         typedef Iterator iterator;
         typedef std::string value_type;
+
+        enum state {Scheme, Username, Password,
+                    Domain, Port, Path, Page, Query};
     private:
         void normalise();
         void tokenise(const std::string &url);
@@ -45,6 +52,11 @@ class URL
                                 domain; // i.e. www, google, co, uk
         std::map<value_type, value_type> query_string; // i.e. name=Jim&a=1
 };
+
+static inline std::ostream& operator<< (std::ostream &stream, const URL &url)
+{
+    return url.print(stream);
+}
 
 } // oodles
 

@@ -2,16 +2,197 @@
 #include "URL.hpp"
 
 // STL
+#include <sstream>
+
+// STL
 using std::map;
+using std::copy;
 using std::string;
 using std::vector;
+using std::ostream;
+using std::ostringstream;
+using std::ostream_iterator;
+
+static const string::size_type NONE = string::npos;
+
+static
+inline
+size_t
+count_chars(const string &s, size_t start, size_t end, const char c = '.')
+{
+    size_t n = 0;
+
+    while (start <= end)
+        if (s[start++] == c)
+            ++n;
+
+    return n;
+}
+
+static
+inline
+int
+tokenise_scheme(const string &url, string::size_type &index, string &scheme)
+{
+    int state = oodles::URL::Scheme;
+
+    if (url[index] == ':') { // Predict next state
+        index += 2; // Skip over ':/'
+
+        if (url.find_last_of('@', url.find_first_of('/', index + 1)) != NONE)
+            state = oodles::URL::Username;
+        else
+            state = oodles::URL::Domain;
+    } else {
+        scheme += url[index];
+    }
+
+    return state;
+}
+
+static
+inline
+int
+tokenise_domain(const string &url,
+                string::size_type &index,
+                vector<string> &domain)
+{
+    int state = oodles::URL::Domain;
+    string::size_type i = 0, j = 0, max = url.size();
+
+    if ((j = url.find_first_of('/', index)) == NONE)
+        j = max; // No path or page given, just a domain
+
+    if ((i = url.find_last_of(':', j)) > index)
+        j = i; // We have a port to parse to
+
+    i = 0; // Reset to use as index to domain
+
+    /*
+     * Reserve (pre-allocate) the correct no. of entries for our domain. The
+     * no. domain components will be 1 more than the no. of dots delimiting it.
+     */
+    domain.resize(count_chars(url, index, j, '.') + 1);
+
+    for (string *s = &domain[i] ; index < j ; ++index) {
+        if (url[index] == '.')
+            s = &domain[++i]; // Reference next domain component
+        else
+            *s += url[index];
+    }
+
+    if (url[index] == ':')
+        state = oodles::URL::Port;
+    else if (url[index] == '/')
+        state = oodles::URL::Path;
+
+    return state;
+}
+
+static
+inline
+int
+tokenise_path(const string &url,
+              string::size_type &index,
+              vector<string> &path)
+{
+    int state = oodles::URL::Page;
+    string::size_type i = 0, j = 0;
+
+    if ((j = url.find_last_of('/')) == NONE)
+        return state; // Seems there are no further path fragments
+
+    /*
+     * Reserve (pre-allocate) the correct no. of entries for our path. The
+     * no. path components will be equal to the no. of slashes delimiting it.
+     */
+    path.resize(count_chars(url, index, j, '/')); // Reserve capacity
+
+    for (string *s = &path[i] ; index < j ; ++index) {
+        if (url[index] == '/')
+            s = &path[++i]; // Reference next path component
+        else
+            *s += url[index];
+    }
+
+    return state; // Next (potential) state already set above
+}
+
+static
+inline
+int
+tokenise_query(const string &url,
+               string::size_type &index,
+               map<string, string> &query_string)
+{
+    int state = oodles::URL::Query;
+    string::size_type i = 0, j = 0, max = url.size();
+
+    if ((i = url.find_first_of('#', index)) != NONE) // Skip any anchor
+        max = i - 1;
+
+    while (index < max) {
+        i = url.find_first_of('=', index);
+        if ((j = url.find_first_of('&', i)) == NONE)
+            j = max + 1;
+
+        query_string[url.substr(index, j - i)] =
+                     url.substr(i + 1, (j - 1) - i);
+        index = j + 1;
+    }
+
+    return state;
+}
 
 namespace oodles {
 
-URL::URL(const string &url) : port("80"), scheme("http")
+URL::URL(const string &url)
 {
     tokenise(url);
     normalise();
+}
+
+string
+URL::to_string() const
+{
+    ostringstream stream;
+
+    stream << scheme << "://";
+
+    if (!username.empty())
+        stream << username << ':' << password << '@';
+
+    copy(domain.begin(),
+         domain.end() - 1,
+         ostream_iterator<value_type>(stream, "."));
+    stream << *(domain.end() - 1);
+
+    if (!path.empty()) {
+        copy(path.begin(),
+             path.end() - 1,
+             ostream_iterator<value_type>(stream, "/"));
+        stream << *(path.end() - 1);
+    }
+
+    stream << page;
+
+    if (!query_string.empty()) {
+        map<value_type, value_type>::const_iterator i = query_string.begin();
+
+        stream << '?';
+        while (i != query_string.end()) {
+            stream << i->first << '=' << i->second << '&';
+            ++i;
+        }
+    }
+
+    return stream.str();
+}
+
+ostream&
+URL::print(ostream &stream) const
+{
+    return stream << to_string();
 }
 
 bool
@@ -29,6 +210,40 @@ URL::operator!=(const URL &rhs) const
 void
 URL::normalise()
 {
+    if (!path.empty()) {
+        value_type &root = path.front(), &leaf = path.back();
+        root.insert(root.begin(), '/');
+        leaf += '/';
+
+        vector<value_type>::iterator i = path.begin(), j = path.end(), k;
+        while (i != j) {
+            if (*i == "..") {
+                k = i;
+
+                if ((k + 1) != j)
+                    ++k;
+
+                path.erase(i);
+                i = k;
+            } else if (*i == ".") {
+                k = i;
+
+                if (k != path.begin())
+                    --k;
+
+                path.erase(i);
+                i = k;
+            }
+
+            ++i;
+        }
+    }
+
+    if (port.empty())
+        port = "80";
+
+    value_type &dc = domain.back();
+    dc += ":" + port;
 }
 
 /*
@@ -40,23 +255,12 @@ URL::normalise()
 void
 URL::tokenise(const string &url)
 {
-    string fragment;
-    string::size_type i = 0, j = url.size(), k = string::npos, n = 0;
-    enum state { Scheme, Username, Password, Domain, Port, Path, Page, Query };
+    string::size_type i = 0, max = url.size();
 
-    for (uint16_t s = Scheme ; i < j ; ++i) {
+    for (int s = Scheme ; i < max ; ++i) {
         switch (s) {
             case Scheme:
-                if (url[i] == ':') { // Predict next state
-                    i += 2; // Skip over ':/'
-
-                    if (url.rfind('@', url.find_first_of('/', i + 1)) != k)
-                        s = Username;
-                    else
-                        s = Domain;
-                } else {
-                    scheme += url[i];
-                }
+                s = tokenise_scheme(url, i, scheme);
                 break;
             case Username:
                 if (url[i] == ':')
@@ -71,62 +275,25 @@ URL::tokenise(const string &url)
                     password += url[i];
                 break;
             case Domain:
-                if ((n = url.rfind(':', url.find_first_of('/', i))) == k)
-                    if ((n = url.find_first_of('/', i)) == k)
-                        n = j; // No path or page given, just a domain
-
-                for (fragment.clear() ; i < n ; ++i) {
-                    if (url[i] == '.') { // Store domain component
-                        domain.push_back(fragment);
-                        fragment.clear();
-                    } else {
-                        fragment += url[i];
-                    }
-                }
-
-                domain.push_back(fragment);
-
-                if (url[i] == ':')
-                    s = Port;
-                else if (url[i] == '/')
-                    s = Path;
+                s = tokenise_domain(url, i, domain);
                 break;
             case Port:
-                if ((n = url.find_first_of('/', i)) == k)
-                    n = j; // :port *may* be our last token
-
-                port = url.substr(i, n);
+                if (url[i] == '/')
+                    s = Path;
+                else
+                    port += url[i];
                 break;
             case Path:
-                if ((n = url.find_last_of('/', i)) != k) {
-                    for (fragment.clear() ; i < n ; ++i) {
-                        if (url[i] == '/') { // Store path component
-                            path.push_back(fragment);
-                            fragment.clear();
-                        } else {
-                            fragment += url[i];
-                        }
-                    }
-
-                    path.push_back(fragment);
-                }
-                s = Page; // FIXME: May in fact be a leaf of the path?
+                s = tokenise_path(url, i, path);
                 break;
             case Page:
-                if ((n = url.find_first_of('?', i)) == k)
-                    n = j; // No query string found
-
-                for ( ; i < n ; ++i)
-                    page += url[i];
-
-                if (j > n)
+                if (url[i] == '?')
                     s = Query;
+                else
+                    page += url[i]; // May in fact be a leaf of the path?
                 break;
             case Query:
-                if ((n = url.find_first_of('#', i)) != k) // Skip any anchor
-                    j = n - 1;
-
-                // TODO: Prase query string into k=v pairs
+                s = tokenise_query(url, i, query_string);
                 break;
         }
     }

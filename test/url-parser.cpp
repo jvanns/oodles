@@ -21,8 +21,8 @@ bool
 build_url(const string &line) // line from the input file
 {
     try {
-        cout << "Input URL: " << line << endl;
         oodles::URL url(line);
+        cout << url << endl;
     } catch (const exception &e) {
         cerr << e.what();
         return false;
@@ -45,12 +45,12 @@ int main(int argc, char *argv[])
         if (n != s.size())
             return 1;
 
-        string::size_type b = 0, e = s.find_first_of('\n', e), t = string::npos;
+        string::size_type b = 0, e = s.find_first_of('\n', b), t = string::npos;
 
         while (e != t) {
-            build_url(s.substr(b, ++e));
+            build_url(s.substr(b, e - b));
 
-            b = e;
+            b = e + 1;
             e = s.find_first_of('\n', b);
         }
     } catch (const exception &e) {
