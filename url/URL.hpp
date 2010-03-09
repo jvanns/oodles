@@ -35,8 +35,7 @@ class URL
         typedef Iterator iterator;
         typedef std::string value_type;
 
-        enum state {Scheme, Username, Password,
-                    Domain, Port, Path, Page, Query};
+        enum {Scheme, Username, Password, Domain, Port, Path, Page, Query};
     private:
         void normalise();
         void tokenise(const std::string &url);

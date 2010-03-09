@@ -85,6 +85,8 @@ tokenise_domain(const string &url,
         state = oodles::URL::Port;
     else if (url[index] == '/')
         state = oodles::URL::Path;
+    else
+        state = oodles::URL::Page;
 
     return state;
 }
@@ -97,10 +99,12 @@ tokenise_path(const string &url,
               vector<string> &path)
 {
     int state = oodles::URL::Page;
-    string::size_type i = 0, j = 0;
+    string::size_type i = 0, j = url.find_last_of('/');
 
-    if ((j = url.find_last_of('/')) == NONE)
+    if (j == NONE || j == index - 1) {
+        index--; // Will re-skip the single '/' that got us here
         return state; // Seems there are no further path fragments
+    }
 
     /*
      * Reserve (pre-allocate) the correct no. of entries for our path. The
@@ -237,13 +241,14 @@ URL::normalise()
 
             ++i;
         }
+    } else if (!page.empty()) {
+        page.insert(page.begin(), '/');
     }
 
-    if (port.empty())
-        port = "80";
-
-    value_type &dc = domain.back();
-    dc += ":" + port;
+    if (!port.empty() && port != "80") {
+        value_type &dc = domain.back();
+        dc += ":" + port;
+    }
 }
 
 /*
