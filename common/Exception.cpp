@@ -2,6 +2,8 @@
 #include "Exception.hpp"
 
 #include <stdio.h> // For vsnprintf
+#include <string.h> // For strerror
+#include <stdint.h> // For uint16_t
 
 // STL
 using std::string;
