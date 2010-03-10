@@ -44,7 +44,7 @@ tokenise_scheme(const string &url, string::size_type &index, string &scheme)
         else
             state = oodles::URL::Domain;
     } else {
-        scheme += url[index];
+        scheme += tolower(url[index]); // Normalise as we go :)
     }
 
     return state;
@@ -78,7 +78,7 @@ tokenise_domain(const string &url,
         if (url[index] == '.')
             s = &domain[++i]; // Reference next domain component
         else
-            *s += url[index];
+            *s += tolower(url[index]); // Normalise as we go :)
     }
 
     if (url[index] == ':')
@@ -254,9 +254,8 @@ URL::normalise()
 
             ++i;
         }
-    } else if (!page.empty()) {
-        page.insert(page.begin(), '/');
-    }
+    } else
+        path.push_back("/");
 
     if (!port.empty() && port != "80") {
         value_type &dc = domain.back();
