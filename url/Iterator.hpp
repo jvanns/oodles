@@ -14,9 +14,9 @@ class Iterator :
                          std::string>
 {
     private:
-        enum State {Invalid = 0, Begin, Transient, End };
+        enum {Invalid = 0, Begin, Transient, End};
     public:
-        Iterator(const URL *url = NULL, State = Invalid);
+        Iterator(const URL *target = NULL, int = Invalid);
         Iterator(const Iterator &rhs);
 
         Iterator& operator=(const Iterator &rhs);
@@ -38,12 +38,15 @@ class Iterator :
             return value != rhs.value;
         }
     private:
-        friend class URL; // URL wants access only to State
+        bool move_pointer_forward();
+        bool move_pointer_backward();
     private:
+        friend class URL; // URL wants access only to enums above
+    private:
+        int internal_state, external_state;
         const std::string *value;
         const URL *url;
         size_t index;
-        State state;
 };
 
 } // oodles

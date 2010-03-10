@@ -9,6 +9,10 @@
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::ostream_iterator;
+
+// Algorithms
+using std::copy;
 
 // Containers
 using std::string;
@@ -22,7 +26,12 @@ build_url(const string &line) // line from the input file
 {
     try {
         oodles::URL url(line);
-        cout << url << endl;
+        cout << "Tokenised URL: " << url << endl;
+
+        cout << "Iterating through URL: ";
+        copy(url.begin(), url.end(),
+             ostream_iterator<oodles::URL::value_type>(cout));
+        cout << endl;
     } catch (const exception &e) {
         cerr << e.what();
         return false;
