@@ -12,7 +12,8 @@ using std::endl;
 using std::ostream_iterator;
 
 // Algorithms
-using std::copy;
+using std::find;
+using std::count;
 
 // Containers
 using std::string;
@@ -28,9 +29,15 @@ build_url(const string &line) // line from the input file
         oodles::URL url(line);
         cout << "Tokenised URL: " << url << endl;
 
-        cout << "Iterating through URL: ";
-        copy(url.begin(), url.end(),
-             ostream_iterator<oodles::URL::value_type>(cout));
+        cout << "Testing iterator access...";
+        if (find(url.begin(), url.begin(), "http") != url.end())
+            cout << "(http scheme), ";
+
+        if (find(url.begin(), url.end(), "index.html") != url.end())
+            cout << "(.html index page), ";
+
+        if (count(url.begin(), url.end(), "www") > 0)
+            cout << "(www host).";
         cout << endl;
     } catch (const exception &e) {
         cerr << e.what();

@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
         if (parse_html_document(argv[i])) {
             cout << "PASS.";
         } else {
-           cout << "FAIL.";
+            cout << "FAIL.";
             rc = 1;
         }
 
