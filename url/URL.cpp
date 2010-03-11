@@ -5,7 +5,8 @@
 #include <sstream>
 
 // STL
-using std::map;
+using std::set;
+using std::pair;
 using std::copy;
 using std::string;
 using std::vector;
@@ -127,7 +128,7 @@ inline
 int
 tokenise_query(const string &url,
                string::size_type &index,
-               map<string, string> &query_string)
+               set<oodles::url::URL::query_kvp> &query_string)
 {
     int state = oodles::url::URL::Query;
     string::size_type i = 0, j = 0, max = url.size();
@@ -140,8 +141,10 @@ tokenise_query(const string &url,
         if ((j = url.find_first_of('&', i)) == NONE)
             j = max + 1;
 
-        query_string[url.substr(index, j - i)] =
-                     url.substr(i + 1, (j - 1) - i);
+        const oodles::url::URL::query_kvp p(url.substr(index, i - index),
+                                            url.substr(i + 1, (j - 1) - i));
+
+        query_string.insert(p);
         index = j + 1;
     }
 
@@ -181,16 +184,6 @@ URL::to_string() const
 
     stream << page;
 
-    if (!query_string.empty()) {
-        map<value_type, value_type>::const_iterator i = query_string.begin();
-
-        stream << '?';
-        while (i != query_string.end()) {
-            stream << i->first << '=' << i->second << '&';
-            ++i;
-        }
-    }
-
     return stream.str();
 }
 
@@ -204,9 +197,6 @@ bool
 URL::operator==(const URL &rhs) const
 {
     if (page != rhs.page)
-        return false;
-
-    if (query_string.size() != rhs.query_string.size())
         return false;
 
     if (path.size() != rhs.path.size())
@@ -257,6 +247,20 @@ URL::normalise()
         }
     } else
         path.push_back("/");
+
+    if (!query_string.empty()) {
+        set<query_kvp>::iterator i = query_string.begin(),
+                                 j = query_string.end();
+        page += "?";
+
+        while (i != j) {
+            page += i->first + "=" + i->second + "&";
+            ++i;
+        }
+
+        page.erase(page.end() - 1); // Remove trailing '&'
+        query_string.clear();
+    }
 
     if (!port.empty() && port != "80") {
         value_type &dc = domain.back();

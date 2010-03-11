@@ -5,7 +5,7 @@
 #include "Iterator.hpp"
 
 // STL
-#include <map>
+#include <set>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -35,6 +35,7 @@ class URL
     public:
         typedef Iterator iterator;
         typedef std::string value_type;
+        typedef std::pair<value_type, value_type> query_kvp;
 
         enum {Scheme, Username, Password, Domain, Port, Path, Page, Query};
     private:
@@ -50,7 +51,7 @@ class URL
                    password;
         std::vector<value_type> path, // i.e. /product, /ids etc.
                                 domain; // i.e. www, google, co, uk
-        std::map<value_type, value_type> query_string; // i.e. name=Jim&a=1
+        std::set<query_kvp> query_string; // i.e. name=Jim&uuid=12345
 };
 
 static inline std::ostream& operator<< (std::ostream &stream, const URL &url)
