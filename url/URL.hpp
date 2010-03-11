@@ -11,6 +11,7 @@
 #include <iostream>
 
 namespace oodles {
+namespace url {
 
 /*
  * Class to confom to URL generic syntax such as:
@@ -57,6 +58,7 @@ static inline std::ostream& operator<< (std::ostream &stream, const URL &url)
     return url.print(stream);
 }
 
+} // url
 } // oodles
 
 #endif

@@ -26,7 +26,7 @@ bool
 build_url(const string &line) // line from the input file
 {
     try {
-        oodles::URL url(line);
+        oodles::url::URL url(line);
         cout << "Tokenised URL: " << url << endl;
 
         cout << "Testing iterator access...";

@@ -34,15 +34,15 @@ inline
 int
 tokenise_scheme(const string &url, string::size_type &index, string &scheme)
 {
-    int state = oodles::URL::Scheme;
+    int state = oodles::url::URL::Scheme;
 
     if (url[index] == ':') { // Predict next state
         index += 2; // Skip over ':/'
 
         if (url.find_last_of('@', url.find_first_of('/', index + 1)) != NONE)
-            state = oodles::URL::Username;
+            state = oodles::url::URL::Username;
         else
-            state = oodles::URL::Domain;
+            state = oodles::url::URL::Domain;
     } else {
         scheme += tolower(url[index]); // Normalise as we go :)
     }
@@ -57,7 +57,7 @@ tokenise_domain(const string &url,
                 string::size_type &index,
                 vector<string> &domain)
 {
-    int state = oodles::URL::Domain;
+    int state = oodles::url::URL::Domain;
     string::size_type i = 0, j = 0, max = url.size();
 
     if ((j = url.find_first_of('/', index)) == NONE)
@@ -82,11 +82,11 @@ tokenise_domain(const string &url,
     }
 
     if (url[index] == ':')
-        state = oodles::URL::Port;
+        state = oodles::url::URL::Port;
     else if (url[index] == '/')
-        state = oodles::URL::Path;
+        state = oodles::url::URL::Path;
     else
-        state = oodles::URL::Page;
+        state = oodles::url::URL::Page;
 
     return state;
 }
@@ -98,7 +98,7 @@ tokenise_path(const string &url,
               string::size_type &index,
               vector<string> &path)
 {
-    int state = oodles::URL::Page;
+    int state = oodles::url::URL::Page;
     string::size_type i = 0, j = url.find_last_of('/');
 
     if (j == NONE || j == index - 1) {
@@ -129,7 +129,7 @@ tokenise_query(const string &url,
                string::size_type &index,
                map<string, string> &query_string)
 {
-    int state = oodles::URL::Query;
+    int state = oodles::url::URL::Query;
     string::size_type i = 0, j = 0, max = url.size();
 
     if ((i = url.find_first_of('#', index)) != NONE) // Skip any anchor
@@ -149,6 +149,7 @@ tokenise_query(const string &url,
 }
 
 namespace oodles {
+namespace url {
 
 URL::URL(const string &url)
 {
@@ -316,4 +317,5 @@ URL::tokenise(const string &url)
     }
 }
 
+} // url
 } // oodles

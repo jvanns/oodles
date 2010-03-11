@@ -1,11 +1,12 @@
-#ifndef OODLES_ITERATOR_HPP
-#define OODLES_ITERATOR_HPP
+#ifndef OODLES_URL_ITERATOR_HPP
+#define OODLES_URL_ITERATOR_HPP
 
 // STL
 #include <string>
 #include <iterator>
 
 namespace oodles {
+namespace url {
 
 class URL; // Forward declaration for Iterator
 
@@ -49,6 +50,7 @@ class Iterator :
         size_t index;
 };
 
+} // url
 } // oodles
 
 #endif

@@ -3,6 +3,7 @@
 #include "Iterator.hpp"
 
 namespace oodles {
+namespace url {
 
 Iterator::Iterator(const URL *target, int state) :
     internal_state(state),
@@ -98,6 +99,12 @@ Iterator::move_pointer_forward()
     return recall;
 }
 
+bool
+Iterator::move_pointer_backward()
+{
+    return false;
+}
+
 Iterator&
 Iterator::operator++()
 {
@@ -121,4 +128,5 @@ Iterator::operator--()
     return *this;
 }
 
+} // url
 } // oodles
