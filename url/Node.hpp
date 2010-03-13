@@ -1,4 +1,4 @@
-#ifndef OODLES_URL_NODE_HPP
+#ifndef OODLES_URL_NODE_HPP // Interface
 #define OODLES_URL_NODE_HPP
 
 #include <vector>
@@ -24,26 +24,13 @@ struct Node
     Node *parent;
     std::vector<Node<T>*> children;
 
-    Node() :
-        path_id(0),
-        node_id(0),
-        tree_id(0),
-        parent(NULL)
-    {
-    }
-
-    Node(const value_t &v, path_index_t i) :
-        value(v),
-        path_id(i),
-        node_id(0),
-        tree_id(0),
-        parent(NULL)
-    {
-    }
+    bool has_child(const T &v, Node<T> *&c) const;
 };
 
 } // url
 } // oodles
+
+#include "Node.ipp" // Implementation
 
 #endif
 
