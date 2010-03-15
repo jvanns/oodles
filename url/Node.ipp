@@ -1,20 +1,29 @@
 #ifndef OODLES_URL_NODE_IPP // Implementation
 #define OODLES_URL_NODE_IPP
 
+// STL
+#include <iostream>
+
 namespace oodles {
 namespace url {
 
 template<class T>
-Node<T>::Node() : path_id(0), node_id(0), tree_id(0), parent(NULL) {}
+Node<T>::Node() : path_id(0), node_id(0), parent(NULL) {}
 
 template<class T>
 Node<T>::Node(const T &v, path_index_t i) :
     value(v),
     path_id(i),
     node_id(0),
-    tree_id(0),
     parent(NULL)
 {
+}
+
+template<class T>
+Node<T>::~Node()
+{
+    for (iterator i = children.begin() ; i != children.end() ; ++i)
+        delete *i;
 }
 
 /*
@@ -28,8 +37,6 @@ inline
 bool
 Node<T>::has_child(const T &v, Node<T> *&c) const
 {
-    typedef typename std::vector<Node<T>*>::const_iterator iterator;
-
     if (children.empty())
         return false;
     
@@ -41,6 +48,21 @@ Node<T>::has_child(const T &v, Node<T> *&c) const
     }
 
     return false;
+}
+
+template<class T>
+static
+inline
+std::ostream& operator<< (std::ostream &stream, const Node<T> &node)
+{
+    stream << node.value << ": "
+           << "PID(" << node.path_id << "), "
+           << "NID(" << node.node_id << ")";
+
+    if (node.parent)
+        stream << ", PPID(" << node.parent->path_id << ")";
+
+    return stream << ", Children: " << node.children.size();
 }
 
 } // url
