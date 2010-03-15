@@ -4,6 +4,7 @@
 
 // STL
 #include <iostream>
+#include <algorithm>
 
 // IO streams
 using std::cout;
