@@ -4,73 +4,61 @@
 namespace oodles {
 namespace url {
 
-template<class T>
-const typename Tree<T>::tree_index_t Tree<T>::invalid_index = -1;
-
-template<class T>
-Tree<T>::Tree()
-{
-}
-
-template<class T>
-Tree<T>::~Tree()
-{
-    typedef typename std::vector<Node<T>*>::const_iterator iterator;
-
-    for (iterator i = nodes.begin() ; i != nodes.end() ; ++i)
-        delete *i;
-}
-
 /*
  * Insert a range in-sequence in the tree;
  * b = Beginning of range
  * e = End of range
- * i = Index of parent returned from last call
- * p = Path ID of current item (dereferenced iterator)
+ * p = Node of parent returned from last call
+ * i = Path ID of current item (dereferenced iterator)
  */
 template<class T>
 template<class Iterator>
-typename Tree<T>::tree_index_t
-Tree<T>::insert(Iterator b, Iterator e, tree_index_t i)
+Node<T>*
+Tree<T>::insert(Iterator b, Iterator e, Node<T> *p)
 {
-    path_index_t p = i != invalid_index ? nodes[i]->path_id + 1 : 0;
+    path_index_t i = 0;
+
+    if (p)
+        i = p->path_id + 1;
+    else
+        p = &root;
 
     while (b != e) {
-        i = insert(*b, p, i);
-        ++p;
+        p = insert(*b, i, *p);
+        ++i;
         ++b;
     }
 
-    return i;
+    return p;
 }
 
 /*
  * Insert an individual item from the range above;
  * v = Item value (i.e. 'com' or 'www' etc.)
- * p = Path index ID
- * i = Index of parent node
- * c = Current node by index i
- * t = Temporary pointer
+ * i = Path index ID
+ * p = Parent node
+ * c = Current node
  */
 template<class T>
-typename Tree<T>::tree_index_t
-Tree<T>::insert(const T &v, path_index_t p, tree_index_t i)
+Node<T>*
+Tree<T>::insert(const T &v, path_index_t i, Node<T> &p)
 {
-    Node<T> *c = (i != invalid_index ? nodes[i] : &root), *t = NULL;
+    Node<T> *c = NULL;
 
-    if (c->has_child(v, t))
-        return t->tree_id;
+    if (p.has_child(v, c)) {
+        std::cout << *c << std::endl;
+        return c;
+    }
     
-    t = new Node<T> (v, p); // Create new node
+    c = new Node<T>(v, i); // Create new node
 
-    t->parent = c; // Set it's parent
-    t->tree_id = nodes.size() - 1; // Assign the array index to it
-    t->node_id = c->children.size(); // Assign this sibling's index
+    c->parent = &p; // Set it's parent
+    p.children.push_back(c); // Append this child
+    c->node_id = p.children.size() - 1; // Assign the sibling index
 
-    nodes.push_back(t); // Store a pointer to it in the vector
-    c->children.push_back(t); // Store a pointer to t as (it is) a child of c
+    std::cout << *c << std::endl;
 
-    return t->tree_id;
+    return c;
 }
 
 } // url

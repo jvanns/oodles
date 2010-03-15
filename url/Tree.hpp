@@ -14,22 +14,16 @@ template<class T>
 class Tree
 {
     public:
-        typedef typename Node<T>::tree_index_t tree_index_t;
         typedef typename Node<T>::path_index_t path_index_t;
     public:
-        Tree();
-        ~Tree();
-
         template<class Iterator>
-        tree_index_t insert(Iterator b, // Beginning
-                            Iterator e, // End
-                            tree_index_t i = invalid_index); // Parent index
+        Node<T>* insert(Iterator b, // Beginning
+                        Iterator e, // End
+                        Node<T> *p = NULL); // Parent node
     private:
-        tree_index_t insert(const T &v, path_index_t i, tree_index_t i);
+        Node<T>* insert(const T &v, path_index_t i, Node<T> &p);
     private:
         Node<T> root;
-        std::vector<Node<T>*> nodes;
-        static const tree_index_t invalid_index; 
 };
 
 } // url
