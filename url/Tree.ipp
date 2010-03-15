@@ -5,7 +5,7 @@ namespace oodles {
 namespace url {
 
 template<class T>
-const Tree<T>::index_t Tree<T>::no_index = (Tree<T>::index_t) -1;
+const typename Tree<T>::tree_index_t Tree<T>::invalid_index = -1;
 
 template<class T>
 Tree<T>::Tree()
@@ -20,16 +20,19 @@ Tree<T>::Tree()
  * p = Path ID of current item (dereferenced iterator)
  */
 template<class T>
-Tree<T>::index_t
-Tree<T>::insert(std::iterator &b, std::iterator &e, index_t i)
+template<class Iterator>
+typename Tree<T>::tree_index_t
+Tree<T>::insert(Iterator b, Iterator e, tree_index_t i)
 {
-    Node<T>::path_index_t p = (i != no_index ? nodes[i].path_id + 1 : 0);
+    path_index_t p = i != invalid_index ? nodes[i].path_id + 1 : 0;
 
     while (b != e) {
         i = insert(*b, p, i);
         ++p;
         ++b;
     }
+
+    return i;
 }
 
 /*
@@ -41,10 +44,10 @@ Tree<T>::insert(std::iterator &b, std::iterator &e, index_t i)
  * t = Temporary pointer
  */
 template<class T>
-Tree<T>::index_t
-Tree<T>::insert(const T &v, Node<T>::path_index_t p, index_t i)
+typename Tree<T>::tree_index_t
+Tree<T>::insert(const T &v, path_index_t p, tree_index_t i)
 {
-    Node<T> *c = &(i != no_index ? nodes[i] : root), *t = NULL;
+    Node<T> *c = &(i != invalid_index ? nodes[i] : root), *t = NULL;
 
     if (c->has_child(v, t))
         return t->tree_id;

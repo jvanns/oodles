@@ -8,7 +8,7 @@ template<class T>
 Node<T>::Node() : path_id(0), node_id(0), tree_id(0), parent(NULL) {}
 
 template<class T>
-Node<T>::Node(const value_t &v, path_index_t i) :
+Node<T>::Node(const T &v, path_index_t i) :
     value(v),
     path_id(i),
     node_id(0),
@@ -28,15 +28,16 @@ inline
 bool
 Node<T>::has_child(const T &v, Node<T> *&c) const
 {
+    typedef typename std::vector<Node<T>*>::const_iterator node_iterator;
+
     if (children.empty())
         return false;
-
-    for (std::vector<Node<T>*>::const_iterator i = children.begin();
-         i != children.end();
-         ++i)
-    {
-        if (v == (*i)->value)
+    
+    for (node_iterator i = children.begin() ; i != children.end() ; ++i) {
+        if (v == (*i)->value) {
+            c = *i;
             return true;
+        }
     }
 
     return false;

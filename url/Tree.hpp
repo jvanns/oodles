@@ -6,7 +6,6 @@
 
 // STL
 #include <vector>
-#include <iterator>
 
 namespace oodles {
 namespace url {
@@ -15,20 +14,21 @@ template<class T>
 class Tree
 {
     public:
-        typedef Node<T>::tree_index_t index_t;
+        typedef typename Node<T>::tree_index_t tree_index_t;
+        typedef typename Node<T>::path_index_t path_index_t;
     public:
         Tree();
-        ~Tree();
 
-        index_t insert(std::iterator &b, // Beginning
-                       std::iterator &e, // End
-                       index_t i = no_index); // Parent index
+        template<class Iterator>
+        tree_index_t insert(Iterator b, // Beginning
+                            Iterator e, // End
+                            tree_index_t i = invalid_index); // Parent index
     private:
-        index_t insert(const T &v, Node<T>::path_index_t i, index_t i);
+        tree_index_t insert(const T &v, path_index_t i, tree_index_t i);
     private:
-        const Node<T> root;
+        Node<T> root;
         std::vector<Node<T> > nodes;
-        static const index_t no_index; 
+        static const tree_index_t invalid_index; 
 };
 
 } // url
