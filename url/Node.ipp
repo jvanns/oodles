@@ -28,12 +28,12 @@ inline
 bool
 Node<T>::has_child(const T &v, Node<T> *&c) const
 {
-    typedef typename std::vector<Node<T>*>::const_iterator node_iterator;
+    typedef typename std::vector<Node<T>*>::const_iterator iterator;
 
     if (children.empty())
         return false;
     
-    for (node_iterator i = children.begin() ; i != children.end() ; ++i) {
+    for (iterator i = children.begin() ; i != children.end() ; ++i) {
         if (v == (*i)->value) {
             c = *i;
             return true;

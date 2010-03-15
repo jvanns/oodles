@@ -18,6 +18,7 @@ class Tree
         typedef typename Node<T>::path_index_t path_index_t;
     public:
         Tree();
+        ~Tree();
 
         template<class Iterator>
         tree_index_t insert(Iterator b, // Beginning
@@ -27,7 +28,7 @@ class Tree
         tree_index_t insert(const T &v, path_index_t i, tree_index_t i);
     private:
         Node<T> root;
-        std::vector<Node<T> > nodes;
+        std::vector<Node<T>*> nodes;
         static const tree_index_t invalid_index; 
 };
 

@@ -16,7 +16,7 @@ struct Node
     typedef uint16_t node_index_t;
     typedef uint32_t tree_index_t;
 
-    T value;
+    const T value;
     path_index_t path_id; // Index of this node within it's path
     node_index_t node_id; // Index of this node amoung it's siblings
     tree_index_t tree_id; // Index of this node according to the whole tree
