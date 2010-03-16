@@ -1,11 +1,10 @@
-#ifndef OODLES_URL_NODE_IPP // Implementation
-#define OODLES_URL_NODE_IPP
+#ifndef OODLES_NODE_IPP // Implementation
+#define OODLES_NODE_IPP
 
 // STL
 #include <iostream>
 
 namespace oodles {
-namespace url {
 
 template<class T>
 inline
@@ -72,7 +71,6 @@ std::ostream& operator<< (std::ostream &stream, const Node<T> &node)
     return stream << ", Children: " << node.children.size();
 }
 
-} // url
 } // oodles
 
 #endif

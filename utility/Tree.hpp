@@ -1,5 +1,5 @@
-#ifndef OODLES_URL_TREE_HPP // Interface
-#define OODLES_URL_TREE_HPP
+#ifndef OODLES_TREE_HPP // Interface
+#define OODLES_TREE_HPP
 
 // oodles
 #include "Node.hpp"
@@ -8,7 +8,6 @@
 #include <vector>
 
 namespace oodles {
-namespace url {
 
 template<class T>
 class Tree
@@ -26,7 +25,6 @@ class Tree
         Node<T> root;
 };
 
-} // url
 } // oodles
 
 #include "Tree.ipp" // Implementation

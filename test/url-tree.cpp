@@ -1,6 +1,6 @@
 // oodles
 #include "url/URL.hpp"
-#include "url/Tree.hpp"
+#include "utility/Tree.hpp"
 #include "utility/file-ops.hpp"
 
 // STL
@@ -23,7 +23,7 @@ using std::string;
 // STL exception
 using std::exception;
 
-static oodles::url::Tree<oodles::url::URL::value_type> tree;
+static oodles::Tree<oodles::url::URL::value_type> tree;
 
 static
 bool

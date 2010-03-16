@@ -1,8 +1,7 @@
-#ifndef OODLES_URL_TREE_IPP // Implementation
-#define OODLES_URL_TREE_IPP
+#ifndef OODLES_TREE_IPP // Implementation
+#define OODLES_TREE_IPP
 
 namespace oodles {
-namespace url {
 
 /*
  * Insert a range in-sequence in the tree;
@@ -51,7 +50,6 @@ Tree<T>::insert(const T &v, path_index_t i, Node<T> &p)
     return c;
 }
 
-} // url
 } // oodles
 
 #endif

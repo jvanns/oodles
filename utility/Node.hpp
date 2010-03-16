@@ -1,5 +1,5 @@
-#ifndef OODLES_URL_NODE_HPP // Interface
-#define OODLES_URL_NODE_HPP
+#ifndef OODLES_NODE_HPP // Interface
+#define OODLES_NODE_HPP
 
 // STL
 #include <vector>
@@ -7,7 +7,6 @@
 #include <stdint.h> // For uint16_t
 
 namespace oodles {
-namespace url {
 
 template<class T> class Tree; // Forward declaration for friend below
 
@@ -38,13 +37,12 @@ class Node
         Node();
         ~Node();
 
-        Node(const Node &n);
-        Node& operator=(const Node &n);
+        Node(const Node &n); // Do not allow...
+        Node& operator=(const Node &n); // ... copying presently.
 
         friend class Tree<T>; // Tree wants Node() only.
 };
 
-} // url
 } // oodles
 
 #include "Node.ipp" // Implementation
