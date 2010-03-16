@@ -8,22 +8,20 @@ namespace oodles {
 namespace url {
 
 template<class T>
-Node<T>::Node() : path_id(0), node_id(0), parent(NULL) {}
-
-template<class T>
-Node<T>::Node(const T &v, path_index_t i) :
-    value(v),
-    path_id(i),
-    node_id(0),
-    parent(NULL)
+inline
+Node<T>*
+Node<T>::create_child(const T &v, path_index_t i)
 {
-}
+    Node<T> *n = new Node<T>();
 
-template<class T>
-Node<T>::~Node()
-{
-    for (iterator i = children.begin() ; i != children.end() ; ++i)
-        delete *i;
+    n->value = v;
+    n->path_idx = i;
+    n->child_idx = children.size();
+
+    n->parent = this;
+    children.push_back(n);
+
+    return n;
 }
 
 /*
@@ -49,6 +47,15 @@ Node<T>::has_child(const T &v, Node<T> *&c) const
 
     return false;
 }
+template<class T>
+Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL) {}
+
+template<class T>
+Node<T>::~Node()
+{
+    for (iterator i = children.begin() ; i != children.end() ; ++i)
+        delete *i;
+}
 
 template<class T>
 static
@@ -56,11 +63,11 @@ inline
 std::ostream& operator<< (std::ostream &stream, const Node<T> &node)
 {
     stream << node.value << ": "
-           << "PID(" << node.path_id << "), "
-           << "NID(" << node.node_id << ")";
+           << "PID(" << node.path_idx << "), "
+           << "NID(" << node.child_idx << ")";
 
     if (node.parent)
-        stream << ", PPID(" << node.parent->path_id << ")";
+        stream << ", PPID(" << node.parent->path_idx << ")";
 
     return stream << ", Children: " << node.children.size();
 }
