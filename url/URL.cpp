@@ -176,11 +176,13 @@ URL::to_string() const
     stream << *(domain.end() - 1);
 
     if (!path.empty()) {
-        copy(path.begin(),
-             path.end() - 1,
-             ostream_iterator<value_type>(stream, "/"));
-        stream << *(path.end() - 1);
-    }
+        vector<value_type>::const_iterator i = path.begin(), j = path.end() - 1;
+
+        stream << '/';
+        copy(i, j, ostream_iterator<value_type>(stream, "/"));
+        stream << *j << '/';
+    } else
+        stream << '/';
 
     stream << page;
 
@@ -219,10 +221,6 @@ void
 URL::normalise()
 {
     if (!path.empty()) {
-        value_type &root = path.front(), &leaf = path.back();
-        root.insert(root.begin(), '/');
-        leaf += '/';
-
         vector<value_type>::iterator i = path.begin(), j = path.end(), k;
         while (i != j) {
             if (*i == "..") {
@@ -245,8 +243,7 @@ URL::normalise()
 
             ++i;
         }
-    } else
-        path.push_back("/");
+    }
 
     if (!query_string.empty()) {
         set<query_kvp>::iterator i = query_string.begin(),
