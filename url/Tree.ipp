@@ -19,7 +19,7 @@ Tree<T>::insert(Iterator b, Iterator e, Node<T> *p)
     path_index_t i = 0;
 
     if (p)
-        i = p->path_id + 1;
+        i = p->path_idx + 1;
     else
         p = &root;
 
@@ -45,18 +45,8 @@ Tree<T>::insert(const T &v, path_index_t i, Node<T> &p)
 {
     Node<T> *c = NULL;
 
-    if (p.has_child(v, c)) {
-        std::cout << *c << std::endl;
-        return c;
-    }
-    
-    c = new Node<T>(v, i); // Create new node
-
-    c->parent = &p; // Set it's parent
-    p.children.push_back(c); // Append this child
-    c->node_id = p.children.size() - 1; // Assign the sibling index
-
-    std::cout << *c << std::endl;
+    if (!p.has_child(v, c))
+        c = p.create_child(v, i); // Create new child node
 
     return c;
 }
