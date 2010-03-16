@@ -59,7 +59,7 @@ Iterator::move_pointer_forward()
             external_state = URL::Domain;
             break;
         case URL::Domain:
-            if (index < url->domain.size()) {
+            if (!url->domain.empty() && index < url->domain.size()) {
                 value = &url->domain[index];
                 ++index;
             } else {
@@ -73,7 +73,7 @@ Iterator::move_pointer_forward()
             external_state = URL::Path;
             break;
         case URL::Path:
-            if (index < url->path.size()) {
+            if (!url->path.empty() && index < url->path.size()) {
                 value = &url->path[index];
                 ++index;
             } else {
@@ -119,6 +119,11 @@ Iterator::move_pointer_backward()
             external_state = URL::Username;
             break;
         case URL::Domain:
+            if (url->domain.empty()) {
+                external_state = URL::Password;
+                return true;
+            }
+
             if (index >= 0) {
                 value = &url->domain[index];
 
@@ -134,6 +139,11 @@ Iterator::move_pointer_backward()
             index = url->domain.size() - 1; // Prepare index for next state
             break;
         case URL::Path:
+            if (url->path.empty()) {
+                external_state = URL::Port;
+                return true;
+            }
+
             if (index >= 0) {
                 value = &url->path[index];
 
