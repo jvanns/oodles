@@ -32,20 +32,14 @@ Node<T>::create_child(const T &v, path_index_t i)
 template<class T>
 inline
 bool
-Node<T>::has_child(const T &v, Node<T> *&c) const
+Node<T>::has_child(const T &v, Node *&c) const
 {
     if (children.empty())
         return false;
-    
-    for (iterator i = children.begin() ; i != children.end() ; ++i) {
-        if (v == (*i)->value) {
-            c = *i;
-            return true;
-        }
-    }
 
-    return false;
+    return search(0, children.size() - 1, v, c);
 }
+
 template<class T>
 Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL) {}
 
@@ -54,6 +48,32 @@ Node<T>::~Node()
 {
     for (iterator i = children.begin() ; i != children.end() ; ++i)
         delete *i;
+}
+
+/*
+ * Recursive divide and conquer algorithm for searching a
+ * simple, unordered array of items (child nodes).
+ */
+template<class T>
+inline
+bool
+Node<T>::search(const size_t l, const size_t r, const T &v, Node *&c) const
+{
+    if (l == r) {
+        if (v == children[l]->value) {
+            c = children[l];
+            return true;
+        }
+
+        return false;
+    }
+
+    const size_t m = (l + r) / 2;
+
+    if (search(l, m, v, c))
+        return true;
+
+    return search(m + 1, r, v, c);
 }
 
 template<class T>
