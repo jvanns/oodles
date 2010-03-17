@@ -11,9 +11,8 @@ inline
 Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
-    Node<T> *n = new Node<T>();
+    Node<T> *n = new Node<T>(v);
 
-    n->value = v;
     n->path_idx = i;
     n->child_idx = children.size();
 
@@ -41,13 +40,20 @@ Node<T>::has_child(const T &v, Node *&c) const
 }
 
 template<class T>
-Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL) {}
+Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL)
+{
+}
 
 template<class T>
 Node<T>::~Node()
 {
     for (iterator i = children.begin() ; i != children.end() ; ++i)
         delete *i;
+}
+
+template<class T>
+Node<T>::Node(const T &v) : value(v), path_idx(0), child_idx(0), parent(NULL)
+{
 }
 
 /*

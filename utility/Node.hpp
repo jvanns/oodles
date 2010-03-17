@@ -23,7 +23,7 @@ class Node
         Node* create_child(const T &v, path_index_t i);
 
         /* Member variables/attributes */
-        T value; // Value at this node
+        const T value; // Value at this node
         path_index_t path_idx; // Index of this node within it's path
         child_index_t child_idx; // Index of this node amoung it's siblings
 
@@ -36,6 +36,7 @@ class Node
         /* Member functions/methods */
         Node();
         ~Node();
+        Node(const T &v);
 
         Node(const Node &n); // Do not allow...
         Node& operator=(const Node &n); // ... copying presently.
