@@ -3,6 +3,7 @@
 
 // STL
 #include <vector>
+#include <iostream>
 
 #include <stdint.h> // For uint16_t
 
@@ -19,6 +20,7 @@ class Node
         typedef uint16_t child_index_t;
 
         /* Member functions/methods */
+        void print(std::ostream &stream) const;
         bool has_child(const T &v, Node *&c) const;
         Node* create_child(const T &v, path_index_t i);
 
@@ -45,6 +47,16 @@ class Node
 
         friend class Tree<T>; // Tree wants Node() only.
 };
+
+template<class T>
+static
+inline
+std::ostream&
+operator<< (std::ostream &stream, const Node<T> &node)
+{
+    node.print(stream);
+    return stream;
+}
 
 } // oodles
 

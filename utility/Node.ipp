@@ -1,25 +1,29 @@
 #ifndef OODLES_NODE_IPP // Implementation
 #define OODLES_NODE_IPP
 
-// STL
-#include <iostream>
-
 namespace oodles {
 
 template<class T>
 inline
-Node<T>*
-Node<T>::create_child(const T &v, path_index_t i)
+void
+Node<T>::print(std::ostream &stream) const
 {
-    Node<T> *n = new Node<T>(v);
+    static const std::string branch("+-- ");
+    static const std::string::size_type len = branch.size() - 1;
 
-    n->path_idx = i;
-    n->child_idx = children.size();
+    if (parent) {
+        for (path_index_t i = 0 ; i < path_idx ; ++i) {
+            stream << '|';
 
-    n->parent = this;
-    children.push_back(n);
+            for (std::string::size_type j = 0 ; j < len ; ++j)
+                stream << ' ';
+        }
 
-    return n;
+        stream << branch << value << std::endl;
+    }
+
+    for (iterator i = children.begin() ; i != children.end() ; ++i)
+        stream << *(*i);
 }
 
 /*
@@ -37,6 +41,22 @@ Node<T>::has_child(const T &v, Node *&c) const
         return false;
 
     return search(0, children.size() - 1, v, c);
+}
+
+template<class T>
+inline
+Node<T>*
+Node<T>::create_child(const T &v, path_index_t i)
+{
+    Node<T> *n = new Node<T>(v);
+
+    n->path_idx = i;
+    n->child_idx = children.size();
+
+    n->parent = this;
+    children.push_back(n);
+
+    return n;
 }
 
 template<class T>
@@ -80,21 +100,6 @@ Node<T>::search(const size_t l, const size_t r, const T &v, Node *&c) const
         return true;
 
     return search(m + 1, r, v, c);
-}
-
-template<class T>
-static
-inline
-std::ostream& operator<< (std::ostream &stream, const Node<T> &node)
-{
-    stream << node.value << ": "
-           << "PID(" << node.path_idx << "), "
-           << "NID(" << node.child_idx << ")";
-
-    if (node.parent)
-        stream << ", PPID(" << node.parent->path_idx << ")";
-
-    return stream << ", Children: " << node.children.size();
 }
 
 } // oodles
