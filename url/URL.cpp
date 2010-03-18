@@ -189,10 +189,10 @@ URL::to_string() const
     return stream.str();
 }
 
-ostream&
+void
 URL::print(ostream &stream) const
 {
-    return stream << to_string();
+    stream << to_string();
 }
 
 bool

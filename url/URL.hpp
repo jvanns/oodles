@@ -29,7 +29,7 @@ class URL
         bool operator!= (const URL &rhs) const;
 
         std::string to_string() const;
-        std::ostream& print(std::ostream &stream) const;
+        void print(std::ostream &stream) const;
 
         Iterator begin() const
         {
@@ -75,9 +75,13 @@ class URL
         std::set<query_kvp> query_string; // i.e. name=Jim&uuid=12345
 };
 
-static inline std::ostream& operator<< (std::ostream &stream, const URL &url)
+static
+inline
+std::ostream&
+operator<< (std::ostream &stream, const URL &url)
 {
-    return url.print(stream);
+    url.print(stream);
+    return stream;
 }
 
 } // url
