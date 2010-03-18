@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
             b = e + 1;
             e = s.find_first_of('\n', b);
         }
+
+        cout << tree;
     } catch (const exception &e) {
         cerr << e.what();
         return 1;

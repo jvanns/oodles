@@ -3,6 +3,13 @@
 
 namespace oodles {
 
+template<class T>
+void
+Tree<T>::print(std::ostream &stream) const
+{
+    stream << root;
+}
+
 /*
  * Insert a range in-sequence in the tree;
  * b = Beginning of range

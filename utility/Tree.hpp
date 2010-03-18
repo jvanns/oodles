@@ -15,6 +15,8 @@ class Tree
     public:
         typedef typename Node<T>::path_index_t path_index_t;
     public:
+        void print(std::ostream &stream) const;
+
         template<class Iterator>
         Node<T>* insert(Iterator b, // Beginning
                         Iterator e, // End
@@ -24,6 +26,16 @@ class Tree
     private:
         Node<T> root;
 };
+
+template<class T>
+static
+inline
+std::ostream&
+operator<< (std::ostream &stream, const Tree<T> &tree)
+{
+    tree.print(stream);
+    return stream;
+}
 
 } // oodles
 
