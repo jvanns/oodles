@@ -64,7 +64,7 @@ tokenise_domain(const string &url,
     if ((j = url.find_first_of('/', index)) == NONE)
         j = max; // No path or page given, just a domain
 
-    if ((i = url.find_last_of(':', j)) > index)
+    if ((i = url.find_last_of(':', j)) != NONE && i > index)
         j = i; // We have a port to parse to
 
     i = 0; // Reset to use as index to domain
@@ -274,9 +274,13 @@ URL::normalise()
 void
 URL::tokenise(const string &url)
 {
+    int s = Scheme; // Normally a URL will start with a scheme such as http...
     string::size_type i = 0, max = url.size();
 
-    for (int s = Scheme ; i < max ; ++i) {
+    if (url.find_first_of("://") > url.find_first_of('.'))
+        s = Domain; // ...however, some links begin with only a domain
+
+    for ( ; i < max ; ++i) {
         switch (s) {
             case Scheme:
                 s = tokenise_scheme(url, i, scheme);
