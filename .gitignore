@@ -3,3 +3,4 @@ bin/*/*
 .config
 *.o
 *.d
+*.tar.gz
