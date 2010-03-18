@@ -103,6 +103,7 @@ Iterator::move_pointer_backward()
     if (internal_state == End) {
         internal_state = Transient;
         external_state = URL::Page;
+        index = url->path.size() - 1; // Prepare index for Path state
     }
 
     switch (external_state) {
@@ -121,10 +122,8 @@ Iterator::move_pointer_backward()
         case URL::Domain:
             if (url->domain.empty()) {
                 external_state = URL::Password;
-                return true;
-            }
-
-            if (index >= 0) {
+                recall = true;
+            } else if (index >= 0) {
                 value = &url->domain[index];
 
                 if (index == 0)
@@ -141,10 +140,8 @@ Iterator::move_pointer_backward()
         case URL::Path:
             if (url->path.empty()) {
                 external_state = URL::Port;
-                return true;
-            }
-
-            if (index >= 0) {
+                recall = true;
+            } else if (index >= 0) {
                 value = &url->path[index];
 
                 if (index == 0)
@@ -156,7 +153,6 @@ Iterator::move_pointer_backward()
         case URL::Page:
             value = &url->page;
             external_state = URL::Path;
-            index = url->path.size() - 1; // Prepare index for next state
             break;
         default:
             value = NULL;
