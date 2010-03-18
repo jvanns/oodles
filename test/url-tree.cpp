@@ -31,7 +31,7 @@ build_url(const string &line) // line from the input file
 {
     try {
         oodles::url::URL url(line);
-        tree.insert(url.begin(), url.end());
+        tree.insert(url.begin_tree(), url.end_tree());
     } catch (const exception &e) {
         cerr << e.what();
         return false;
