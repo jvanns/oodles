@@ -175,6 +175,9 @@ URL::to_string() const
          ostream_iterator<value_type>(stream, "."));
     stream << *(domain.end() - 1);
 
+    if (!port.empty() && port != "80")
+        stream << ':' << port;
+
     if (!path.empty()) {
         vector<value_type>::const_iterator i = path.begin(), j = path.end() - 1;
 
@@ -257,11 +260,6 @@ URL::normalise()
 
         page.erase(page.end() - 1); // Remove trailing '&'
         query_string.clear();
-    }
-
-    if (!port.empty() && port != "80") {
-        value_type &dc = domain.back();
-        dc += ":" + port;
     }
 }
 
