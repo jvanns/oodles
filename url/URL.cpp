@@ -201,7 +201,7 @@ URL::print(ostream &stream) const
 bool
 URL::operator==(const URL &rhs) const
 {
-    if (page != rhs.page)
+    if (page.size() != rhs.page.size())
         return false;
 
     if (path.size() != rhs.path.size())
@@ -210,7 +210,9 @@ URL::operator==(const URL &rhs) const
     if (domain.size() != rhs.domain.size())
         return false;
 
-    /* TODO: Add the more complex comparison tests if we get this far */
+    if (page != rhs.page)
+        return false;
+
     return true;
 }
 
