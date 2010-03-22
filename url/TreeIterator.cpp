@@ -71,7 +71,11 @@ TreeIterator::move_pointer_forward()
             }
             break;
         case URL::Page:
-            value = &url->page;
+            if (!url->page.empty())  // Ensure leaf node is non-empty
+                value = &url->page;
+            else
+                recall = true;
+
             external_state = -1; // Finish
             break;
         default:
@@ -119,7 +123,11 @@ TreeIterator::move_pointer_backward()
             }
             break;
         case URL::Page:
-            value = &url->page;
+            if (!url->page.empty())
+                value = &url->page;
+            else
+                recall = true;
+
             external_state = URL::Path;
             break;
         default:

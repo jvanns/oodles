@@ -83,7 +83,11 @@ Iterator::move_pointer_forward()
             }
             break;
         case URL::Page:
-            value = &url->page;
+            if (!url->page.empty())
+                value = &url->page;
+            else
+                recall = true;
+
             external_state = -1;
             break;
         default:
@@ -151,7 +155,11 @@ Iterator::move_pointer_backward()
             }
             break;
         case URL::Page:
-            value = &url->page;
+            if (!url->page.empty())
+                value = &url->page;
+            else
+                recall = true;
+
             external_state = URL::Path;
             break;
         default:
