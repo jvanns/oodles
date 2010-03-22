@@ -20,6 +20,7 @@ class Node
         typedef uint16_t child_index_t;
 
         /* Member functions/methods */
+        bool leaf() const;
         void print(std::ostream &stream) const;
         bool has_child(const T &v, Node *&c) const;
         Node* create_child(const T &v, path_index_t i);

@@ -8,6 +8,14 @@ namespace oodles {
  */
 template<class T>
 inline
+bool
+Node<T>::leaf() const
+{
+    return parent && children.empty(); // A leaf node should never have children
+}
+
+template<class T>
+inline
 void
 Node<T>::print(std::ostream &stream) const
 {
