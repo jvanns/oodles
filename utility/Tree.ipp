@@ -54,7 +54,7 @@ Tree<T>::insert(const T &v, path_index_t i, Node<T> &p)
     if (!p.has_child(v, c))
         c = p.create_child(v, i); // Create new child node
 
-    return c;
+    return c; // Return it to caller so it can be passed back here as a parent
 }
 
 } // oodles

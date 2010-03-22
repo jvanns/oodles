@@ -13,8 +13,10 @@ template<class T>
 class Tree
 {
     public:
+        /* Dependent typedefs */
         typedef typename Node<T>::path_index_t path_index_t;
-    public:
+
+        /* Member functions/methods */
         void print(std::ostream &stream) const;
 
         template<class Iterator>
@@ -22,8 +24,10 @@ class Tree
                         Iterator e, // End
                         Node<T> *p = NULL); // Parent node
     private:
+        /* Member functions/methods */
         Node<T>* insert(const T &v, path_index_t i, Node<T> &p);
-    private:
+
+        /* Member variables/attributes */
         Node<T> root;
 };
 
