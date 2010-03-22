@@ -77,6 +77,12 @@ tokenise_domain(const string &url,
 
     for (string *s = &domain[i] ; index < j ; ++index) {
         if (url[index] == '.')
+            /*
+             * TODO: Check here for each domain component whether or not
+             * it is in fact an IP octet (i.e. a number). If all components
+             * are numbers then set a bool indicating the domain is in fact
+             * an IP address - affects TreeIterator.
+             */
             s = &domain[++i]; // Reference next domain component
         else
             *s += tolower(url[index]); // Normalise as we go :)
