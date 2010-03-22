@@ -3,6 +3,9 @@
 
 namespace oodles {
 
+/*
+ * Public methods
+ */
 template<class T>
 inline
 void
@@ -63,7 +66,7 @@ inline
 Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
-    Node<T> *n = new Node<T>(v);
+    Node *n = new_node(v);
 
     n->path_idx = i;
     n->child_idx = children.size();
@@ -88,11 +91,9 @@ Node<T>::create_child(const T &v, path_index_t i)
     return n;
 }
 
-template<class T>
-Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL)
-{
-}
-
+/*
+ * Protected methods
+ */
 template<class T>
 Node<T>::~Node()
 {
@@ -102,6 +103,26 @@ Node<T>::~Node()
 
 template<class T>
 Node<T>::Node(const T &v) : value(v), path_idx(0), child_idx(0), parent(NULL)
+{
+}
+
+/*
+ * Virtual method that should be overwritten when derived from to be sure
+ * the instance of Node is of the correct derived type offering extended
+ * use.
+ */
+template<class T>
+Node<T>*
+Node<T>::new_node(const T &v) const
+{
+    return new Node(v);
+}
+
+/*
+ * Private methods
+ */
+template<class T>
+Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL)
 {
 }
 

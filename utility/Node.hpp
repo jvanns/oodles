@@ -31,20 +31,25 @@ class Node
 
         Node *parent; // Pointer to parent node
         std::vector<Node<T>*> children; // This nodes children
-    private:
+    protected:
         /* Dependent typedefs */
         typedef typename std::vector<Node<T>*>::const_iterator iterator;
 
         /* Member functions/methods */
-        Node();
-        ~Node();
+        virtual ~Node();
         Node(const T &v);
+
+        virtual Node* new_node(const T &v) const;
+    private:
+        /* Member functions/methods */
+        Node();
 
         Node(const Node &n); // Do not allow...
         Node& operator=(const Node &n); // ... copying presently.
 
         bool search(const size_t l, const size_t r, const T &v, size_t &n) const;
 
+        /* Friend class declarations */
         friend class Tree<T>; // Tree wants Node() only.
 };
 
