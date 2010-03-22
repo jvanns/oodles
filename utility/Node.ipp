@@ -51,7 +51,7 @@ Node<T>::has_child(const T &v, Node *&c) const
             r = children[i]->value == v;
             break;
         default:
-            r = search(0, s - 1, v, i);
+            r = find(0, s - 1, v, i);
             break;
     }
 
@@ -133,7 +133,7 @@ Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL)
 template<class T>
 inline
 bool
-Node<T>::search(const size_t l, const size_t r, const T &v, size_t &n) const
+Node<T>::find(const size_t l, const size_t r, const T &v, size_t &n) const
 {
     bool c = false; // c = condition
 
@@ -149,9 +149,9 @@ Node<T>::search(const size_t l, const size_t r, const T &v, size_t &n) const
     const size_t m = (l + r) / 2; // Split the range in to two halves
 
     if (v <= children[m]->value)
-        c = search(l, m, v, n); // Search the 'left' half
+        c = find(l, m, v, n); // Search the 'left' half
     else
-        c = search(m + 1, r, v, n); // Search the 'right' half
+        c = find(m + 1, r, v, n); // Search the 'right' half
 
     return c;
 }
