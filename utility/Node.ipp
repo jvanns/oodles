@@ -7,7 +7,6 @@ namespace oodles {
  * Public methods
  */
 template<class T>
-inline
 bool
 Node<T>::leaf() const
 {
@@ -15,7 +14,6 @@ Node<T>::leaf() const
 }
 
 template<class T>
-inline
 void
 Node<T>::print(std::ostream &stream) const
 {
@@ -44,7 +42,6 @@ Node<T>::print(std::ostream &stream) const
  * for a better data structure such as a BST or even a RBT (set<>).
  */
 template<class T>
-inline
 bool
 Node<T>::has_child(const T &v, Node *&c) const
 {
@@ -70,7 +67,6 @@ Node<T>::has_child(const T &v, Node *&c) const
 }
 
 template<class T>
-inline
 Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
@@ -139,7 +135,6 @@ Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL)
  * simple, unordered array of items (child nodes).
  */
 template<class T>
-inline
 bool
 Node<T>::find(const size_t l, const size_t r, const T &v, size_t &n) const
 {
