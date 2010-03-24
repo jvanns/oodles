@@ -36,6 +36,7 @@ LDLIBS += $(LDLIBS_BOOST)
 .PHONY: clean default all
 
 # Compile object files
+SCHEDULER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard sched/*.cpp))
 UTILITY_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard utility/*.cpp))
 COMMON_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard common/*.cpp))
 TEST_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard test/*.cpp))
@@ -44,13 +45,17 @@ URL := $(patsubst %.cpp,%.o,$(wildcard url/*.cpp))
 # Binary targets
 TESTS = test/html-parser \
 	test/word-indexer \
-	test/url-parser \
-	test/url-tree
+    test/url-scheduler \
+    test/url-parser \
+    test/url-tree
 
 test/html-parser: test/html-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 test/word-indexer: test/word-indexer.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+
+test/url-scheduler: test/url-scheduler.o $(SCHEDULER_OBJECTS) $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 test/url-parser: test/url-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL)
