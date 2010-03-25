@@ -15,6 +15,9 @@ class Scheduler
 {
     public:
         /* Member functions/methods */
+        Scheduler();
+        ~Scheduler();
+
         void schedule(const std::string &url);
     private:
         /* Member variables/attributes */

@@ -1,5 +1,8 @@
 // oodles
+#include "PageData.hpp"
 #include "Scheduler.hpp"
+
+#include <time.h> // For time()
 
 // STL
 using std::string;
@@ -7,17 +10,32 @@ using std::string;
 namespace oodles {
 namespace sched {
 
+Scheduler::Scheduler()
+{
+}
+
+Scheduler::~Scheduler()
+{
+}
+
 void
 Scheduler::schedule(const string &url)
 {
-    url::URL *u = new url::URL(url);
-    Node *leaf = static_cast<Node*> (tree.insert(u->begin_tree(),
-                                                 u->end_tree()));
+    PageData *page = new PageData(url);
+    Node *node = static_cast<Node*> (tree.insert(page->url.begin_tree(),
+                                                 page->url.end_tree()));
 
-    if (!leaf->url) // Unique insert
-        leaf->url = u; // Ownership of 'u' is implicitly transferred here
-    else
-        ; // URL was a duplicate (hit already logged by Tree::insert)
+    assert(node->leaf()); // The returned node should never have children
+
+    if (!node->page) { // Newly inserted, unique URL
+        page->epoch = time(NULL);
+        node->page = page; // Ownership of page is implicitly transferred here
+    } else {
+        delete page;
+        page = node->page;
+    }
+
+    ++page->links;
 }
 
 }

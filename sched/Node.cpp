@@ -1,21 +1,17 @@
 // oodles
 #include "Node.hpp"
+#include "PageData.hpp"
 
 namespace oodles {
 namespace sched {
 
-Node::Node(const value_type &v) :
-    oodles::Node<value_type>(v),
-    last_crawl(0),
-    crawl_count(0),
-    url(NULL),
-    referer(NULL)
+Node::Node(const value_type &v) : oodles::Node<value_type>(v), page(NULL)
 {
 }
 
 Node::~Node()
 {
-    delete url; // If set, ownership is implicitly transferred
+    delete page; // If set, ownership is implicitly transferred
 }
 
 inline
