@@ -5,17 +5,11 @@
 
 // STL
 #include <iostream>
-#include <algorithm>
 
 // IO streams
 using std::cout;
 using std::cerr;
 using std::endl;
-using std::ostream_iterator;
-
-// Algorithms
-using std::find;
-using std::count;
 
 // Containers
 using std::string;
@@ -42,11 +36,11 @@ build_url(const string &line) // line from the input file
 
 int main(int argc, char *argv[])
 {
-    if (argc != 2) { 
+    if (argc != 2) {
         cerr << "Provide the location (file path) to a file containing URLs.\n";
-        return 1; 
+        return 1;
     }
-    
+
     try {
         string s;
         size_t n = oodles::read_file_data(argv[1], s);
