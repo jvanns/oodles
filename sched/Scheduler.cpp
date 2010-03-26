@@ -19,7 +19,19 @@ Scheduler::~Scheduler()
 }
 
 void
-Scheduler::schedule(const string &url)
+Scheduler::schedule_from_seed(const string &url)
+{
+    schedule(url, true);
+}
+
+void
+Scheduler::schedule_from_crawl(const string &url)
+{
+    schedule(url, false);
+}
+
+void
+Scheduler::schedule(const string &url, bool from_seed)
 {
     PageData *page = new PageData(url);
     Node *node = static_cast<Node*> (tree.insert(page->url.begin_tree(),
@@ -35,7 +47,8 @@ Scheduler::schedule(const string &url)
         page = node->page;
     }
 
-    ++page->links;
+    if (!from_seed)
+        ++page->links; // If we're from a seed it doesn't count as a link!
 }
 
 }

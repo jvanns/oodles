@@ -18,10 +18,14 @@ class Scheduler
         Scheduler();
         ~Scheduler();
 
-        void schedule(const std::string &url);
+        void schedule_from_seed(const std::string &url);
+        void schedule_from_crawl(const std::string &url);
     private:
         /* Member variables/attributes */
         Tree<Node::value_type> tree;
+
+        /* Member functions/methods */
+        void schedule(const std::string &url, bool from_seed);
 };
 
 } // sched
