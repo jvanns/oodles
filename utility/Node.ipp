@@ -132,7 +132,7 @@ Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL)
 
 /*
  * Recursive divide and conquer algorithm for searching a
- * simple, unordered array of items (child nodes).
+ * simple, ordered array of items (child nodes).
  */
 template<class T>
 bool
