@@ -18,6 +18,12 @@ Scheduler::~Scheduler()
 {
 }
 
+uint32_t
+Scheduler::run()
+{
+    return 0;
+}
+
 void
 Scheduler::schedule_from_seed(const string &url)
 {

@@ -18,6 +18,7 @@ class Scheduler
         Scheduler();
         ~Scheduler();
 
+        uint32_t run(); // Performs scheduling run
         void schedule_from_seed(const std::string &url);
         void schedule_from_crawl(const std::string &url);
     private:
