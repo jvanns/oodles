@@ -40,6 +40,7 @@ class Node
         virtual ~Node();
         Node(const T &v);
 
+        virtual void visit();
         virtual Node* new_node(const T &v) const;
     private:
         /* Member functions/methods */

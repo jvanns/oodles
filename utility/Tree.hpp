@@ -23,8 +23,12 @@ class Tree
         Node<T>* insert(Iterator b, // Beginning
                         Iterator e, // End
                         Node<T> *p = NULL); // Parent node
+
+        void depth_first_traverse(Node<T> &n) const;
+        void breadth_first_traverse(Node<T> &n) const;
     private:
         /* Member functions/methods */
+        void visit(Node<T> &n) const;
         Node<T>* insert(const T &v, path_index_t i, Node<T> &p);
 
         /* Member variables/attributes */

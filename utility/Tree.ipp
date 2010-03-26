@@ -38,6 +38,46 @@ Tree<T>::insert(Iterator b, Iterator e, Node<T> *p)
     return p;
 }
 
+template<class T>
+void
+Tree<T>::depth_first_traverse(Node<T> &n) const
+{
+    visit(n);
+
+    if (n.leaf())
+        return;
+
+    typename Node<T>::iterator i = n.children.begin(), j = n.children.end();
+    for ( ; i != j ; ++i)
+        depth_first_traverse(*(*i));
+}
+
+template<class T>
+void
+Tree<T>::breadth_first_traverse(Node<T> &n) const
+{
+    if (n.leaf())
+        return;
+
+    typename Node<T>::iterator i = n.children.begin(), j = n.children.end();
+    for ( ; i != j ; ++i)
+        visit(*(*i));
+
+    visit(n);
+
+    /* FIXME: Pretty lame having to loop twice! */
+    for (i = n.children.begin() ; i != j ; ++i)
+        breadth_first_traverse(*(*i));
+}
+
+template<class T>
+inline
+void
+Tree<T>::visit(Node<T> &n) const
+{
+    n.visit();
+}
+
 /*
  * Insert an individual item from the range above;
  * v = Item value (i.e. 'com' or 'www' etc.)

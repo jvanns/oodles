@@ -67,6 +67,12 @@ Node<T>::has_child(const T &v, Node *&c) const
 }
 
 template<class T>
+void
+Node<T>::visit()
+{
+}
+
+template<class T>
 Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
