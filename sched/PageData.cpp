@@ -13,7 +13,8 @@ PageData::PageData(const string &url) :
     epoch(0),
     last_crawl(0),
     links(0),
-    crawl_count(0)
+    crawl_count(0),
+    paralleled(0)
 {
 }
 
