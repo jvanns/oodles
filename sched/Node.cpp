@@ -5,7 +5,12 @@
 namespace oodles {
 namespace sched {
 
-Node::Node(const value_type &v) : oodles::Node<value_type>(v), page(NULL)
+// Public methods
+
+Node::Node(const value_type &v) :
+    oodles::Node<value_type>(v),
+    weight(0.0f),
+    page(NULL)
 {
 }
 
@@ -13,6 +18,8 @@ Node::~Node()
 {
     delete page; // If set, ownership is implicitly transferred
 }
+
+// Private methods
 
 inline
 Node*

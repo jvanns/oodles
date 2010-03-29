@@ -26,6 +26,7 @@ class Scheduler
         Tree<Node::value_type> tree;
 
         /* Member functions/methods */
+        void weigh_tree_branch(Node &n) const;
         void schedule(const std::string &url, bool from_seed);
 };
 

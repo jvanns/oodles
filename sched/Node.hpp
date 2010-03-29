@@ -21,6 +21,7 @@ class Node : public oodles::Node<url::value_type>
         ~Node();
 
         /* Member variables/attributes */
+        float weight; // Weight of this *branch* inc. this node
         PageData *page; // Only used with leaf nodes, NULL otherwise
     private:
         /* Member functions/methods */

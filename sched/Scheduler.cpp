@@ -37,6 +37,28 @@ Scheduler::schedule_from_crawl(const string &url)
 }
 
 void
+Scheduler::weigh_tree_branch(Node &n) const
+{
+    if (!n.parent)
+        return;
+
+    Node &parent = static_cast<Node&> (*(n.parent));
+
+    /*
+     * TODO: Formula untested - simulate a non-seeded set of URLs
+     */
+    if (n.leaf()) {
+        parent.weight -= n.weight;
+        n.weight = (n.page->links *
+                   (time(NULL) - (n.page->last_crawl - n.page->epoch)))
+                   / n.page->crawl_count + 1;
+    }
+
+    parent.weight = parent.weight + (n.weight / (n.children.size() + 1));
+    weigh_tree_branch(parent);
+}
+
+void
 Scheduler::schedule(const string &url, bool from_seed)
 {
     PageData *page = new PageData(url);
@@ -51,8 +73,10 @@ Scheduler::schedule(const string &url, bool from_seed)
         page = node->page;
     }
 
-    if (!from_seed)
+    if (!from_seed) {
         ++page->links; // If we're from a seed it doesn't count as a link!
+        weigh_tree_branch(*node); // Calculates branch schedule index (weight)
+    }
 }
 
 }
