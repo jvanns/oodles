@@ -25,6 +25,7 @@ class Scheduler
         void schedule_from_crawl(const std::string &url);
     private:
         /* Member variables/attributes */
+        size_t leaves;
         Tree<Node::value_type> tree;
         std::priority_queue<Crawler*,
                             std::deque<Crawler*>,

@@ -11,7 +11,7 @@ using std::string;
 namespace oodles {
 namespace sched {
 
-Scheduler::Scheduler()
+Scheduler::Scheduler() : leaves(0)
 {
 }
 
@@ -72,6 +72,7 @@ Scheduler::schedule(const string &url, bool from_seed)
                                                  page->url.end_tree()));
 
     if (!node->page) { // Newly inserted, unique URL
+        ++leaves;
         page->epoch = time(NULL);
         node->page = page; // Ownership of page is implicitly transferred here
     } else {
