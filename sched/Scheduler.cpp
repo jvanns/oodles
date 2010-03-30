@@ -1,6 +1,7 @@
 // oodles
 #include "PageData.hpp"
 #include "Scheduler.hpp"
+#include "utility/math.hpp"
 
 #include <time.h> // For time()
 
@@ -48,10 +49,15 @@ Scheduler::weigh_tree_branch(Node &n) const
      * TODO: Formula untested - simulate a non-seeded set of URLs
      */
     if (n.leaf()) {
+        const time_t now = time(NULL),
+                     max = std::max(now - n.page->epoch,
+                                    now - n.page->last_crawl),
+                     min = std::min(now - n.page->epoch, max),
+                     score = (n.page->links * (now - (max - min)))
+                                        / n.page->crawl_count + 1;
+
         parent.weight -= n.weight;
-        n.weight = (n.page->links *
-                   (time(NULL) - (n.page->last_crawl - n.page->epoch)))
-                   / n.page->crawl_count + 1;
+        n.weight = normalise<time_t> (score, 0, 1, min, max);
     }
 
     parent.weight = parent.weight + (n.weight / (n.children.size() + 1));
