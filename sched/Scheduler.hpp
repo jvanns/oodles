@@ -3,9 +3,11 @@
 
 // oodles
 #include "Node.hpp"
+#include "Crawler.hpp"
 #include "utility/Tree.hpp"
 
 // STL
+#include <queue>
 #include <string>
 
 namespace oodles {
@@ -24,6 +26,9 @@ class Scheduler
     private:
         /* Member variables/attributes */
         Tree<Node::value_type> tree;
+        std::priority_queue<Crawler*,
+                            std::deque<Crawler*>,
+                            RankCrawler> crawlers;
 
         /* Member functions/methods */
         void weigh_tree_branch(Node &n) const;
