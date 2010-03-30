@@ -25,6 +25,7 @@ class Node : public oodles::Node<url::value_type>
         PageData *page; // Only used with leaf nodes, NULL otherwise
     private:
         /* Member functions/methods */
+        void visit();
         Node* new_node(const value_type &v) const;
 };
 

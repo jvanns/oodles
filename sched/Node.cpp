@@ -21,6 +21,11 @@ Node::~Node()
 
 // Private methods
 
+void
+Node::visit()
+{
+}
+
 inline
 Node*
 Node::new_node(const value_type &v) const
