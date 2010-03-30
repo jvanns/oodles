@@ -10,6 +10,7 @@ namespace sched {
 Node::Node(const value_type &v) :
     oodles::Node<value_type>(v),
     weight(0.0f),
+    assigned(false),
     page(NULL)
 {
 }

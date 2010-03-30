@@ -22,6 +22,7 @@ class Node : public oodles::Node<url::value_type>
 
         /* Member variables/attributes */
         float weight; // Weight of this *branch* inc. this node
+        bool assigned; // Is this (leaf) node assigned a crawler?
         PageData *page; // Only used with leaf nodes, NULL otherwise
     private:
         /* Member functions/methods */
