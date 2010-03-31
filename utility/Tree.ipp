@@ -7,7 +7,7 @@ template<class Type>
 void
 Tree<Type>::print(std::ostream &stream) const
 {
-    stream << root;
+    stream << root();
 }
 
 /*
@@ -27,7 +27,7 @@ Tree<Type>::insert(Iterator b, Iterator e, Node<Type> *p)
     if (p)
         i = p->path_idx + 1;
     else
-        p = &root;
+        p = &seed;
 
     while (b != e) {
         p = insert(*b, i, *p);

@@ -24,6 +24,8 @@ class Tree
                            Iterator e, // End
                            Node<Type> *p = NULL); // Parent node
 
+        const Node<Type>& root() const { return seed; }
+
         void depth_first_traverse(Node<Type> &n) const;
         void breadth_first_traverse(Node<Type> &n) const;
     private:
@@ -32,7 +34,7 @@ class Tree
         Node<Type>* insert(const Type &v, path_index_t i, Node<Type> &p);
 
         /* Member variables/attributes */
-        Node<Type> root;
+        Node<Type> seed; // Roots grow from a seed - and root() is already used!
 };
 
 template<class Type>
