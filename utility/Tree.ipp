@@ -3,9 +3,9 @@
 
 namespace oodles {
 
-template<class T>
+template<class Type>
 void
-Tree<T>::print(std::ostream &stream) const
+Tree<Type>::print(std::ostream &stream) const
 {
     stream << root;
 }
@@ -17,10 +17,10 @@ Tree<T>::print(std::ostream &stream) const
  * p = Node of parent returned from last call
  * i = Path ID of current item (dereferenced iterator)
  */
-template<class T>
+template<class Type>
 template<class Iterator>
-Node<T>*
-Tree<T>::insert(Iterator b, Iterator e, Node<T> *p)
+Node<Type>*
+Tree<Type>::insert(Iterator b, Iterator e, Node<Type> *p)
 {
     path_index_t i = 0;
 
@@ -38,28 +38,28 @@ Tree<T>::insert(Iterator b, Iterator e, Node<T> *p)
     return p;
 }
 
-template<class T>
+template<class Type>
 void
-Tree<T>::depth_first_traverse(Node<T> &n) const
+Tree<Type>::depth_first_traverse(Node<Type> &n) const
 {
     visit(n);
 
     if (n.leaf())
         return;
 
-    typename Node<T>::iterator i = n.children.begin(), j = n.children.end();
+    typename Node<Type>::iterator i = n.children.begin(), j = n.children.end();
     for ( ; i != j ; ++i)
         depth_first_traverse(*(*i));
 }
 
-template<class T>
+template<class Type>
 void
-Tree<T>::breadth_first_traverse(Node<T> &n) const
+Tree<Type>::breadth_first_traverse(Node<Type> &n) const
 {
     if (n.leaf())
         return;
 
-    typename Node<T>::iterator i = n.children.begin(), j = n.children.end();
+    typename Node<Type>::iterator i = n.children.begin(), j = n.children.end();
     for ( ; i != j ; ++i)
         visit(*(*i));
 
@@ -70,10 +70,10 @@ Tree<T>::breadth_first_traverse(Node<T> &n) const
         breadth_first_traverse(*(*i));
 }
 
-template<class T>
+template<class Type>
 inline
 void
-Tree<T>::visit(Node<T> &n) const
+Tree<Type>::visit(Node<Type> &n) const
 {
     n.visit();
 }
@@ -85,11 +85,11 @@ Tree<T>::visit(Node<T> &n) const
  * p = Parent node
  * c = Current node
  */
-template<class T>
-Node<T>*
-Tree<T>::insert(const T &v, path_index_t i, Node<T> &p)
+template<class Type>
+Node<Type>*
+Tree<Type>::insert(const Type &v, path_index_t i, Node<Type> &p)
 {
-    Node<T> *c = NULL;
+    Node<Type> *c = NULL;
 
     if (!p.has_child(v, c))
         c = p.create_child(v, i); // Create new child node

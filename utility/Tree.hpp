@@ -9,37 +9,37 @@
 
 namespace oodles {
 
-template<class T>
+template<class Type>
 class Tree
 {
     public:
         /* Dependent typedefs */
-        typedef typename Node<T>::path_index_t path_index_t;
+        typedef typename Node<Type>::path_index_t path_index_t;
 
         /* Member functions/methods */
         void print(std::ostream &stream) const;
 
         template<class Iterator>
-        Node<T>* insert(Iterator b, // Beginning
-                        Iterator e, // End
-                        Node<T> *p = NULL); // Parent node
+        Node<Type>* insert(Iterator b, // Beginning
+                           Iterator e, // End
+                           Node<Type> *p = NULL); // Parent node
 
-        void depth_first_traverse(Node<T> &n) const;
-        void breadth_first_traverse(Node<T> &n) const;
+        void depth_first_traverse(Node<Type> &n) const;
+        void breadth_first_traverse(Node<Type> &n) const;
     private:
         /* Member functions/methods */
-        void visit(Node<T> &n) const;
-        Node<T>* insert(const T &v, path_index_t i, Node<T> &p);
+        void visit(Node<Type> &n) const;
+        Node<Type>* insert(const Type &v, path_index_t i, Node<Type> &p);
 
         /* Member variables/attributes */
-        Node<T> root;
+        Node<Type> root;
 };
 
-template<class T>
+template<class Type>
 static
 inline
 std::ostream&
-operator<< (std::ostream &stream, const Tree<T> &tree)
+operator<< (std::ostream &stream, const Tree<Type> &tree)
 {
     tree.print(stream);
     return stream;
