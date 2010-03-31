@@ -22,6 +22,17 @@ Scheduler::~Scheduler()
 uint32_t
 Scheduler::run()
 {
+    /*
+     * In our priority queue, crawlers, the top most item will
+     * be the one with the least amount of work (therefore able
+     * to take on more). If that item has reached full capacity
+     * we can do no more.
+     */
+    for (Crawler &crawler = *(crawlers.top()) ;
+         crawler.unit_size() < Crawler::max_unit_size() ; )
+    {
+    }
+
     return 0;
 }
 
