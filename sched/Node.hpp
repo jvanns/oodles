@@ -20,6 +20,8 @@ class Node : public oodles::Node<url::value_type>
         Node(const value_type &v);
         ~Node();
 
+        bool eligible() const { return !assigned && page != NULL; }
+
         /* Member variables/attributes */
         float weight; // Weight of this *branch* inc. this node
         bool assigned; // Is this (leaf) node assigned a crawler?
