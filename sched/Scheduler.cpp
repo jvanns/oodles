@@ -1,12 +1,12 @@
 // oodles
 #include "PageData.hpp"
 #include "Scheduler.hpp"
-#include "utility/math.hpp"
 
 #include <time.h> // For time()
 
 // STL
 using std::string;
+using std::vector;
 
 namespace oodles {
 namespace sched {
@@ -25,12 +25,15 @@ Scheduler::run()
     /*
      * In our priority queue, crawlers, the top most item will
      * be the one with the least amount of work (therefore able
-     * to take on more). If that item has reached full capacity
+     * to take on more). If that crawler has reached full capacity
      * we can do no more.
      */
-    for (Crawler &crawler = *(crawlers.top()) ;
-         crawler.unit_size() < Crawler::max_unit_size() ; )
-    {
+    Crawler &c = *(crawlers.top());
+    for (size_t i = 0, j = crawlers.size() ; i < j ; ++i) {
+        fill_crawler(c); // Assign as much work to crawler (fills work unit)
+
+        crawlers.pop(); // Pop the top of the queue (i.e. remove 'c')
+        crawlers.push(&c); // Push c back onto the queue forcing rank order
     }
 
     return 0;
@@ -48,6 +51,16 @@ Scheduler::schedule_from_crawl(const string &url)
     schedule(url, false);
 }
 
+inline
+Node*
+Scheduler::traverse_branch(Node *n) const
+{
+    if (!n)
+        return NULL;
+
+    return traverse_branch(select_best_node(*n));
+}
+
 void
 Scheduler::weigh_tree_branch(Node &n) const
 {
@@ -56,23 +69,32 @@ Scheduler::weigh_tree_branch(Node &n) const
 
     Node &parent = static_cast<Node&> (*(n.parent));
 
-    /*
-     * TODO: Formula untested - simulate a non-seeded set of URLs
-     */
-    if (n.leaf()) {
-        const time_t now = time(NULL),
-                     max = std::max(now - n.page->epoch,
-                                    now - n.page->last_crawl),
-                     min = std::min(now - n.page->epoch, max),
-                     score = (n.page->links * (now - (max - min)))
-                                        / n.page->crawl_count + 1;
+    parent.weight -= n.weight;
+    n.weight = n.calculate_weight();
+    parent.weight = parent.weight + (n.weight / (n.children.size() + 1));
 
-        parent.weight -= n.weight;
-        n.weight = normalise<time_t> (score, 0, 1, min, max);
+    weigh_tree_branch(parent);
+}
+
+Node*
+Scheduler::select_best_node(const Node &parent) const
+{
+    Node *c = NULL, *n = NULL;
+    vector<Node::Base*>::const_iterator i = parent.children.begin();
+
+    for ( ; i != parent.children.end() ; ++i) {
+        c = static_cast<Node*>(*i);
+
+        if (c->leaf() && !c->eligible()) // Ignore any ineligible leaf nodes
+            continue;
+
+        if (!n)
+            n = c;
+        else if (c->weight > n->weight)
+            n = c;
     }
 
-    parent.weight = parent.weight + (n.weight / (n.children.size() + 1));
-    weigh_tree_branch(parent);
+    return n;
 }
 
 void
@@ -97,6 +119,37 @@ Scheduler::schedule(const string &url, bool from_seed)
     }
 }
 
-}
+void
+Scheduler::fill_crawler(Crawler &c)
+{
+    Node *n = NULL, *p = NULL;
+    static const Node *root = static_cast<const Node*>(&tree.root());
+
+    while (c.unit_size() < Crawler::max_unit_size()) {
+        if (!n)
+            n = const_cast<Node*>(root);
+        else
+            n = static_cast<Node*>(n->parent);
+
+        if (!n)
+            break; // We've returned to the top of the tree, exhausted
+
+        p = n; // Set the previous node - we may need to backtrack up the tree
+        n = traverse_branch(n);
+
+        if (!n) // No child was eligible
+            n = p;
+        else
+            link_crawler_and_node(c, *n);
+    }
 }
 
+void
+Scheduler::link_crawler_and_node(Crawler &c, Node &n) const
+{
+    c.add_url(&n.page->url);
+    n.assigned = true;
+}
+
+} // sched
+} // oodles
