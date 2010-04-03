@@ -15,11 +15,13 @@ class Node : public oodles::Node<url::value_type>
     public:
         /* Dependent typedefs */
         typedef url::value_type value_type;
+        typedef oodles::Node<value_type> Base;
 
         /* Member functions/methods */
         Node(const value_type &v);
         ~Node();
 
+        float calculate_weight() const;
         bool eligible() const { return !assigned && page != NULL; }
 
         /* Member variables/attributes */
@@ -30,6 +32,11 @@ class Node : public oodles::Node<url::value_type>
         /* Member functions/methods */
         void visit();
         Node* new_node(const value_type &v) const;
+};
+
+struct RankNode : public std::binary_function<Node::Base, Node::Base, bool>
+{
+    bool operator() (const Node::Base *lhs, const Node::Base *rhs) const;
 };
 
 } // sched
