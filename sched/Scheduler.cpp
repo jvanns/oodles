@@ -98,6 +98,30 @@ Scheduler::select_best_node(const Node &parent) const
 }
 
 void
+Scheduler::fill_crawler(Crawler &c)
+{
+    Node *n = NULL, *p = NULL;
+    static const Node *root = static_cast<const Node*>(&tree.root());
+
+    while (c.unit_size() < Crawler::max_unit_size()) {
+        if (!n)
+            n = const_cast<Node*>(root);
+        else
+            p = n = static_cast<Node*>(n->parent);
+
+        if (!n)
+            break; // We've returned to the top of the tree, exhausted
+
+        n = traverse_branch(n);
+
+        if (n && n->eligible())
+            n->page->assign_crawler(&c);
+        else
+            n = p; // Begin to backtrack up the tree
+    }
+}
+
+void
 Scheduler::schedule(const string &url, bool from_seed)
 {
     PageData *page = new PageData(url);
@@ -117,38 +141,6 @@ Scheduler::schedule(const string &url, bool from_seed)
         ++page->links; // If we're from a seed it doesn't count as a link!
         weigh_tree_branch(*node); // Calculates branch schedule index (weight)
     }
-}
-
-void
-Scheduler::fill_crawler(Crawler &c)
-{
-    Node *n = NULL, *p = NULL;
-    static const Node *root = static_cast<const Node*>(&tree.root());
-
-    while (c.unit_size() < Crawler::max_unit_size()) {
-        if (!n)
-            n = const_cast<Node*>(root);
-        else
-            n = static_cast<Node*>(n->parent);
-
-        if (!n)
-            break; // We've returned to the top of the tree, exhausted
-
-        p = n; // Set the previous node - we may need to backtrack up the tree
-        n = traverse_branch(n);
-
-        if (!n) // No child was eligible
-            n = p;
-        else
-            link_crawler_and_node(c, *n);
-    }
-}
-
-void
-Scheduler::link_crawler_and_node(Crawler &c, Node &n) const
-{
-    c.add_url(&n.page->url);
-    n.assigned = true;
 }
 
 } // sched

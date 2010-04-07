@@ -36,10 +36,8 @@ class Scheduler
         void weigh_tree_branch(Node &n) const;
         Node* select_best_node(const Node &parent) const;
         
-        void schedule(const std::string &url, bool from_seed);
-        
         void fill_crawler(Crawler &c);
-        void link_crawler_and_node(Crawler &c, Node &n) const;
+        void schedule(const std::string &url, bool from_seed);
 };
 
 } // sched
