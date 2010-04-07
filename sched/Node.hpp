@@ -2,7 +2,7 @@
 #define OODLES_SCHED_NODE_HPP
 
 // oodles
-#include "url/URL.hpp"
+#include "PageData.hpp"
 #include "utility/Node.hpp"
 
 namespace oodles {
@@ -22,11 +22,10 @@ class Node : public oodles::Node<url::value_type>
         ~Node();
 
         float calculate_weight() const;
-        bool eligible() const { return !assigned && page != NULL; }
+        bool eligible() const { return page ? page->crawler == NULL : false; }
 
         /* Member variables/attributes */
         float weight; // Weight of this *branch* inc. this node
-        bool assigned; // Is this (leaf) node assigned a crawler?
         PageData *page; // Only used with leaf nodes, NULL otherwise
     private:
         /* Member functions/methods */
