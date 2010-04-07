@@ -8,11 +8,13 @@ namespace oodles {
 namespace sched {
 
 class Node; // Forward declaration for PageData
+class Crawler; // Forward declaration for PageData
 
 struct PageData
 {
-    const url::URL url;
-    const Node *referrer;
+    Crawler *crawler; // Our crawler, if any.
+    const url::URL url; // Our URL object/structure.
+    const Node *referrer; // Link to a Node that holds a hyperlink to us.
 
     time_t epoch, // Creation time of leaf node
            last_crawl; // Time of last crawl or 0
@@ -21,6 +23,7 @@ struct PageData
              paralleled; // No. of currently scheduled pages in same domain
 
     PageData(const std::string &url);
+    void assign_crawler(Crawler *c);
 };
 
 } // sched

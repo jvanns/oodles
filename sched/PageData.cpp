@@ -1,4 +1,5 @@
 // oodles
+#include "Crawler.hpp"
 #include "PageData.hpp"
 
 // STL
@@ -8,6 +9,7 @@ namespace oodles {
 namespace sched {
 
 PageData::PageData(const string &url) :
+    crawler(NULL),
     url(url),
     referrer(NULL),
     epoch(0),
@@ -16,6 +18,13 @@ PageData::PageData(const string &url) :
     crawl_count(0),
     paralleled(0)
 {
+}
+
+void
+PageData::assign_crawler(Crawler *c)
+{
+    crawler = c;
+    crawler->add_url(&url);
 }
 
 } // oodles
