@@ -18,8 +18,6 @@ namespace net {
 
 namespace sched {
 
-struct RankCrawler; // Forward declaration for Crawler
-
 class Crawler
 {
     public:
