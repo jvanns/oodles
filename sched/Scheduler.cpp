@@ -130,7 +130,6 @@ Scheduler::schedule(const string &url, bool from_seed)
 
     if (!node->page) { // Newly inserted, unique URL
         ++leaves;
-        page->epoch = time(NULL);
         node->page = page; // Ownership of page is implicitly transferred here
     } else {
         delete page;
