@@ -16,8 +16,8 @@ class Node
 {
     public:
         /* Dependent typedefs */
-        typedef uint16_t path_index_t;
-        typedef uint16_t child_index_t;
+        typedef uint16_t path_index_t; // Depth
+        typedef uint32_t child_index_t; // Breadth
 
         /* Member functions/methods */
         bool leaf() const;
