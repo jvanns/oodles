@@ -3,6 +3,7 @@
 
 // STL
 #include <vector>
+#include <string>
 #include <functional>
 
 namespace oodles {
@@ -23,7 +24,7 @@ class Crawler
 {
     public:
         /* Member variables/attributes */
-        Crawler();
+        Crawler(const std::string &name);
         uint16_t add_url(const url::URL *url);
 
         static uint16_t max_unit_size() { return 32; }
@@ -31,6 +32,7 @@ class Crawler
         uint16_t unit_size() const { return work_unit.size(); }
     private:
         /* Member variables/attributes */
+        std::string name; // Identifier for this Crawler (i.e. hostname)
         net::Endpoint *endpoint; // Network session associated with this Crawler
         std::vector<const url::URL*> work_unit; // Units of work (URLs to crawl)
 };

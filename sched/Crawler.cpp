@@ -1,10 +1,13 @@
 // oodles
 #include "Crawler.hpp"
 
+// STL
+using std::string;
+
 namespace  oodles {
 namespace sched {
 
-Crawler::Crawler() : endpoint(NULL)
+Crawler::Crawler(const string &name) : name(name), endpoint(NULL)
 {
 }
 
