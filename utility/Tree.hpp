@@ -17,6 +17,9 @@ class Tree
         typedef typename Node<Type>::path_index_t path_index_t;
 
         /* Member functions/methods */
+        Tree(Node<Type> *n = NULL);
+        ~Tree();
+
         void print(std::ostream &stream) const;
 
         template<class Iterator>
@@ -24,7 +27,7 @@ class Tree
                            Iterator e, // End
                            Node<Type> *p = NULL); // Parent node
 
-        const Node<Type>& root() const { return seed; }
+        const Node<Type>& root() const { return *seed; }
 
         void depth_first_traverse(Node<Type> &n) const;
         void breadth_first_traverse(Node<Type> &n) const;
@@ -34,7 +37,7 @@ class Tree
         Node<Type>* insert(const Type &v, path_index_t i, Node<Type> &p);
 
         /* Member variables/attributes */
-        Node<Type> seed; // Roots grow from a seed - and root() is already used!
+        Node<Type>* seed; // Roots grow from seed - and root() is already used!
 };
 
 template<class Type>

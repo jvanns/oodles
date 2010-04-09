@@ -4,6 +4,21 @@
 namespace oodles {
 
 template<class Type>
+Tree<Type>::Tree(Node<Type> *n) : seed(NULL)
+{
+    if (!n)
+        seed = new Node<Type>;
+    else
+        seed = n; // Tree takes ownership and will delete 'seed'
+}
+
+template<class Type>
+Tree<Type>::~Tree()
+{
+    delete seed;
+}
+
+template<class Type>
 void
 Tree<Type>::print(std::ostream &stream) const
 {
@@ -27,7 +42,7 @@ Tree<Type>::insert(Iterator b, Iterator e, Node<Type> *p)
     if (p)
         i = p->path_idx + 1;
     else
-        p = &seed;
+        p = seed;
 
     while (b != e) {
         p = insert(*b, i, *p);
