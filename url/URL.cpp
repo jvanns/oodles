@@ -189,11 +189,10 @@ URL::to_string() const
 
         stream << '/';
         copy(i, j, ostream_iterator<value_type>(stream, "/"));
-        stream << *j << '/';
-    } else
-        stream << '/';
-
-    stream << page;
+        stream << *j;
+    }
+    
+    stream << '/' << page;
 
     return stream.str();
 }
