@@ -11,7 +11,7 @@ using std::vector;
 namespace oodles {
 namespace sched {
 
-Scheduler::Scheduler() : leaves(0)
+Scheduler::Scheduler() : leaves(0), tree(new Node("ROOT"))
 {
 }
 
@@ -131,11 +131,15 @@ Scheduler::fill_crawler(Crawler &c)
 void
 Scheduler::schedule(const string &url, bool from_seed)
 {
+    bool duplicate = true;
     PageData *page = new PageData(url);
     Node *node = static_cast<Node*> (tree.insert(page->url.begin_tree(),
                                                  page->url.end_tree()));
 
-    if (!node->page) { // Newly inserted, unique URL
+    if (node->leaf() && !node->page)
+        duplicate = false;
+
+    if (!duplicate) { // Newly inserted, unique URL
         ++leaves;
         node->page = page; // Ownership of page is implicitly transferred here
     } else {
