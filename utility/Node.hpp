@@ -42,7 +42,7 @@ class Node
         std::vector<Node*> children; // This nodes children
     protected:
         /* Dependent typedefs */
-        typedef typename std::vector<Node<T>*>::const_iterator iterator;
+        typedef typename std::vector<Node*>::const_iterator iterator;
 
         /* Member functions/methods */
         Node(const T &v);
