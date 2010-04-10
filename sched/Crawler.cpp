@@ -12,9 +12,9 @@ Crawler::Crawler(const string &name) : name(name), endpoint(NULL)
 }
 
 uint16_t
-Crawler::add_url(const url::URL *url)
+Crawler::add_url(const url::URL &url)
 {
-    work_unit.push_back(url);
+    work_unit.push_back(&url);
     return unit_size();
 }
 

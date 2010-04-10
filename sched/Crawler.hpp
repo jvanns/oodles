@@ -6,6 +6,8 @@
 #include <string>
 #include <functional>
 
+#include <stdint.h> // For uint16_t
+
 namespace oodles {
 
 namespace url {
@@ -23,7 +25,7 @@ class Crawler
     public:
         /* Member variables/attributes */
         Crawler(const std::string &name);
-        uint16_t add_url(const url::URL *url);
+        uint16_t add_url(const url::URL &url);
 
         static uint16_t max_unit_size() { return 32; }
         bool online() const { return endpoint != NULL; }
