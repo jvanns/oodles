@@ -62,10 +62,9 @@ inline
 Node*
 Scheduler::traverse_branch(Node *n) const
 {
-    if (!n)
-        return NULL;
+    Node *p = select_best_node(*n);
 
-    return traverse_branch(select_best_node(*n));
+    return (p ? traverse_branch(p) : n);
 }
 
 void
@@ -100,7 +99,7 @@ Scheduler::select_best_node(const Node &parent) const
         else if (c->weight > n->weight)
             n = c;
     }
-
+    
     return n;
 }
 
@@ -114,17 +113,18 @@ Scheduler::fill_crawler(Crawler &c)
         if (!n)
             n = const_cast<Node*>(root);
         else
-            p = n = static_cast<Node*>(n->parent);
+            n = static_cast<Node*>(n->parent);
 
         if (!n)
             break; // We've returned to the top of the tree, exhausted
 
+        p = n;
         n = traverse_branch(n);
 
         if (n && n->eligible())
             n->page->assign_crawler(&c);
         else
-            n = p; // Begin to backtrack up the tree
+            n = p;
     }
 }
 
