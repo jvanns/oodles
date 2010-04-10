@@ -24,7 +24,7 @@ void
 PageData::assign_crawler(Crawler *c)
 {
     crawler = c;
-    crawler->add_url(&url);
+    crawler->add_url(url);
 }
 
 } // oodles

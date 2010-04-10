@@ -4,6 +4,8 @@
 // oodles
 #include "url/URL.hpp"
 
+#include <stdint.h> // For uint32_t
+
 namespace oodles {
 namespace sched {
 
