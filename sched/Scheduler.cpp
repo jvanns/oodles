@@ -8,6 +8,14 @@
 using std::string;
 using std::vector;
 
+static
+inline
+oodles::sched::Node*
+parent_of(oodles::sched::Node::Base &node)
+{
+    return static_cast<oodles::sched::Node*>(node.parent);
+}
+
 namespace oodles {
 namespace sched {
 
@@ -28,12 +36,13 @@ Scheduler::run()
      * to take on more). If that crawler has reached full capacity
      * we can do no more.
      */
-    Crawler &c = *(crawlers.top());
-    for (size_t i = 0, j = crawlers.size() ; i < j ; ++i) {
-        fill_crawler(c); // Assign as much work to crawler (fills work unit)
+    size_t i = 0, j = crawlers.size();
+    for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
+        if (c->online()) // Do not assign anything to offline Crawlers
+            fill_crawler(*c); // Assign as much work to crawler (fill work unit)
 
         crawlers.pop(); // Pop the top of the queue (i.e. remove 'c')
-        crawlers.push(&c); // Push c back onto the queue forcing rank order
+        crawlers.push(c); // Push c back onto the queue forcing rank order
     }
 
     return 0;
@@ -60,11 +69,26 @@ Scheduler::schedule_from_crawl(const string &url)
 
 inline
 Node*
-Scheduler::traverse_branch(Node *n) const
+Scheduler::traverse_branch(Node &n) const
 {
-    Node *p = select_best_node(*n);
+    Node *p = select_best_node(n);
 
-    return (p ? traverse_branch(p) : n);
+    /*
+     * If we have been unable to consider any children as eligible for
+     * crawling then we must mark the node as 'white' - we do not
+     * want to traverse it again... yet.
+     */
+    if (!p) {
+        if (n.eligible()) // Return when we've found something crawlable
+            return &n;
+
+        p = parent_of(n); // Begin to backtrack
+
+        if (!p)
+            return NULL; // We've returned to the root node
+    }
+
+    return traverse_branch(*p); // Continue delving deeper
 }
 
 void
@@ -73,17 +97,17 @@ Scheduler::weigh_tree_branch(Node &n) const
     if (!n.parent)
         return;
 
-    Node &parent = static_cast<Node&> (*(n.parent));
+    Node *parent = parent_of(n);
 
-    parent.weight -= n.weight;
+    parent->weight -= n.weight;
     n.weight = n.calculate_weight();
-    parent.weight = parent.weight + (n.weight / (n.children.size() + 1));
+    parent->weight = parent->weight + (n.weight / (n.children.size() + 1));
 
-    weigh_tree_branch(parent);
+    weigh_tree_branch(*parent);
 }
 
 Node*
-Scheduler::select_best_node(const Node &parent) const
+Scheduler::select_best_node(Node &parent) const
 {
     Node *c = NULL, *n = NULL;
     vector<Node::Base*>::const_iterator i = parent.children.begin();
@@ -91,7 +115,12 @@ Scheduler::select_best_node(const Node &parent) const
     for ( ; i != parent.children.end() ; ++i) {
         c = static_cast<Node*>(*i);
 
-        if (c->leaf() && !c->eligible()) // Ignore any ineligible leaf nodes
+        if (c->visit_state == Node::White) // Skip-over any visited branch
+            continue;
+
+        c->visit_state = Node::Grey; // Node visited but not all children
+
+        if (c->page && !c->eligible()) // Ignore ineligible yet crawlable nodes
             continue;
 
         if (!n)
@@ -99,7 +128,10 @@ Scheduler::select_best_node(const Node &parent) const
         else if (c->weight > n->weight)
             n = c;
     }
-    
+
+    if (!n) // No child was a candidate although all were considered
+        parent.visit_state = Node::White;
+
     return n;
 }
 
@@ -111,20 +143,20 @@ Scheduler::fill_crawler(Crawler &c)
 
     while (c.unit_size() < Crawler::max_unit_size()) {
         if (!n)
-            n = const_cast<Node*>(root);
+            n = const_cast<Node*>(root); // At the top of the tree
         else
-            n = static_cast<Node*>(n->parent);
+            n = parent_of(*n); // Begin to backtrack
 
         if (!n)
-            break; // We've returned to the top of the tree, exhausted
+            break; // We've exhausted the tree (root's parent is NULL)
 
-        p = n;
-        n = traverse_branch(n);
+        p = n; // Keep a copy of our current position
+        n = traverse_branch(*n); // Traverse to find best candidate for crawling
 
         if (n && n->eligible())
             n->page->assign_crawler(&c);
         else
-            n = p;
+            n = p; // Restore the copy of the previous node
     }
 }
 
