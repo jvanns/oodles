@@ -1,5 +1,6 @@
 // oodles
 #include "Crawler.hpp"
+#include "url/URL.hpp"
 
 // STL
 using std::string;
