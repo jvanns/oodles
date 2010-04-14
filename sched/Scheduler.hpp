@@ -34,9 +34,9 @@ class Scheduler
                             RankCrawler> crawlers;
 
         /* Member functions/methods */
-        Node* traverse_branch(Node *n) const;
+        Node* traverse_branch(Node &n) const;
         void weigh_tree_branch(Node &n) const;
-        Node* select_best_node(const Node &parent) const;
+        Node* select_best_node(Node &parent) const;
         
         void fill_crawler(Crawler &c);
         void schedule(const std::string &url, bool from_seed);
