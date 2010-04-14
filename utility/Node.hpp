@@ -30,15 +30,23 @@ class Node
         path_index_t path_idx; // Index of this node within it's path
         child_index_t child_idx; // Index of this node amoung it's siblings
 
+        /* Visitation state */
+        enum {
+            Black = 0, // This node not visited nor any of it's children
+            White = 1, // This node and all children have been visited
+            Grey = 2 // This node visited but not yet all children
+        };
+
         Node *parent; // Pointer to parent node
-        std::vector<Node<T>*> children; // This nodes children
+        int visit_state; // Visitation state for this node
+        std::vector<Node*> children; // This nodes children
     protected:
         /* Dependent typedefs */
         typedef typename std::vector<Node<T>*>::const_iterator iterator;
 
         /* Member functions/methods */
-        virtual ~Node();
         Node(const T &v);
+        virtual ~Node();
 
         virtual void visit();
         virtual Node* new_node(const T &v) const;

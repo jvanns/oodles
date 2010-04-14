@@ -67,12 +67,6 @@ Node<T>::has_child(const T &v, Node *&c) const
 }
 
 template<class T>
-void
-Node<T>::visit()
-{
-}
-
-template<class T>
 Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
@@ -105,6 +99,16 @@ Node<T>::create_child(const T &v, path_index_t i)
  * Protected methods
  */
 template<class T>
+Node<T>::Node(const T &v) :
+    value(v),
+    path_idx(0),
+    child_idx(0),
+    parent(NULL),
+    visit_state(Black)
+{
+}
+
+template<class T>
 Node<T>::~Node()
 {
     for (iterator i = children.begin() ; i != children.end() ; ++i)
@@ -112,7 +116,8 @@ Node<T>::~Node()
 }
 
 template<class T>
-Node<T>::Node(const T &v) : value(v), path_idx(0), child_idx(0), parent(NULL)
+void
+Node<T>::visit()
 {
 }
 
@@ -132,7 +137,7 @@ Node<T>::new_node(const T &v) const
  * Private methods
  */
 template<class T>
-Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL)
+Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL), visit_state(Black)
 {
 }
 
