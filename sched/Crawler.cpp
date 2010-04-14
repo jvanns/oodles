@@ -28,6 +28,9 @@ RankCrawler::operator() (const Crawler *lhs, const Crawler *rhs) const
     if (!lhs->online())
         return false;
 
+    if (lhs->unit_size() == rhs->unit_size())
+        return false; // Maintain a stable queue
+
     /*
      * Always prefer Crawlers with less work at the front of the queue
      */
