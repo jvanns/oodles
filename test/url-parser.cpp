@@ -41,10 +41,10 @@ build_url(const string &line) // line from the input file
             cout << "(www host).";
         cout << endl;
 
-        // Test bidirectional iteratation...
+        cout << "Testing bidirectional iteratation...";
         for (oodles::url::URL::iterator i = url.end() ; i != url.begin() ; )
-            cout << *(--i);
-        cout << endl;
+            cout << *(--i) << ",";
+        cout << endl << endl;
     } catch (const exception &e) {
         cerr << e.what();
         return false;
