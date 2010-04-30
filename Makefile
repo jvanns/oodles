@@ -44,8 +44,8 @@ URL := $(patsubst %.cpp,%.o,$(wildcard url/*.cpp))
 # Binary targets
 TESTS = test/html-parser \
 	test/word-indexer \
-    test/url-parser \
-    test/url-tree
+	test/url-parser \
+	test/url-tree
 
 test/html-parser: test/html-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
