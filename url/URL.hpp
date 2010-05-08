@@ -1,14 +1,13 @@
-#ifndef OODLES_URL_HPP
-#define OODLES_URL_HPP
+#ifndef OODLES_URL_URL_HPP
+#define OODLES_URL_URL_HPP
 
 // oodles
+#include "Parser.hpp"
 #include "Iterator.hpp"
 #include "TreeIterator.hpp"
+#include "common/Exceptions.hpp"
 
 // STL
-#include <set>
-#include <string>
-#include <vector>
 #include <iostream>
 
 namespace oodles {
@@ -23,6 +22,13 @@ namespace url {
 class URL
 {
     public:
+        /* Dependent typedefs */
+        typedef Iterator iterator;
+        typedef TreeIterator tree_iterator;
+
+        enum {Scheme, Username, Password, Domain, Port, Path, Page};
+
+        /* Member functions/methods */
         URL(const std::string &url);
 
         bool operator== (const URL &rhs) const;
@@ -50,29 +56,16 @@ class URL
         {
             return TreeIterator(this, Iterator::End);
         }
-    public:
-        typedef Iterator iterator;
-        typedef TreeIterator tree_iterator;
-
-        typedef std::string value_type;
-        typedef std::pair<value_type, value_type> query_kvp;
-
-        enum {Scheme, Username, Password, Domain, Port, Path, Page, Query};
     private:
-        void normalise();
-        void tokenise(const std::string &url);
-    private:
+        /* Member functions/methods */
+        void tokenise(const std::string &url) throw(ParseError);
+
+        /* Member variables/attributes */
+        Attributes attributes;
+
+        /* Friend class declarations */
         friend class Iterator; // We need to give iterators access to...
         friend class TreeIterator; // We need to give iterators access to...
-    private:
-        value_type port,
-                   page, // i.e. index.html
-                   scheme, // i.e. http (ignoring ://)
-                   username,
-                   password;
-        std::vector<value_type> path, // i.e. /product, /ids etc.
-                                domain; // i.e. www, google, co, uk
-        std::set<query_kvp> query_string; // i.e. name=Jim&uuid=12345
 };
 
 static
