@@ -22,9 +22,6 @@ namespace html {
 template <class Iterator>
 Parser<Iterator>::Parser() : Parser<Iterator>::base_type(html, "element")
 {
-    using qi::_1;
-    using qi::_val;
-
     using qi::lit;
     using qi::lexeme;
     using qi::matches;
