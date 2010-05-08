@@ -41,3 +41,5 @@ http://www.blakearchive.org
 http://www.rc.umd.edu/
 http://jbloggs:xyz123@www.writepage.com:8080/others/wwpbios2.htm
 http://orion.it.luc.edu/~acraciu/wrew.htm
+http://gopher.upenn.edu/a/b/c/d/../../pennprintout/html/./v11/3/creature.html
+http://gopher.upenn.edu/a/b/c/d/../../pennprintout/html/.././v11/3/creature.html
