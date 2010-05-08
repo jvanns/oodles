@@ -75,6 +75,7 @@ Parser::Parser() : Parser::base_type(url, "url")
     using boost::spirit::qi::_1;
     using boost::spirit::qi::_val;
 
+    using boost::spirit::byte_;
     using boost::spirit::qi::eoi; // End Of Input
     using boost::spirit::qi::lit; // Literal
     using boost::spirit::qi::omit;
@@ -113,13 +114,13 @@ Parser::Parser() : Parser::base_type(url, "url")
     /*
      * Path: A forward-slash delimited sequence of strings up to the page
      */
-    dir %= +(char_ - '/'); // Identifies a single path fragment
+    dir %= +(byte_ - '/'); // Identifies a single path fragment
     path = *(dir >> '/')[normalise_path_fragment(_val, _1)] >> -omit['/'];
 
     /*
      * Page: Leaf node of the path - the last of the URL (drop the #fragment)
      */
-    page %= +(char_ - '#') >> -omit[lit('#') >> +(char_ -  eoi)] || eoi;
+    page %= *(byte_ - '#') >> -omit[lit('#') >> *(byte_ -  eoi)] || eoi;
 
     url =
         -scheme[at_c<2>(_val) = _1] /* Scheme is not always present in links */
