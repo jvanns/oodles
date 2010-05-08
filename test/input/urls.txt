@@ -1,4 +1,5 @@
 http://uk.weather.com/weather/tomorrow-Godalming-GU7
+http://uk.weather.com/weather/tomorrow-Godalming-GU7#foobar
 http://link.brightcove.com/services/player/bcpid58471091001?bclid=66428918001&bctid=68682364001
 http://english.ucsb.edu:591/rchrono/
 http://www.lib.ucdavis.edu/English/BWRP/index.htm
