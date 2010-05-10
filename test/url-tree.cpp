@@ -17,7 +17,7 @@ using std::string;
 // STL exception
 using std::exception;
 
-static oodles::Tree<oodles::url::URL::value_type> tree;
+static oodles::Tree<oodles::url::value_type> tree;
 
 static
 bool

@@ -1,8 +1,10 @@
 #ifndef OODLES_URL_ITERATOR_HPP
 #define OODLES_URL_ITERATOR_HPP
 
+// oodles
+#include "type.hpp"
+
 // STL
-#include <string>
 #include <iterator>
 
 namespace oodles {
@@ -11,8 +13,7 @@ namespace url {
 class URL; // Forward declaration for Iterator
 
 class Iterator :
-    public std::iterator<std::bidirectional_iterator_tag,
-                         std::string>
+    public std::iterator<std::bidirectional_iterator_tag, value_type>
 {
     private:
         enum {Invalid = 0, Begin, Transient, End};
@@ -24,7 +25,7 @@ class Iterator :
         Iterator& operator++();
         Iterator& operator--();
 
-        const std::string& operator*()
+        const value_type& operator*()
         {
             return *value;
         }
@@ -45,7 +46,7 @@ class Iterator :
         friend class URL; // URL wants access only to enums above
     private:
         int internal_state, external_state;
-        const std::string *value;
+        const value_type *value;
         const URL *url;
         size_t index;
 };

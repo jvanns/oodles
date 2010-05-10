@@ -47,20 +47,21 @@ Iterator::move_pointer_forward()
 
     switch (external_state) {
         case URL::Scheme:
-            value = &url->scheme;
+            value = &url->attributes.scheme;
             external_state = URL::Username;
             break;
         case URL::Username:
-            value = &url->username;
+            value = &url->attributes.username;
             external_state = URL::Password;
             break;
         case URL::Password:
-            value = &url->password;
+            value = &url->attributes.password;
             external_state = URL::Domain;
             break;
         case URL::Domain:
-            if (!url->domain.empty() && index < url->domain.size()) {
-                value = &url->domain[index];
+            if (!url->attributes.domain.empty() &&
+                index < url->attributes.domain.size()) {
+                value = &url->attributes.domain[index];
                 ++index;
             } else {
                 external_state = URL::Port;
@@ -69,12 +70,13 @@ Iterator::move_pointer_forward()
             }
             break;
         case URL::Port:
-            value = &url->port;
+            value = &url->attributes.port;
             external_state = URL::Path;
             break;
         case URL::Path:
-            if (!url->path.empty() && index < url->path.size()) {
-                value = &url->path[index];
+            if (!url->attributes.path.empty() &&
+                index < url->attributes.path.size()) {
+                value = &url->attributes.path[index];
                 ++index;
             } else {
                 external_state = URL::Page;
@@ -83,8 +85,8 @@ Iterator::move_pointer_forward()
             }
             break;
         case URL::Page:
-            if (!url->page.empty())
-                value = &url->page;
+            if (!url->attributes.page.empty())
+                value = &url->attributes.page;
             else
                 recall = true;
 
@@ -107,28 +109,28 @@ Iterator::move_pointer_backward()
     if (internal_state == End) {
         internal_state = Transient;
         external_state = URL::Page;
-        index = url->path.size() - 1; // Prepare index for Path state
+        index = url->attributes.path.size() - 1; // Prepare index for Path state
     }
 
     switch (external_state) {
         case URL::Scheme:
-            value = &url->scheme;
+            value = &url->attributes.scheme;
             external_state = -1;
             break;
         case URL::Username:
-            value = &url->username;
+            value = &url->attributes.username;
             external_state = URL::Scheme;
             break;
         case URL::Password:
-            value = &url->password;
+            value = &url->attributes.password;
             external_state = URL::Username;
             break;
         case URL::Domain:
-            if (url->domain.empty()) {
+            if (url->attributes.domain.empty()) {
                 external_state = URL::Password;
                 recall = true;
             } else if (index >= 0) {
-                value = &url->domain[index];
+                value = &url->attributes.domain[index];
 
                 if (index == 0)
                     external_state = URL::Password;
@@ -137,16 +139,16 @@ Iterator::move_pointer_backward()
             }
             break;
         case URL::Port:
-            value = &url->port;
+            value = &url->attributes.port;
             external_state = URL::Domain;
-            index = url->domain.size() - 1; // Prepare index for next state
+            index = url->attributes.domain.size() - 1; // Prepare for next state
             break;
         case URL::Path:
-            if (url->path.empty()) {
+            if (url->attributes.path.empty()) {
                 external_state = URL::Port;
                 recall = true;
             } else if (index >= 0) {
-                value = &url->path[index];
+                value = &url->attributes.path[index];
 
                 if (index == 0)
                     external_state = URL::Port;
@@ -155,8 +157,8 @@ Iterator::move_pointer_backward()
             }
             break;
         case URL::Page:
-            if (!url->page.empty())
-                value = &url->page;
+            if (!url->attributes.page.empty())
+                value = &url->attributes.page;
             else
                 recall = true;
 
