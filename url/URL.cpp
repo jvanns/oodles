@@ -15,9 +15,31 @@ using std::ostream_iterator;
 namespace oodles {
 namespace url {
 
-URL::URL(const string &url)
+URL::URL(const string &url) :
+    page(attributes.page),
+    path(attributes.path),
+    domain(attributes.domain)
 {
     tokenise(url);
+}
+
+URL::hash_t
+URL::page_id()
+{
+    return page.id(path_id());
+}
+
+
+URL::hash_t
+URL::path_id()
+{
+    return path.id(domain_id());
+}
+
+URL::hash_t
+URL::domain_id()
+{
+    return domain.id(0); // A seed of 0 indicates no seed
 }
 
 string
