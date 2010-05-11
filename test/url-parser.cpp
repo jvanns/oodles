@@ -31,7 +31,7 @@ build_url(const string &line) // line from the input file
         cout << "Tokenised URL: " << url << endl;
 
         cout << "Testing iterator access...";
-        if (find(url.begin(), url.begin(), "http") != url.end())
+        if (find(url.begin(), url.end(), "http") != url.end())
             cout << "(http scheme), ";
 
         if (find(url.begin(), url.end(), "index.html") != url.end())
