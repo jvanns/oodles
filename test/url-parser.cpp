@@ -29,6 +29,10 @@ build_url(const string &line) // line from the input file
     try {
         oodles::url::URL url(line);
         cout << "Tokenised URL: " << url << endl;
+        cout << "Domain, Path and Page document IDs: "
+             << url.domain_id() << ", "
+             << url.path_id() << ", "
+             << url.page_id() << endl;
 
         cout << "Testing iterator access...";
         if (find(url.begin(), url.end(), "http") != url.end())
