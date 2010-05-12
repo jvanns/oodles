@@ -13,7 +13,7 @@ hasher(const Container &input, URL::hash_t seed);
 
 // Provide the two necessary specialisations of hasher:
 template<>
-static
+inline
 URL::hash_t
 hasher<value_type>(const value_type &input, URL::hash_t seed)
 {
@@ -21,7 +21,7 @@ hasher<value_type>(const value_type &input, URL::hash_t seed)
 }
 
 template<>
-static
+inline
 URL::hash_t
 hasher<std::vector<value_type> >(const std::vector<value_type> &input,
                                                      URL::hash_t seed)
