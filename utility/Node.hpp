@@ -51,6 +51,15 @@ class Node
         virtual void visit();
         virtual Node* new_node(const T &v) const;
     private:
+        /* Internal Data Structures */
+        struct KeyCmp
+        {
+            bool operator() (const Node *lhs, const Node *rhs) const
+            {
+                return lhs->value < rhs->value;
+            }
+        };
+
         /* Member functions/methods */
         Node();
 

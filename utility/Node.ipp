@@ -70,27 +70,18 @@ template<class T>
 Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
+    KeyCmp cmp;
     Node *n = new_node(v);
 
     n->path_idx = i;
     n->child_idx = children.size();
 
     n->parent = this;
-    children.push_back(n);
-
-    if (n->child_idx) { // More than one child already
-        child_index_t r = n->child_idx, l = r - 1;
-
-        while (children[l]->value > children[r]->value) {
-            std::swap(children[l], children[r]); // Maintain an ordered list
-
-            if (l == 0)
-                break;
-
-            --r;
-            --l;
-        }
-    }
+    children.insert(std::lower_bound(children.begin(),
+                                     children.end(),
+                                     n,
+                                     cmp),
+                                     n);
 
     return n;
 }
