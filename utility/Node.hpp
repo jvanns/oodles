@@ -58,6 +58,11 @@ class Node
             {
                 return lhs->value < rhs->value;
             }
+
+            bool operator() (const Node *lhs, const T &rhs) const
+            {
+                return lhs->value < rhs;
+            }
         };
 
         /* Member functions/methods */

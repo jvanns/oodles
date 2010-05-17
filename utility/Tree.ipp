@@ -104,12 +104,7 @@ template<class Type>
 Node<Type>*
 Tree<Type>::insert(const Type &v, path_index_t i, Node<Type> &p)
 {
-    Node<Type> *c = NULL;
-
-    if (!p.has_child(v, c))
-        c = p.create_child(v, i); // Create new child node
-
-    return c; // Return it to caller so it can be passed back here as a parent
+    return p.create_child(v, i);
 }
 
 } // oodles

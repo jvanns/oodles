@@ -1,6 +1,8 @@
 #ifndef OODLES_NODE_IPP // Implementation
 #define OODLES_NODE_IPP
 
+#include <algorithm>
+
 namespace oodles {
 
 /*
@@ -71,17 +73,23 @@ Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
     KeyCmp cmp;
+    typename std::vector<Node<T>*>::iterator x =
+        std::lower_bound(children.begin(), children.end(), v, cmp);
+
+    /*
+     * Check if lower_bound() returned an existing
+     * node with a key equal to this value...
+     */
+    if (x != children.end() && (*x)->value == v)
+        return *x;
+
     Node *n = new_node(v);
 
     n->path_idx = i;
     n->child_idx = children.size();
 
     n->parent = this;
-    children.insert(std::lower_bound(children.begin(),
-                                     children.end(),
-                                     n,
-                                     cmp),
-                                     n);
+    children.insert(x, n);
 
     return n;
 }
