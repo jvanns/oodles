@@ -50,7 +50,7 @@ class Node
         virtual Node* new_node(const T &v) const;
     private:
         /* Internal Data Structures */
-        struct KeyCmp
+        struct KeyCmp : public std::binary_function<Node<T>, T, bool>
         {
             bool operator() (const Node *lhs, const T &rhs) const
             {
