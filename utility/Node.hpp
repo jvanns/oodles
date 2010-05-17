@@ -22,7 +22,6 @@ class Node
         /* Member functions/methods */
         bool leaf() const;
         void print(std::ostream &stream) const;
-        bool has_child(const T &v, Node *&c) const;
         Node* create_child(const T &v, path_index_t i);
 
         /* Member variables/attributes */
@@ -54,11 +53,6 @@ class Node
         /* Internal Data Structures */
         struct KeyCmp
         {
-            bool operator() (const Node *lhs, const Node *rhs) const
-            {
-                return lhs->value < rhs->value;
-            }
-
             bool operator() (const Node *lhs, const T &rhs) const
             {
                 return lhs->value < rhs;
@@ -70,9 +64,6 @@ class Node
 
         Node(const Node &n); // Do not allow...
         Node& operator=(const Node &n); // ... copying presently.
-
-        bool find(size_t l, size_t r, const T &v, size_t &n) const;
-        bool bsearch(size_t l, size_t r, const T &v, size_t &n) const;
 
         /* Friend class declarations */
         friend class Tree<T>; // Tree wants Node() only.
