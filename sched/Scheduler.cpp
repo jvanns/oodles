@@ -110,7 +110,7 @@ Node*
 Scheduler::select_best_node(Node &parent) const
 {
     Node *c = NULL, *n = NULL;
-    vector<Node::Base*>::const_iterator i = parent.children.begin();
+    Node::Base::const_iterator i = parent.children.begin();
 
     for ( ; i != parent.children.end() ; ++i) {
         c = static_cast<Node*>(*i);

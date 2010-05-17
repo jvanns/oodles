@@ -18,6 +18,8 @@ class Node
         /* Dependent typedefs */
         typedef uint16_t path_index_t; // Depth
         typedef uint32_t child_index_t; // Breadth
+        typedef typename std::vector<Node*>::iterator iterator;
+        typedef typename std::vector<Node*>::const_iterator const_iterator;
 
         /* Member functions/methods */
         bool leaf() const;
@@ -40,9 +42,6 @@ class Node
         int visit_state; // Visitation state for this node
         std::vector<Node*> children; // This nodes children
     protected:
-        /* Dependent typedefs */
-        typedef typename std::vector<Node*>::const_iterator iterator;
-
         /* Member functions/methods */
         Node(const T &v);
         virtual ~Node();

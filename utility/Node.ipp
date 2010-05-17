@@ -33,7 +33,7 @@ Node<T>::print(std::ostream &stream) const
         stream << branch << value << std::endl;
     }
 
-    for (iterator i = children.begin() ; i != children.end() ; ++i)
+    for (const_iterator i = children.begin() ; i != children.end() ; ++i)
         stream << *(*i);
 }
 
@@ -42,8 +42,7 @@ Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
     KeyCmp cmp;
-    typename std::vector<Node<T>*>::iterator x =
-        std::lower_bound(children.begin(), children.end(), v, cmp);
+    iterator x = std::lower_bound(children.begin(), children.end(), v, cmp);
 
     /*
      * Check if lower_bound() returned an existing
@@ -79,7 +78,7 @@ Node<T>::Node(const T &v) :
 template<class T>
 Node<T>::~Node()
 {
-    for (iterator i = children.begin() ; i != children.end() ; ++i)
+    for (const_iterator i = children.begin() ; i != children.end() ; ++i)
         delete *i;
 }
 

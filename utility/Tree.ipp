@@ -62,7 +62,8 @@ Tree<Type>::depth_first_traverse(Node<Type> &n) const
     if (n.leaf())
         return;
 
-    typename Node<Type>::iterator i = n.children.begin(), j = n.children.end();
+    typename Node<Type>::const_iterator i = n.children.begin(),
+                                        j = n.children.end();
     for ( ; i != j ; ++i)
         depth_first_traverse(*(*i));
 }
@@ -74,7 +75,8 @@ Tree<Type>::breadth_first_traverse(Node<Type> &n) const
     if (n.leaf())
         return;
 
-    typename Node<Type>::iterator i = n.children.begin(), j = n.children.end();
+    typename Node<Type>::const_iterator i = n.children.begin(),
+                                        j = n.children.end();
     for ( ; i != j ; ++i)
         visit(*(*i));
 
