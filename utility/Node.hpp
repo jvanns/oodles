@@ -58,11 +58,7 @@ class Node
         Node& operator=(const Node &n); // ... copying presently.
 
         bool find(size_t l, size_t r, const T &v, size_t &n) const;
-        bool bsearch(size_t l,
-                     size_t r,
-                     const T &v,
-                     size_t &n,
-                     const bool &cancel) const;
+        bool bsearch(size_t l, size_t r, const T &v, size_t &n) const;
 
         /* Friend class declarations */
         friend class Tree<T>; // Tree wants Node() only.

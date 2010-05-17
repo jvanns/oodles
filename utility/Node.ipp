@@ -1,11 +1,6 @@
 #ifndef OODLES_NODE_IPP // Implementation
 #define OODLES_NODE_IPP
 
-#ifdef HAVE_OPENMP
-// OpenMP
-#include <omp.h>
-#endif
-
 namespace oodles {
 
 /*
@@ -146,64 +141,16 @@ Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL), visit_state(Black)
 {
 }
 
+/*
+ * Interface to search algorithm implementation
+ */
 template<class T>
 bool
-Node<T>::find(const size_t l, const size_t r, const T &v, size_t &n) const
-#ifdef HAVE_OPENMP
-/*
- * Use a parallel loop to search the array between n threads
- * as scheduled by OpenMP and the following directives.
- */
+Node<T>::find(size_t l, size_t r, const T &v, size_t &n) const
 {
-    static size_t threads = 0;
-   
-    if (!threads) {
-        #pragma omp parallel
-        {
-            #pragma omp single
-            {
-                threads = omp_get_num_threads();
-                #pragma omp flush(threads)
-            }
-        }
-    }
-    
-    bool found = false;
-    size_t id = 0, i = 0, j = 0, p = 0;
-    const size_t chunk = 512, min = threads * chunk;
-    const size_t batch = (r >= min ? r / threads : r);
-    #pragma omp parallel if(r >= min) shared(found) private(id, i, j, p)
-    {
-        id = omp_get_thread_num(); // Thread ID
-        i = (batch * id) + id; // Range begin
-        j = batch * (id + 1); // Range end
-        p = 0; // Position of item, if found.
-
-        if (bsearch(i, j, v, p, found)) {
-            #pragma omp critical
-            {
-                found = true; // Should cancel other threads
-                n = p;
-            }
-
-            #pragma omp flush(found)
-        }
-    }
-
-    return found;
+    return bsearch(l, r, v, n);
 }
-#else
-{
-    size_t p = 0;
-    static const bool cancel = false;
-    const bool found = bsearch(l, r, v, p, cancel);
 
-    if (found)
-        n = p;
-    
-    return found;
-}
-#endif
 /*
  * Binary search implemented as a recursive divide and
  * conquer algorithm for searching a simple, ordered
@@ -214,14 +161,8 @@ bool
 Node<T>::bsearch(size_t l,
                  size_t r,
                  const T &v,
-                 size_t &n,
-                 const bool &cancel) const
+                 size_t &n) const
 {
-#ifdef HAVE_OPENMP
-    if (cancel)
-        return false; // If we've been cancelled, we haven't found 'v'!
-#endif
-
     if (l == r) {
         const bool found = v == children[l]->value;
 
@@ -234,9 +175,9 @@ Node<T>::bsearch(size_t l,
     const size_t m = (l + r) / 2; // Split the range in to two halves
 
     if (v <= children[m]->value)
-        return bsearch(l, m, v, n, cancel);  // Search the 'left' half
+        return bsearch(l, m, v, n);  // Search the 'left' half
 
-    return bsearch(m + 1, r, v, n, cancel); // Search the 'right' half
+    return bsearch(m + 1, r, v, n); // Search the 'right' half
 }
 
 } // oodles
