@@ -115,7 +115,14 @@ Scheduler::select_best_node(Node &parent) const
         Node &c = parent.child(i);
 
         if (c.visit_state == Node::White) // Skip-over any visited branch
+#ifdef DEBUG_SCHED
+        {
+            std::cerr << '[' << c.value << "]: marked WHITE\n";
+#endif
             continue;
+#ifdef DEBUG_SCHED
+        }
+#endif
 
         c.visit_state = Node::Grey; // Node visited but not all children
 
@@ -130,6 +137,11 @@ Scheduler::select_best_node(Node &parent) const
 
     if (!n) // No child was a candidate although all were considered
         parent.visit_state = Node::White;
+
+#ifdef DEBUG_SCHED
+    if (n)
+        std::cerr << '[' << n->value << "]: Selected\n";
+#endif
 
     return n;
 }
@@ -173,6 +185,9 @@ Scheduler::schedule(const string &url, bool from_seed)
     if (!duplicate) { // Newly inserted, unique URL
         ++leaves;
         node->page = page; // Ownership of page is implicitly transferred here
+#ifdef DEBUG_SCHED
+        std::cerr << '[' << leaves << "]: Leaves (pages) stored\n";
+#endif
     } else {
         delete page;
         page = node->page;

@@ -16,6 +16,13 @@ uint16_t
 Crawler::add_url(const url::URL &url)
 {
     work_unit.push_back(&url);
+
+#ifdef DEBUG_SCHED
+    std::cerr << '[' << name << "]: "
+              << *(work_unit.back())
+              << " assigned\n";
+#endif
+
     return unit_size();
 }
 
