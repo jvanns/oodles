@@ -67,19 +67,23 @@ namespace url {
  * Format:
  * scheme://username:password@domain.com:port/path/page?query_string#anchor
  */
-Parser::Parser() : Parser::base_type(url, "url")
+Parser::Parser() : Parser::base_type(url, "url"), ip(false)
 {
+    using boost::phoenix::ref;
     using boost::phoenix::at_c;
-    using boost::phoenix::empty;
 
     using boost::spirit::qi::_1;
     using boost::spirit::qi::_val;
 
-    using boost::spirit::byte_;
+    /* Directives */
     using boost::spirit::qi::eoi; // End Of Input
     using boost::spirit::qi::lit; // Literal
     using boost::spirit::qi::omit;
+    using boost::spirit::qi::repeat;
     using boost::spirit::qi::no_case; // Ignore case
+
+    /* Parsers */
+    using boost::spirit::byte_;
     using boost::spirit::ascii::char_;
     using boost::spirit::ascii::digit;
 
@@ -102,7 +106,12 @@ Parser::Parser() : Parser::base_type(url, "url")
      * Domain: A period delimited sequence of strings up to a path or port
      */
     domain %=
-        +(no_case[~char_(".:/")]) % '.'
+        (   // FIXME: There has to be a better expression that this!
+            repeat(3)[+digit >> '.'] >>
+            repeat(1)[+digit][ref(ip) = true] // Try and distinguish IP octets
+        |
+            +(no_case[~char_(".:/")]) % '.'  // From domain components
+        )
         >> -omit[char_(':') | '/']
     ;
 
@@ -126,14 +135,14 @@ Parser::Parser() : Parser::base_type(url, "url")
         -scheme[at_c<2>(_val) = _1] /* Scheme is not always present in links */
         >> -(username[at_c<3>(_val) = _1] >  /* Most domains have no username */
              password[at_c<4>(_val) = _1]) /* But those that do have password */
-        >> -domain[at_c<6>(_val) = _1] /* Absolute URLs will have a domain */
+        >> -domain[at_c<6>(_val) = _1] /* Absolute URLs have a domain */
         >> -port[at_c<0>(_val) = _1] /* And maybe a port number too */
         >> -path[at_c<5>(_val) = _1] /* And of course perhaps a file path */
         >> -page[at_c<1>(_val) = _1] /* Any further characters are the page */
     ;
 
     /* Give the rules an appropriate name */
-    url.name("url");
+    url.name("URL");
     port.name("Port number");
     page.name("Page/document");
     scheme.name("Scheme/protocol");
@@ -173,9 +182,12 @@ Parser::parse(value_type::const_iterator &begin,
               value_type::const_iterator &end,
               Attributes &url)
 {
-    if (qi::parse(begin, end, *this, url))
+    if (qi::parse(begin, end, *this, url)) {
+        url.ip = ip; // Update the attribute copy of the flag, ip
+
         if (begin == end)
             return true; // Parse was both successful and completed in full
+    }
 
     return false;
 }

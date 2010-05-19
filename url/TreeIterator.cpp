@@ -43,7 +43,14 @@ TreeIterator::move_pointer_forward()
     if (internal_state == Begin) {
         internal_state = Transient;
         external_state = URL::Domain;
-        index = url->attributes.domain.size() - 1; // Prepare for Domain state
+
+        /*
+         * Prepare the index for the initial Domain/IP state
+         */
+        if (url->attributes.ip)
+            index = 0;
+        else
+            index = url->attributes.domain.size() - 1;
     }
 
     switch (external_state) {
@@ -51,13 +58,27 @@ TreeIterator::move_pointer_forward()
             if (url->attributes.domain.empty()) {
                 external_state = URL::Path;
                 recall = true;
+                index = 0;
             } else if (index >= 0) {
+                bool end = false;
                 value = &url->attributes.domain[index];
 
-                if (index == 0)
+                if (url->attributes.ip) {
+                    if (index == url->attributes.domain.size() - 1)
+                        end = true;
+                    else
+                        ++index;
+                } else {
+                    if (index == 0)
+                        end = true;
+                    else
+                        --index;
+                }
+
+                if (end) {
                     external_state = URL::Path;
-                else
-                    --index;
+                    index = 0;
+                }
             }
             break;
         case URL::Path:
@@ -104,7 +125,14 @@ TreeIterator::move_pointer_backward()
             if (!url->attributes.domain.empty() &&
                 index < url->attributes.domain.size()) {
                 value = &url->attributes.domain[index];
-                ++index;
+
+                if (url->attributes.ip) {
+                    if (index == 0)
+                        internal_state = End;
+                    else
+                        --index;
+                } else
+                    ++index;
             } else {
                 external_state = -1; // Finish
                 recall = true;
@@ -118,9 +146,12 @@ TreeIterator::move_pointer_backward()
             } else if (index >= 0) {
                 value = &url->attributes.path[index];
 
-                if (index == 0)
+                if (index == 0) {
                     external_state = URL::Domain;
-                else
+
+                    if (url->attributes.ip)
+                        index = url->attributes.domain.size() - 1;
+                } else
                     --index;
             }
             break;

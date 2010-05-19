@@ -14,12 +14,16 @@ namespace qi = boost::spirit::qi;
 
 struct Attributes
 {
+    bool ip; // Is the domain stored in fact an IP address?
+
     value_type port,
                page,
                scheme,
                username,
                password;
     std::vector<value_type> path, domain;
+
+    Attributes() : ip(false) {} // Assume not to begin with
 };
 
 struct Parser : qi::grammar<value_type::const_iterator, Attributes()>
@@ -33,6 +37,7 @@ struct Parser : qi::grammar<value_type::const_iterator, Attributes()>
      * There is no reason for these to be public really.
      */
     private:
+        bool ip;
         qi::rule<value_type::const_iterator, Attributes()> url;
         qi::rule<value_type::const_iterator, value_type()> dir,
                                                            page,
