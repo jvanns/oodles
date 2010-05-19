@@ -1,3 +1,5 @@
+0--1.net/tom/truck.html
+http://192.168.12.10/ip/octet/parsing/test/
 http://uk.weather.com/weather/tomorrow-Godalming-GU7
 http://uk.weather.com/weather/tomorrow-Godalming-GU7#foobar
 http://link.brightcove.com/services/player/bcpid58471091001?bclid=66428918001&bctid=68682364001
@@ -10,6 +12,7 @@ http://jefferson.village.virginia.edu/blake/
 http://www.english.upenn.edu/~curran/home.html
 http://dept.english.upenn.edu/~mgamer/Romantic/
 http://gopher.upenn.edu/pennprintout/html/v11/3/creature.html
+http://192.168.202.17/ip/octet/parsing/test/number/two/page.html
 http://www.rc.umd.edu/
 http://fay.english.umb.edu/
 http://www.nottingham.ac.uk/~aezacweb/wrew.htm
