@@ -1,6 +1,7 @@
 // oodles
 #include "url/URL.hpp"
 #include "utility/Tree.hpp"
+#include "utility/NodeIO.hpp"
 #include "utility/file-ops.hpp"
 
 // STL
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
 
     try {
         string s;
+        const oodles::io::ASCIIArt aa(tree);
         size_t n = oodles::read_file_data(argv[1], s);
 
         if (n != s.size())
@@ -57,7 +59,7 @@ int main(int argc, char *argv[])
             e = s.find_first_of('\n', b);
         }
 
-        cout << tree;
+        cout << aa;
     } catch (const exception &e) {
         cerr << e.what();
         return 1;

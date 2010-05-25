@@ -13,22 +13,7 @@ template<class T>
 void
 Node<T>::print(std::ostream &stream) const
 {
-    static const std::string branch("+-- ");
-    static const std::string::size_type len = branch.size() - 1;
-
-    if (parent) {
-        for (path_index_t i = 0 ; i < path_idx ; ++i) {
-            stream << '|';
-
-            for (std::string::size_type j = 0 ; j < len ; ++j)
-                stream << ' ';
-        }
-
-        stream << branch << value << std::endl;
-    }
-
-    for (const_iterator i = children.begin() ; i != children.end() ; ++i)
-        (*i)->print(stream);
+    stream << value;
 }
 
 template<class T>
