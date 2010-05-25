@@ -3,6 +3,7 @@
 
 // oodles
 #include "Node.hpp"
+#include "TreeBase.hpp"
 
 // STL
 #include <vector>
@@ -10,7 +11,7 @@
 namespace oodles {
 
 template<class Type>
-class Tree
+class Tree : public TreeBase
 {
     public:
         /* Dependent typedefs */
@@ -19,6 +20,9 @@ class Tree
         /* Member functions/methods */
         Tree(Node<Type> *n = NULL);
         ~Tree();
+
+        TreeBase& base() { return *this; } // Base class...
+        const TreeBase& base() const { return *this; } // accessors.
 
         void print(std::ostream &stream) const;
 

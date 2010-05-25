@@ -101,7 +101,7 @@ Scheduler::weigh_tree_branch(Node &n) const
 
     parent->weight -= n.weight;
     n.weight = n.calculate_weight();
-    parent->weight = parent->weight + (n.weight / (n.children.size() + 1));
+    parent->weight = parent->weight + (n.weight / (n.size() + 1));
 
     weigh_tree_branch(*parent);
 }
@@ -109,24 +109,23 @@ Scheduler::weigh_tree_branch(Node &n) const
 Node*
 Scheduler::select_best_node(Node &parent) const
 {
-    Node *c = NULL, *n = NULL;
-    Node::Base::const_iterator i = parent.children.begin();
+    Node *n = NULL;
 
-    for ( ; i != parent.children.end() ; ++i) {
-        c = static_cast<Node*>(*i);
+    for (size_t i = 0 ; i < parent.size() ; ++i) {
+        Node &c = parent.child(i);
 
-        if (c->visit_state == Node::White) // Skip-over any visited branch
+        if (c.visit_state == Node::White) // Skip-over any visited branch
             continue;
 
-        c->visit_state = Node::Grey; // Node visited but not all children
+        c.visit_state = Node::Grey; // Node visited but not all children
 
-        if (c->page && !c->eligible()) // Ignore ineligible yet crawlable nodes
+        if (c.page && !c.eligible()) // Ignore ineligible yet crawlable nodes
             continue;
 
         if (!n)
-            n = c;
-        else if (c->weight > n->weight)
-            n = c;
+            n = &c;
+        else if (c.weight > n->weight)
+            n = &c;
     }
 
     if (!n) // No child was a candidate although all were considered

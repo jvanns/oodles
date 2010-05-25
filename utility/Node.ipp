@@ -8,12 +8,6 @@ namespace oodles {
 /*
  * Public methods
  */
-template<class T>
-bool
-Node<T>::leaf() const
-{
-    return parent && children.empty(); // A leaf node should never have children
-}
 
 template<class T>
 void
@@ -34,7 +28,7 @@ Node<T>::print(std::ostream &stream) const
     }
 
     for (const_iterator i = children.begin() ; i != children.end() ; ++i)
-        stream << *(*i);
+        (*i)->print(stream);
 }
 
 template<class T>
@@ -48,13 +42,17 @@ Node<T>::create_child(const T &v, path_index_t i)
      * Check if lower_bound() returned an existing
      * node with a key equal to this value...
      */
-    if (x != children.end() && (*x)->value == v)
-        return *x;
+    if (x != children.end()) {
+        Node<T> &n = *(*x); // All items in 'children' are NodeBase pointers
+        
+        if (n.value == v)
+            return &n;
+    }
 
     Node *n = new_node(v);
 
     n->path_idx = i;
-    n->child_idx = children.size();
+    n->child_idx = size();
 
     n->parent = this;
     children.insert(x, n);
@@ -66,20 +64,13 @@ Node<T>::create_child(const T &v, path_index_t i)
  * Protected methods
  */
 template<class T>
-Node<T>::Node(const T &v) :
-    value(v),
-    path_idx(0),
-    child_idx(0),
-    parent(NULL),
-    visit_state(Black)
+Node<T>::Node(const T &v) : value(v)
 {
 }
 
 template<class T>
 Node<T>::~Node()
 {
-    for (const_iterator i = children.begin() ; i != children.end() ; ++i)
-        delete *i;
 }
 
 template<class T>
@@ -104,7 +95,7 @@ Node<T>::new_node(const T &v) const
  * Private methods
  */
 template<class T>
-Node<T>::Node() : path_idx(0), child_idx(0), parent(NULL), visit_state(Black)
+Node<T>::Node()
 {
 }
 

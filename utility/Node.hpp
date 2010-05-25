@@ -1,9 +1,11 @@
 #ifndef OODLES_NODE_HPP // Interface
 #define OODLES_NODE_HPP
 
+// oodles
+#include "NodeBase.hpp"
+
 // STL
-#include <vector>
-#include <iostream>
+#include <functional>
 
 #include <stdint.h> // For uint16_t
 
@@ -12,55 +14,35 @@ namespace oodles {
 template<class T> class Tree; // Forward declaration for friend below
 
 template<class T>
-class Node
+class Node : public NodeBase
 {
     public:
-        /* Dependent typedefs */
-        typedef uint16_t path_index_t; // Depth
-        typedef uint32_t child_index_t; // Breadth
-        typedef typename std::vector<Node*>::iterator iterator;
-        typedef typename std::vector<Node*>::const_iterator const_iterator;
-
         /* Member functions/methods */
-        bool leaf() const;
         void print(std::ostream &stream) const;
         Node* create_child(const T &v, path_index_t i);
 
         /* Member variables/attributes */
         const T value; // Value at this node
-        path_index_t path_idx; // Index of this node within it's path
-        child_index_t child_idx; // Index of this node amoung it's siblings
-
-        /* Visitation state */
-        enum {
-            Black = 0, // This node not visited nor any of it's children
-            White = 1, // This node and all children have been visited
-            Grey = 2 // This node visited but not yet all children
-        };
-
-        Node *parent; // Pointer to parent node
-        int visit_state; // Visitation state for this node
-        std::vector<Node*> children; // This nodes children
     protected:
         /* Member functions/methods */
         Node(const T &v);
-        virtual ~Node();
+        ~Node();
 
         virtual void visit();
         virtual Node* new_node(const T &v) const;
     private:
         /* Internal Data Structures */
-        struct KeyCmp : public std::binary_function<Node<T>, T, bool>
+        struct KeyCmp : public std::binary_function<NodeBase, T, bool>
         {
-            bool operator() (const Node *lhs, const T &rhs) const
+            bool operator() (const NodeBase *lhs, const T &rhs) const
             {
-                return lhs->value < rhs;
+                const Node<T> &n = *lhs;
+                return n.value < rhs;
             }
         };
 
         /* Member functions/methods */
         Node();
-
         Node(const Node &n); // Do not allow...
         Node& operator=(const Node &n); // ... copying presently.
 
@@ -68,19 +50,8 @@ class Node
         friend class Tree<T>; // Tree wants Node() only.
 };
 
-template<class T>
-static
-inline
-std::ostream&
-operator<< (std::ostream &stream, const Node<T> &node)
-{
-    node.print(stream);
-    return stream;
-}
-
 } // oodles
 
 #include "Node.ipp" // Implementation
 
 #endif
-
