@@ -49,7 +49,7 @@ Node<T>::create_child(const T &v, path_index_t i)
  * Protected methods
  */
 template<class T>
-Node<T>::Node(const T &v) : value(v)
+Node<T>::Node(const T &v) : NodeBase(), value(v)
 {
 }
 

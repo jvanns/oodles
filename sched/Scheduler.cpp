@@ -114,17 +114,17 @@ Scheduler::select_best_node(Node &parent) const
     for (size_t i = 0 ; i < parent.size() ; ++i) {
         Node &c = parent.child(i);
 
-        if (c.visit_state == Node::White) // Skip-over any visited branch
+        if (c.visit_state == Node::Red) // Skip-over any visited branch
 #ifdef DEBUG_SCHED
         {
-            std::cerr << '[' << c.value << "]: marked WHITE\n";
+            std::cerr << '[' << c.value << "]: marked RED\n";
 #endif
             continue;
 #ifdef DEBUG_SCHED
         }
 #endif
 
-        c.visit_state = Node::Grey; // Node visited but not all children
+        c.visit_state = Node::Amber; // Node visited but not all children
 
         if (c.page && !c.eligible()) // Ignore ineligible yet crawlable nodes
             continue;
@@ -136,7 +136,7 @@ Scheduler::select_best_node(Node &parent) const
     }
 
     if (!n) // No child was a candidate although all were considered
-        parent.visit_state = Node::White;
+        parent.visit_state = Node::Red;
 
 #ifdef DEBUG_SCHED
     if (n)

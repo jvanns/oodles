@@ -47,11 +47,14 @@ class NodeBase
         template<class Node>
         operator const Node&() const { return static_cast<const Node&>(*this); }
 
-        /* Visitation state */
+        /*
+         * Visitation state (using traffic light colours ;)
+         * Use when traversing the tree to mark clean/dirty nodes/branches
+         */
         enum {
-            Black = 0, // This node not visited nor any of it's children
-            White = 1, // This node and all children have been visited
-            Grey = 2 // This node visited but not yet all children
+            Red = 0, // This node and all children have been visited
+            Green = 1, // This node not visited nor any of it's children
+            Amber = 2 // This node visited but not yet all it's children
         };
 
         /* Member variables/attributes */
