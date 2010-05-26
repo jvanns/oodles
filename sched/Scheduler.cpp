@@ -38,9 +38,15 @@ Scheduler::run()
      */
     size_t i = 0, j = crawlers.size();
     for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
+#ifdef DEBUG_SCHED
+        std::cerr << '[' << c->id() << "|PRE]: " << c->unit_size() << std::endl;
+#endif
         if (c->online()) // Do not assign anything to offline Crawlers
             fill_crawler(*c); // Assign as much work to crawler (fill work unit)
 
+#ifdef DEBUG_SCHED
+        std::cerr << '[' << c->id() << "|PST]: " << c->unit_size() << std::endl;
+#endif
         crawlers.pop(); // Pop the top of the queue (i.e. remove 'c')
         crawlers.push(c); // Push c back onto the queue forcing rank order
     }
