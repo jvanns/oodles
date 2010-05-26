@@ -75,7 +75,7 @@ Scheduler::traverse_branch(Node &n) const
 
     /*
      * If we have been unable to consider any children as eligible for
-     * crawling then we must mark the node as 'white' - we do not
+     * crawling then we must mark the node as 'Red' - we do not
      * want to traverse it again... yet.
      */
     if (!p) {
@@ -151,6 +151,16 @@ Scheduler::fill_crawler(Crawler &c)
 {
     Node *n = NULL, *p = NULL;
     static const Node *root = static_cast<const Node*>(&tree.root());
+
+    if (root->visit_state == Node::Red) // Every single node has been traversed
+#ifdef DEBUG_SCHED
+    {
+        std::cerr << "[ROOT]: Entire tree marked RED!\n";
+#endif
+        return;
+#ifdef DEBUG_SCHED
+    }
+#endif
 
     while (c.unit_size() < Crawler::max_unit_size()) {
         if (!n)
