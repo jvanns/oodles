@@ -201,9 +201,6 @@ Scheduler::schedule(const string &url, bool from_seed)
     if (!duplicate) { // Newly inserted, unique URL
         ++leaves;
         node->page = page; // Ownership of page is implicitly transferred here
-#ifdef DEBUG_SCHED
-        std::cerr << '[' << leaves << "]: Leaves (pages) stored\n";
-#endif
     } else {
         delete page;
         page = node->page;
