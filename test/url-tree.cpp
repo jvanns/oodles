@@ -35,16 +35,23 @@ build_url(const string &line) // line from the input file
     return true;
 }
 
+static
+void
+usage(const string &program)
+{
+    cerr << "Provide the location (file path) to a file containing URLs.\n";
+    cerr << "usage: " << program << " <file> [--dot | --ascii]\n";
+}
+
 int main(int argc, char *argv[])
 {
-    if (argc != 2) {
-        cerr << "Provide the location (file path) to a file containing URLs.\n";
+    if (argc < 2 || argc > 3) {
+        usage(argv[0]);
         return 1;
     }
 
     try {
         string s;
-        const oodles::io::ASCIIArt aa(tree);
         size_t n = oodles::read_file_data(argv[1], s);
 
         if (n != s.size())
@@ -59,7 +66,13 @@ int main(int argc, char *argv[])
             e = s.find_first_of('\n', b);
         }
 
-        cout << aa;
+        if (!argv[2] || (argv[2] && strncmp(argv[2], "--ascii", 7) == 0)) {
+            const oodles::io::ASCIIArt aa(tree);
+            cout << aa;
+        } else if (argv[2] && (strncmp(argv[2], "--dot", 5) == 0)) {
+            const oodles::io::DotMatrix dot(tree);
+            cout << dot;
+        }
     } catch (const exception &e) {
         cerr << e.what();
         return 1;
