@@ -28,6 +28,8 @@ class Crawler
         uint16_t add_url(const url::URL &url);
 
         static uint16_t max_unit_size() { return 32; }
+
+        const std::string& id() const { return name; }
         bool online() const { return endpoint != NULL; }
         uint16_t unit_size() const { return work_unit.size(); }
     private:
