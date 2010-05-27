@@ -135,9 +135,7 @@ Scheduler::select_best_node(Node &parent) const
         if (c.page && !c.eligible()) // Ignore ineligible yet crawlable nodes
             continue;
 
-        if (!n)
-            n = &c;
-        else if (c.weight > n->weight)
+        if (!n || (n && c.weight > n->weight))
             n = &c;
     }
 
