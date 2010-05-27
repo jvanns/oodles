@@ -79,7 +79,21 @@ DotMatrix::print(ostream &s, const NodeBase &n) const
          */
         s << nid << " [label=\"";
         n.print(s);
-        s << "\"];\n";
+        s <<  '"';
+
+        switch (n.visit_state) {
+            case NodeBase::Red:
+                s << ", color=red";
+                break;
+            case NodeBase::Green:
+                s << ", color=green";
+                break;
+            case NodeBase::Amber:
+                s << ", color=orange";
+                break;
+        }
+
+        s << "];\n";
 
         /*
          * Link an edge between two node IDs.
