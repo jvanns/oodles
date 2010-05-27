@@ -45,9 +45,9 @@ URL := $(patsubst %.cpp,%.o,$(wildcard url/*.cpp))
 # Binary targets
 TESTS = test/html-parser \
 	test/word-indexer \
-    test/url-scheduler \
-    test/url-parser \
-    test/url-tree
+	test/url-parser \
+	test/url-tree \
+	test/url-scheduler
 
 test/html-parser: test/html-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
@@ -55,13 +55,13 @@ test/html-parser: test/html-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
 test/word-indexer: test/word-indexer.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
-test/url-scheduler: test/url-scheduler.o $(SCHEDULER_OBJECTS) $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL)
-	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
-
 test/url-parser: test/url-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 test/url-tree: test/url-tree.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL)
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+
+test/url-scheduler: test/url-scheduler.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL) $(SCHEDULER_OBJECTS)
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Make targets/rules
