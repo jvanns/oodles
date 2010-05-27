@@ -36,13 +36,13 @@ Scheduler::run()
      * to take on more). If that crawler has reached full capacity
      * we can do no more.
      */
-    size_t i = 0, j = crawlers.size();
+    uint32_t n = 0, i = 0, j = crawlers.size();
     for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PRE]: " << c->unit_size() << std::endl;
 #endif
         if (c->online()) // Do not assign anything to offline Crawlers
-            fill_crawler(*c); // Assign as much work to crawler (fill work unit)
+            n += fill_crawler(*c); // Assign as much work (fill work unit)
 
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PST]: " << c->unit_size() << std::endl;
@@ -51,7 +51,7 @@ Scheduler::run()
         crawlers.push(c); // Push c back onto the queue forcing rank order
     }
 
-    return 0;
+    return n;
 }
 
 bool
@@ -152,10 +152,11 @@ Scheduler::select_best_node(Node &parent) const
     return n;
 }
 
-void
+Crawler::unit_t
 Scheduler::fill_crawler(Crawler &c)
 {
     Node *n = NULL, *p = NULL;
+    Crawler::unit_t assigned = 0;
     static const Node *root = static_cast<const Node*>(&tree.root());
 
     if (root->visit_state == Node::Red) // Every single node has been traversed
@@ -163,7 +164,7 @@ Scheduler::fill_crawler(Crawler &c)
     {
         std::cerr << "[ROOT]: Entire tree marked RED!\n";
 #endif
-        return;
+        return 0;
 #ifdef DEBUG_SCHED
     }
 #endif
@@ -180,11 +181,14 @@ Scheduler::fill_crawler(Crawler &c)
         p = n; // Keep a copy of our current position
         n = traverse_branch(*n); // Traverse to find best candidate for crawling
 
-        if (n && n->eligible())
+        if (n && n->eligible()) {
             n->page->assign_crawler(&c);
-        else
+            ++assigned;
+        } else
             n = p; // Restore the copy of the previous node
     }
+
+    return assigned;
 }
 
 void
