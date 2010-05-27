@@ -20,6 +20,8 @@ class Scheduler
         Scheduler();
         ~Scheduler();
 
+        const TreeBase& url_tree() const { return tree; }
+
         uint32_t run(); // Performs scheduling run
         bool register_crawler(Crawler &c); // Add a crawler
 
