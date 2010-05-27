@@ -29,7 +29,8 @@ run_scheduler(oodles::sched::Scheduler &s)
         s.register_crawler(*crawlers[i]);
     }
 
-    s.run();
+    const uint32_t assigned = s.run();
+    cout << "After 1 scheduling run " << assigned << " pages were assigned:\n";
 
     for (int i = 0 ; i < n ; ++i) {
         cout << crawlers[i]->unit_size() << endl;
