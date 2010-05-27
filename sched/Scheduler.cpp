@@ -77,7 +77,7 @@ inline
 Node*
 Scheduler::traverse_branch(Node &n) const
 {
-    Node *p = select_best_node(n);
+    Node *p = select_best_child(n);
 
     /*
      * If we have been unable to consider any children as eligible for
@@ -113,7 +113,7 @@ Scheduler::weigh_tree_branch(Node &n) const
 }
 
 Node*
-Scheduler::select_best_node(Node &parent) const
+Scheduler::select_best_child(Node &parent) const
 {
     Node *n = NULL;
 
@@ -139,8 +139,14 @@ Scheduler::select_best_node(Node &parent) const
             n = &c;
     }
 
-    if (!n) // No child was a candidate although all were considered
+    if (!n) { // No child was a candidate although all were considered
         parent.visit_state = Node::Red;
+
+        if ((n = parent_of(parent)))
+            ++n->visited;
+
+        n = NULL;
+    }
 
 #ifdef DEBUG_SCHED
     if (n)
@@ -184,6 +190,23 @@ Scheduler::fill_crawler(Crawler &c)
             ++assigned;
         } else
             n = p; // Restore the copy of the previous node
+    }
+
+    /*
+     * If our last node was a leaf node that was assigned to
+     * a crawler, mark it's ancestors as Red where necessary.
+     */
+    if (n && n->leaf() && (n->page && n->page->crawler)) {
+        for (p = parent_of(*n) ; p ; ) {
+            if (p->visited < p->size()) 
+                break; // Terminate the loop if any unvisited children
+
+            p->visit_state = Node::Red;
+            p = parent_of(*p);
+
+            if (p)
+                p->visited++; // Update the grandparent
+        }
     }
 
     return assigned;
