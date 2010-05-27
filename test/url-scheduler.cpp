@@ -1,4 +1,5 @@
 // oodles
+#include "utility/NodeIO.hpp"
 #include "sched/Scheduler.hpp"
 #include "utility/file-ops.hpp"
 
@@ -18,6 +19,7 @@ using std::vector;
 // STL exception
 using std::exception;
 
+static
 void
 run_scheduler(oodles::sched::Scheduler &s)
 {
@@ -39,11 +41,19 @@ run_scheduler(oodles::sched::Scheduler &s)
     }
 }
 
+static
+void
+usage(const string &program)
+{
+    cerr << "Provide the location (file path) to a file containing URLs.\n";
+    cerr << "usage: " << program << " <file> [--dot | --ascii]\n";
+}
+
 int main(int argc, char *argv[])
 {
-    if (argc != 2) { 
-        cerr << "Provide the location (file path) to a file containing URLs.\n";
-        return 1; 
+    if (argc < 2 || argc > 3) {
+        usage(argv[0]);
+        return 1;
     }
     
     try {
@@ -64,6 +74,14 @@ int main(int argc, char *argv[])
         }
 
         run_scheduler(scheduler);
+
+        if (!argv[2] || (argv[2] && strncmp(argv[2], "--ascii", 7) == 0)) {
+            const oodles::io::ASCIIArt aa(scheduler.url_tree());
+            cout << aa;
+        } else if (argv[2] && (strncmp(argv[2], "--dot", 5) == 0)) {
+            const oodles::io::DotMatrix dot(scheduler.url_tree());
+            cout << dot;
+        }
     } catch (const exception &e) {
         cerr << e.what();
         return 1;
