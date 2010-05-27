@@ -25,7 +25,7 @@ run_scheduler(oodles::sched::Scheduler &s)
     vector<oodles::sched::Crawler*> crawlers(n);
 
     for (int i = 0 ; i < n ; ++i) {
-        crawlers[i] = new oodles::sched::Crawler(string(1, i + '0'));
+        crawlers[i] = new oodles::sched::Crawler(string(1, i + 'A'));
         s.register_crawler(*crawlers[i]);
     }
 
@@ -33,7 +33,8 @@ run_scheduler(oodles::sched::Scheduler &s)
     cout << "After 1 scheduling run " << assigned << " pages were assigned:\n";
 
     for (int i = 0 ; i < n ; ++i) {
-        cout << crawlers[i]->unit_size() << endl;
+        cout << '[' << crawlers[i]->id() << "]: "
+             << crawlers[i]->unit_size() << "\n";
         delete crawlers[i];
     }
 }
