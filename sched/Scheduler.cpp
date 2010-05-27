@@ -155,8 +155,6 @@ Scheduler::select_best_node(Node &parent) const
 Crawler::unit_t
 Scheduler::fill_crawler(Crawler &c)
 {
-    Node *n = NULL, *p = NULL;
-    Crawler::unit_t assigned = 0;
     static const Node *root = static_cast<const Node*>(&tree.root());
 
     if (root->visit_state == Node::Red) // Every single node has been traversed
@@ -169,6 +167,8 @@ Scheduler::fill_crawler(Crawler &c)
     }
 #endif
 
+    Node *n = NULL, *p = NULL;
+    Crawler::unit_t assigned = 0;
     while (c.unit_size() < Crawler::max_unit_size()) {
         if (!n)
             n = const_cast<Node*>(root); // At the top of the tree
