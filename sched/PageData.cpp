@@ -15,8 +15,7 @@ PageData::PageData(const string &url) :
     last_crawl(0),
     epoch(time(NULL)),
     links(0),
-    crawl_count(0),
-    paralleled(0)
+    crawl_count(0)
 {
 }
 
