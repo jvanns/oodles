@@ -5,6 +5,8 @@
 #include <vector>
 #include <iostream>
 
+#include <stdint.h> // For uint16_t
+
 namespace oodles {
 
 /*

@@ -7,8 +7,6 @@
 // STL
 #include <functional>
 
-#include <stdint.h> // For uint16_t
-
 namespace oodles {
 
 template<class T> class Tree; // Forward declaration for friend below
