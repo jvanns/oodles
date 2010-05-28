@@ -1,9 +1,17 @@
 // oodles
 #include "Tree.hpp"
 #include "NodeIO.hpp"
+#include "sched/Node.hpp"
 
 // STL
 using std::ostream;
+
+static
+const oodles::sched::Node*
+is_scheduler_node(const oodles::NodeBase *node)
+{
+    return dynamic_cast<const oodles::sched::Node*>(node);
+}
 
 namespace oodles {
 namespace io {
@@ -74,6 +82,8 @@ DotMatrix::print(ostream &s, const NodeBase &n) const
         s << "digraph oodles {\n\n"
           << nid << " [label = \"ROOT\"];\n";
     } else {
+        const oodles::sched::Node *node = is_scheduler_node(&n);
+
         /*
          * Declare a node (using the pointer address as the ID)
          */
@@ -81,16 +91,25 @@ DotMatrix::print(ostream &s, const NodeBase &n) const
         n.print(s);
         s <<  '"';
 
-        switch (n.visit_state) {
-            case NodeBase::Red:
-                s << ", color=red";
-                break;
-            case NodeBase::Green:
-                s << ", color=green";
-                break;
-            case NodeBase::Amber:
-                s << ", color=orange";
-                break;
+        if (node != NULL) {
+            if (node->page && node->page->crawler)
+                s << ", color=blue"; // An assignment was made
+            else
+                node = NULL; // Rely on the traffic lights below ;)
+        }
+
+        if (!node) {
+            switch (n.visit_state) {
+                case NodeBase::Red:
+                    s << ", color=red";
+                    break;
+                case NodeBase::Green:
+                    s << ", color=green";
+                    break;
+                case NodeBase::Amber:
+                    s << ", color=orange";
+                    break;
+            }
         }
 
         s << "];\n";
