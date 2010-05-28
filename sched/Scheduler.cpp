@@ -7,6 +7,7 @@
 // STL
 using std::string;
 using std::vector;
+using std::ostream;
 
 static
 inline
@@ -36,13 +37,15 @@ Scheduler::run()
      * to take on more). If that crawler has reached full capacity
      * we can do no more.
      */
-    uint32_t n = 0, i = 0, j = crawlers.size();
+    Node *n = NULL;
+    uint32_t i = 0, j = crawlers.size(), t = 0;
     for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PRE]: " << c->unit_size() << std::endl;
 #endif
+
         if (c->online()) // Do not assign anything to offline Crawlers
-            n += fill_crawler(*c); // Assign as much work (fill work unit)
+            t += fill_crawler(*c, n); // Assign as much work (fill work unit)
 
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PST]: " << c->unit_size() << std::endl;
@@ -51,7 +54,66 @@ Scheduler::run()
         crawlers.push(c); // Push c back onto the queue forcing rank order
     }
 
-    return n;
+    return t;
+}
+
+void
+Scheduler::replay_run(ostream &s)
+{
+    static const NodeBase *root = static_cast<const NodeBase*>(&tree.root());
+    typedef unsigned long address_t; // Memory location as an integer
+
+    if (trail.empty() || root->size() == 0)
+        return;
+
+    size_t e = 0; // Edge
+    const NodeBase *n = root; // Node
+    address_t nid = 0, pid = 0; // Vertices
+    BreadCrumbTrail::Point i = trail.gather_crumb(); // Discard first crumb
+
+    while (!trail.empty()) {
+        nid = reinterpret_cast<address_t>(n); // First, set the DOT node ID
+
+        /*
+         * Print the node ID with the label as n->value
+         */
+        if (n == root) {
+            s << nid << " [label=\"ROOT\"];\n";
+        } else {
+            s << nid << " [label=\"";
+            n->print(s);
+            s << "\"];\n";
+
+            /*
+             * Label the edge with the trail sequence ID
+             */
+            s << pid << " -> " << nid << " [label=" << e << "];\n";
+        }
+
+        i = trail.gather_crumb(); // Now gather the next crumb
+
+        /*
+         * Determine the direction of travel; If the crumb path index is less
+         * than that of the current node path index we're retreating back up
+         * the way we came - back up the path to where we forked (in the road).
+         */
+        if (i.first < n->path_idx) {
+            do {
+                i = trail.gather_crumb(); // Gather until we reach the fork
+                n = n->parent;
+            } while (!trail.empty() && i.first < n->path_idx);
+
+            if (trail.empty())
+                break;
+
+            nid = reinterpret_cast<address_t>(n); // Set the DOT node ID again
+        }
+
+        assert(i.second < n->size()); // The crumb cannot exceed #children
+        n = &(n->child(i.second)); // Next node is located by the current crumb
+        pid = nid;
+        ++e;
+    }
 }
 
 bool
@@ -73,11 +135,12 @@ Scheduler::schedule_from_crawl(const string &url)
     schedule(url, false);
 }
 
-inline
 Node*
-Scheduler::traverse_branch(Node &n) const
+Scheduler::traverse_branch(Node &n)
 {
     Node *p = select_best_child(n);
+
+    trail.drop_crumb(n.path_idx, n.child_idx); // Leave a breadcrumb trail
 
     /*
      * If we have been unable to consider any children as eligible for
@@ -157,7 +220,7 @@ Scheduler::select_best_child(Node &parent) const
 }
 
 Crawler::unit_t
-Scheduler::fill_crawler(Crawler &c)
+Scheduler::fill_crawler(Crawler &c, Node *&n)
 {
     static const Node *root = static_cast<const Node*>(&tree.root());
 
@@ -171,7 +234,7 @@ Scheduler::fill_crawler(Crawler &c)
     }
 #endif
 
-    Node *n = NULL, *p = NULL;
+    Node *p = NULL;
     Crawler::unit_t assigned = 0;
     while (c.unit_size() < Crawler::max_unit_size()) {
         if (!n)
@@ -188,7 +251,9 @@ Scheduler::fill_crawler(Crawler &c)
         if (n && n->eligible()) {
             n->page->assign_crawler(&c);
             ++assigned;
-        } else
+        } else if (!n) // traverse_branch() exhausted the tree too - we're done!
+            break;
+        else
             n = p; // Restore the copy of the previous node
     }
 

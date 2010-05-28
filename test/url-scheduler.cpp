@@ -81,6 +81,9 @@ int main(int argc, char *argv[])
         } else if (argv[2] && (strncmp(argv[2], "--dot", 5) == 0)) {
             const oodles::io::DotMatrix dot(scheduler.url_tree());
             cout << dot;
+
+            cout << "Replaying 1 scheduling run...\n";
+            scheduler.replay_run(cout);
         }
     } catch (const exception &e) {
         cerr << e.what();
