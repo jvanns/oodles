@@ -21,9 +21,6 @@ class Tree : public TreeBase
         Tree(Node<Type> *n = NULL);
         ~Tree();
 
-        TreeBase& base() { return *this; } // Base class...
-        const TreeBase& base() const { return *this; } // accessors.
-
         void print(std::ostream &stream) const;
 
         template<class Iterator>
