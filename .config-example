@@ -1,0 +1,7 @@
+# This variable is used in the Makefile
+# for setting the path to Boost headers
+CPPFLAGS_BOOST = -I/opt/local/include
+
+CXX = /Developer/usr/bin/g++-4.2
+CXXFLAGS = -m64 -pipe -g3 -O0 -finline
+LDFLAGS = -L/Developer/usr/lib -arch x86_64

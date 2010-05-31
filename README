@@ -9,3 +9,14 @@ bin/ - Output of all compiled programs
 common/ - Code common to all Oodles components
 url/ - URL parser, normaliser and class and iterator code
 sched/ - Crawler scheduler code
+
+--[ Building
+
+First, copy .config-example to .config and modify it according to your
+development platform. For Linux and OSX 10.5 this should be pretty
+straight-forward.
+
+* mkdir -p bin/test
+* make -j2 all
+
+All test programs will be under bin/test. Test input data is under test/input.
