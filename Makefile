@@ -23,17 +23,8 @@ LDFLAGS += $(LDFLAGS_BOOST)
 LDLIBS += $(LDLIBS_BOOST)
 
 # Suffix rules
-%.pic.o:	%.cpp
-		$(CXX) -fPIC -c $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
-
-%.o:		%.cpp
-		$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
-
-%.s:		%.cpp
-		$(CXX) -S $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
-
-# Phony targets
-.PHONY: clean default all
+%.o:	%.cpp
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
 
 # Compile object files
 SCHEDULER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard sched/*.cpp))
@@ -49,22 +40,45 @@ TESTS = test/html-parser \
 	test/url-tree \
 	test/url-scheduler
 
-test/html-parser: test/html-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
+test/html-parser: test/html-parser.o \
+	$(COMMON_OBJECTS) \
+	$(URL) \
+	$(UTILITY_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
-test/word-indexer: test/word-indexer.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS)
+test/word-indexer: test/word-indexer.o \
+	$(COMMON_OBJECTS) \
+	$(URL) \
+	$(UTILITY_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
-test/url-parser: test/url-parser.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL)
+test/url-parser: test/url-parser.o \
+	$(COMMON_OBJECTS) \
+	$(URL) \
+	$(UTILITY_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
-test/url-tree: test/url-tree.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL)
+test/url-tree: test/url-tree.o \
+	$(COMMON_OBJECTS) \
+	$(URL) \
+	$(UTILITY_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+ 
+test/url-scheduler: test/url-scheduler.o \
+	$(COMMON_OBJECTS) \
+	$(URL) \
+	$(UTILITY_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
-test/url-scheduler: test/url-scheduler.o $(UTILITY_OBJECTS) $(COMMON_OBJECTS) $(URL) $(SCHEDULER_OBJECTS)
-	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+# Phony targets
+.PHONY: default all clean
 
-# Make targets/rules
+# Make targets
 default: all
 
 all: $(TESTS)
