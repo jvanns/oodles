@@ -37,10 +37,14 @@ Node<T>::create_child(const T &v, path_index_t i)
     Node *n = new_node(v);
 
     n->path_idx = i;
-    n->child_idx = size();
-
     n->parent = this;
-    children.insert(x, n);
+
+    /*
+     * FIXME: Ack! We must re-index all child indicies after x
+     * This is awful and will impact on performance terribly :(
+     */
+    for (iterator q = children.insert(x, n) ; q != children.end() ; ++q)
+        (*q)->child_idx = q - children.begin();
 
     return n;
 }
