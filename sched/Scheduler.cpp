@@ -1,6 +1,7 @@
 // oodles
 #include "PageData.hpp"
 #include "Scheduler.hpp"
+#include "utility/BreadCrumbTrail.hpp"
 
 #include <time.h> // For time()
 
@@ -20,7 +21,7 @@ parent_of(oodles::sched::Node::Base &node)
 namespace oodles {
 namespace sched {
 
-Scheduler::Scheduler() : leaves(0), tree(new Node("ROOT"))
+Scheduler::Scheduler() : leaves(0), trail(NULL), tree(new Node("ROOT"))
 {
 }
 
@@ -29,7 +30,7 @@ Scheduler::~Scheduler()
 }
 
 uint32_t
-Scheduler::run()
+Scheduler::run(BreadCrumbTrail *t)
 {
     /*
      * In our priority queue, crawlers, the top most item will
@@ -38,14 +39,17 @@ Scheduler::run()
      * we can do no more.
      */
     Node *n = NULL;
-    uint32_t i = 0, j = crawlers.size(), t = 0;
+    uint32_t i = 0, j = crawlers.size(), k = 0;
+
+    trail = t; // Set the BCT, if any
+
     for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PRE]: " << c->unit_size() << std::endl;
 #endif
 
         if (c->online()) // Do not assign anything to offline Crawlers
-            t += fill_crawler(*c, n); // Assign as much work (fill work unit)
+            k += fill_crawler(*c, n); // Assign as much work (fill work unit)
 
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PST]: " << c->unit_size() << std::endl;
@@ -54,24 +58,26 @@ Scheduler::run()
         crawlers.push(c); // Push c back onto the queue forcing rank order
     }
 
-    return t;
+    trail = NULL; // Clear the BCT
+
+    return k;
 }
 
 void
-Scheduler::replay_run(ostream &s)
+Scheduler::replay_run(ostream &s, BreadCrumbTrail &t)
 {
     static const NodeBase *root = static_cast<const NodeBase*>(&tree.root());
     typedef unsigned long address_t; // Memory location as an integer
 
-    if (trail.empty() || root->size() == 0)
+    if (t.empty() || root->size() == 0)
         return;
 
     size_t e = 0; // Edge
     const NodeBase *n = root; // Node
     address_t nid = 0, pid = 0; // Vertices
-    BreadCrumbTrail::Point i = trail.gather_crumb(); // Discard first crumb
+    BreadCrumbTrail::Point i = t.gather_crumb(); // Discard first crumb
 
-    while (!trail.empty()) {
+    while (!t.empty()) {
         nid = reinterpret_cast<address_t>(n); // First, set the DOT node ID
 
         /*
@@ -90,7 +96,7 @@ Scheduler::replay_run(ostream &s)
             s << pid << " -> " << nid << " [label=" << e << "];\n";
         }
 
-        i = trail.gather_crumb(); // Now gather the next crumb
+        i = t.gather_crumb(); // Now gather the next crumb
 
         /*
          * Determine the direction of travel; If the crumb path index is less
@@ -99,11 +105,11 @@ Scheduler::replay_run(ostream &s)
          */
         if (i.first < n->path_idx) {
             do {
-                i = trail.gather_crumb(); // Gather until we reach the fork
+                i = t.gather_crumb(); // Gather until we reach the fork
                 n = n->parent;
-            } while (!trail.empty() && i.first < n->path_idx);
+            } while (!t.empty() && i.first < n->path_idx);
 
-            if (trail.empty())
+            if (t.empty())
                 break;
 
             nid = reinterpret_cast<address_t>(n); // Set the DOT node ID again
@@ -140,7 +146,8 @@ Scheduler::traverse_branch(Node &n)
 {
     Node *p = select_best_child(n);
 
-    trail.drop_crumb(n.path_idx, n.child_idx); // Leave a breadcrumb trail
+    if (trail)
+        trail->drop_crumb(n.path_idx, n.child_idx); // Leave a breadcrumb trail
 
     /*
      * If we have been unable to consider any children as eligible for

@@ -5,13 +5,15 @@
 #include "Node.hpp"
 #include "Crawler.hpp"
 #include "utility/Tree.hpp"
-#include "utility/BreadCrumbTrail.hpp"
 
 // STL
 #include <queue>
 #include <string>
 
 namespace oodles {
+
+class BreadCrumbTrail; // Forward declaration for Scheduler
+
 namespace sched {
 
 class Scheduler
@@ -23,16 +25,17 @@ class Scheduler
 
         const TreeBase& url_tree() const { return tree; }
 
-        uint32_t run(); // Performs a scheduling run
-        void replay_run(std::ostream &s); // With the BCT of the last run()
         bool register_crawler(Crawler &c); // Add a (new, unique) crawler
 
         void schedule_from_seed(const std::string &url);
         void schedule_from_crawl(const std::string &url);
+
+        uint32_t run(BreadCrumbTrail *t = NULL); // Performs a scheduling run
+        void replay_run(std::ostream &s, BreadCrumbTrail &t); // Replay a run
     private:
         /* Member variables/attributes */
         size_t leaves;
-        BreadCrumbTrail trail;
+        BreadCrumbTrail *trail;
         Tree<Node::value_type> tree;
         std::priority_queue<Crawler*,
                             std::deque<Crawler*>,
