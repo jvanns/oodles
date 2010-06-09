@@ -10,6 +10,8 @@ Tree<Type>::Tree(Node<Type> *n) : seed(NULL)
         seed = new Node<Type>;
     else
         seed = n; // Tree takes ownership and will delete 'seed'
+
+    seed->path_idx = seed->child_idx = -1; // Invalidate indices
 }
 
 template<class Type>
