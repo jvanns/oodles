@@ -5,7 +5,7 @@
 #include <vector>
 #include <iostream>
 
-#include <stdint.h> // For uint16_t
+#include <stdint.h> // For int16_t
 
 namespace oodles {
 
@@ -19,8 +19,8 @@ class NodeBase
 {
     public:
         /* Dependent typedefs */
-        typedef uint16_t path_index_t; // Depth
-        typedef uint32_t child_index_t; // Breadth
+        typedef int16_t path_index_t; // Depth
+        typedef int32_t child_index_t; // Breadth
         typedef std::vector<NodeBase*>::iterator iterator;
         typedef std::vector<NodeBase*>::const_iterator const_iterator;
 
