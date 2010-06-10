@@ -62,6 +62,10 @@ class DotMatrix : public PrinterBase
         /* Member functions/methods */
         std::ostream& print(std::ostream &s, const NodeBase &n) const;
 
+        const NodeBase* node_from_trail(const NodeBase *&n);
+        void print_vertex(std::ostream &s, const NodeBase &n) const;
+        void print_edge(std::ostream &s, const ptrdiff_t e[2]) const;
+
         /* Member variables/attributes */
         BreadCrumbTrail *trail;
 };
