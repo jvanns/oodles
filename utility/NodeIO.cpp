@@ -2,6 +2,7 @@
 #include "Tree.hpp"
 #include "NodeIO.hpp"
 #include "sched/Node.hpp"
+#include "BreadCrumbTrail.hpp"
 
 // STL
 using std::ostream;
@@ -62,8 +63,14 @@ ASCIIArt::print(ostream &s, const NodeBase &n) const
     return s;
 }
 
-DotMatrix::DotMatrix(const TreeBase &t) : PrinterBase(t)
+DotMatrix::DotMatrix(const TreeBase &t) : PrinterBase(t), trail(NULL)
 {
+}
+
+void
+DotMatrix::set_trail(BreadCrumbTrail &t)
+{
+    trail = &t;
 }
 
 ostream&

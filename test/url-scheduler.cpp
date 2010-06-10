@@ -78,14 +78,15 @@ int main(int argc, char *argv[])
         run_scheduler(scheduler, trail);
 
         if (!argv[2] || (argv[2] && strncmp(argv[2], "--ascii", 7) == 0)) {
-            const oodles::io::ASCIIArt aa(scheduler.url_tree());
+            oodles::io::ASCIIArt aa(scheduler.url_tree());
             cout << aa;
         } else if (argv[2] && (strncmp(argv[2], "--dot", 5) == 0)) {
-            const oodles::io::DotMatrix dot(scheduler.url_tree());
+            oodles::io::DotMatrix dot(scheduler.url_tree());
             cout << dot;
 
             cout << "Replaying 1 scheduling run...\n";
-            scheduler.replay_run(cout, trail);
+            dot.set_trail(trail);
+            cout << dot;
         }
     } catch (const exception &e) {
         cerr << e.what();

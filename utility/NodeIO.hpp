@@ -8,6 +8,9 @@
 #include <iostream>
 
 namespace oodles {
+
+class BreadCrumbTrail; // Forward declaration for DotMatrix
+
 namespace io {
 
 /*
@@ -53,9 +56,14 @@ class DotMatrix : public PrinterBase
     public:
         /* Member functions/methods */
         DotMatrix(const TreeBase &t);
+
+        void set_trail(BreadCrumbTrail &t);
     private:
         /* Member functions/methods */
         std::ostream& print(std::ostream &s, const NodeBase &n) const;
+
+        /* Member variables/attributes */
+        BreadCrumbTrail *trail;
 };
 
 std::ostream&
