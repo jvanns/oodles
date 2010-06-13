@@ -31,7 +31,6 @@ class Scheduler
         void schedule_from_crawl(const std::string &url);
 
         uint32_t run(BreadCrumbTrail *t = NULL); // Performs a scheduling run
-        void replay_run(std::ostream &s, BreadCrumbTrail &t); // Replay a run
     private:
         /* Member variables/attributes */
         size_t leaves;

@@ -63,65 +63,6 @@ Scheduler::run(BreadCrumbTrail *t)
     return k;
 }
 
-void
-Scheduler::replay_run(ostream &s, BreadCrumbTrail &t)
-{
-    static const NodeBase *root = static_cast<const NodeBase*>(&tree.root());
-    typedef unsigned long address_t; // Memory location as an integer
-
-    if (t.empty() || root->size() == 0)
-        return;
-
-    size_t e = 0; // Edge
-    const NodeBase *n = root; // Node
-    address_t nid = 0, pid = 0; // Vertices
-    BreadCrumbTrail::Point i = t.gather_crumb(); // Discard first crumb
-
-    while (!t.empty()) {
-        nid = reinterpret_cast<address_t>(n); // First, set the DOT node ID
-
-        /*
-         * Print the node ID with the label as n->value
-         */
-        if (n == root) {
-            s << nid << " [label=\"ROOT\"];\n";
-        } else {
-            s << nid << " [label=\"";
-            n->print(s);
-            s << "\"];\n";
-
-            /*
-             * Label the edge with the trail sequence ID
-             */
-            s << pid << " -> " << nid << " [label=" << e << "];\n";
-        }
-
-        i = t.gather_crumb(); // Now gather the next crumb
-
-        /*
-         * Determine the direction of travel; If the crumb path index is less
-         * than that of the current node path index we're retreating back up
-         * the way we came - back up the path to where we forked (in the road).
-         */
-        if (i.first < n->path_idx) {
-            do {
-                i = t.gather_crumb(); // Gather until we reach the fork
-                n = n->parent;
-            } while (!t.empty() && i.first < n->path_idx);
-
-            if (t.empty())
-                break;
-
-            nid = reinterpret_cast<address_t>(n); // Set the DOT node ID again
-        }
-
-        assert(i.second < n->size()); // The crumb cannot exceed #children
-        n = &(n->child(i.second)); // Next node is located by the current crumb
-        pid = nid;
-        ++e;
-    }
-}
-
 bool
 Scheduler::register_crawler(Crawler &c)
 {
