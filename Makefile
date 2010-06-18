@@ -38,7 +38,8 @@ TESTS = test/html-parser \
 	test/word-indexer \
 	test/url-parser \
 	test/url-tree \
-	test/url-scheduler
+	test/url-scheduler \
+	test/allocator
 
 test/html-parser: test/html-parser.o \
 	$(COMMON_OBJECTS) \
@@ -69,6 +70,13 @@ test/url-tree: test/url-tree.o \
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
  
 test/url-scheduler: test/url-scheduler.o \
+	$(COMMON_OBJECTS) \
+	$(URL) \
+	$(UTILITY_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+
+test/allocator: test/allocator.o \
 	$(COMMON_OBJECTS) \
 	$(URL) \
 	$(UTILITY_OBJECTS) \
