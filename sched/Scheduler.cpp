@@ -63,13 +63,6 @@ Scheduler::run(BreadCrumbTrail *t)
     return k;
 }
 
-bool
-Scheduler::register_crawler(Crawler &c)
-{
-    crawlers.push(&c); // TODO: Check for duplicates
-    return true;
-}
-
 void
 Scheduler::schedule_from_seed(const string &url)
 {

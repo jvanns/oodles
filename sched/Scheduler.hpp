@@ -24,8 +24,7 @@ class Scheduler
         ~Scheduler();
 
         const TreeBase& url_tree() const { return tree; }
-
-        bool register_crawler(Crawler &c); // Add a (new, unique) crawler
+        void register_crawler(Crawler &c) { crawlers.push(&c); }
 
         void schedule_from_seed(const std::string &url);
         void schedule_from_crawl(const std::string &url);
