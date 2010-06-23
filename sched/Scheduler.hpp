@@ -9,6 +9,7 @@
 // STL
 #include <queue>
 #include <string>
+#include <tr1/unordered_map>
 
 namespace oodles {
 
@@ -38,6 +39,19 @@ class Scheduler
         std::priority_queue<Crawler*,
                             std::deque<Crawler*>,
                             RankCrawler> crawlers;
+
+        /*
+         * We already have a hash function in URL that identifies the
+         * page, path and domain. TR1 requires the hash functor to
+         * take a key return and return a hash of type size_t. We
+         * simply return the hash (because that's all we'll be passing
+         * around outside of the Scheduler) or id() cast to size_t.
+         */
+        struct hash_id
+        {
+            size_t operator() (url::URL::hash_t h) const { return h; }
+        };
+        std::tr1::unordered_map<url::URL::hash_t, Node*, hash_id> page_table;
 
         /* Member functions/methods */
         Node* traverse_branch(Node &n);

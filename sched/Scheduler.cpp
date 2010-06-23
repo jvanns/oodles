@@ -190,6 +190,7 @@ Scheduler::fill_crawler(Crawler &c, Node *&n)
         n = traverse_branch(*n); // Traverse to find best candidate for crawling
 
         if (n && n->eligible()) {
+            page_table[n->page->url.page_id()] = n; // Cache it
             n->page->assign_crawler(&c);
             ++assigned;
         } else if (!n) // traverse_branch() exhausted the tree too - we're done!
