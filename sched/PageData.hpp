@@ -14,8 +14,8 @@ class Crawler; // Forward declaration for PageData
 
 struct PageData
 {
+    url::URL url; // Our URL object/structure.
     Crawler *crawler; // Our crawler, if any.
-    const url::URL url; // Our URL object/structure.
     const Node *referrer; // Link to a Node that holds a hyperlink to us.
 
     time_t last_crawl; // Time of last crawl or 0

@@ -9,8 +9,8 @@ namespace oodles {
 namespace sched {
 
 PageData::PageData(const string &url) :
-    crawler(NULL),
     url(url),
+    crawler(NULL),
     referrer(NULL),
     last_crawl(0),
     epoch(time(NULL)),
