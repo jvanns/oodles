@@ -5,7 +5,7 @@
 // STL
 using std::string;
 
-namespace  oodles {
+namespace oodles {
 namespace sched {
 
 Crawler::Crawler(const string &name) : name(name), endpoint(NULL)
