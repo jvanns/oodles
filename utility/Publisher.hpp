@@ -36,7 +36,7 @@ class Publisher
         Publisher(Event &e);
         ~Publisher();
 
-        void broadcast();
+        void broadcast() const;
         bool add_subscriber(Subscriber &s);
         bool remove_subscriber(Subscriber &s);
 

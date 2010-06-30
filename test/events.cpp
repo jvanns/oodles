@@ -26,7 +26,7 @@ struct Integers : public oodles::event::Event
 
 struct Sum : public oodles::event::Subscriber
 {
-    void receive(oodles::event::Publisher &p)
+    void receive(const oodles::event::Publisher &p)
     {
         const Integers &m = p.event();
         cout << "Sum: " << calculate_sum(m) << std::endl;
@@ -48,7 +48,7 @@ struct Sum : public oodles::event::Subscriber
 
 struct Deviation : public oodles::event::Subscriber
 {
-    void receive(oodles::event::Publisher &p)
+    void receive(const oodles::event::Publisher &p)
     {
         const Integers &m = p.event();
         cout << "Standard deviation: " << calculate_deviation(m) << std::endl;
@@ -68,7 +68,7 @@ struct Deviation : public oodles::event::Subscriber
 
 struct Concatenate : public oodles::event::Subscriber
 {
-    void receive(oodles::event::Publisher &p)
+    void receive(const oodles::event::Publisher &p)
     {
         const Integers &m = p.event();
         cout << "Concatenation: " << concatenate_integers(m) << std::endl;

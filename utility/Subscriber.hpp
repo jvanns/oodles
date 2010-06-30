@@ -20,7 +20,7 @@ class Subscriber
          * Override this method to receive events
          * from the publisher by calling p.event().
          */
-        virtual void receive(Publisher &p) = 0;
+        virtual void receive(const Publisher &p) = 0;
         bool subscribed() const { return publisher != NULL; }
         bool subscribed_to(Publisher &p) const { return publisher == &p; }
     private:

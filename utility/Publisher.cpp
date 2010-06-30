@@ -32,7 +32,7 @@ Publisher::~Publisher()
 }
 
 void
-Publisher::broadcast()
+Publisher::broadcast() const
 {
     set<Subscriber*>::const_iterator i = subscribers.begin(),
                                      j = subscribers.end();
