@@ -29,6 +29,11 @@ Scheduler::~Scheduler()
 {
 }
 
+void
+Scheduler::receive(const event::Publisher &p)
+{
+}
+
 uint32_t
 Scheduler::run(BreadCrumbTrail *t)
 {
