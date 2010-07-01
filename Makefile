@@ -32,6 +32,7 @@ UTILITY_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard utility/*.cpp))
 COMMON_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard common/*.cpp))
 TEST_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard test/*.cpp))
 URL_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard url/*.cpp))
+NET_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/*.cpp))
 
 # Binary targets
 TESTS = test/html-parser \
