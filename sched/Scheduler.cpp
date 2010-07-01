@@ -193,10 +193,11 @@ Scheduler::fill_crawler(Crawler &c, Node *&n)
             page_table[n->page->url.page_id()] = n; // Cache it
             n->page->assign_crawler(&c);
             ++assigned;
-        } else if (!n) // traverse_branch() exhausted the tree too - we're done!
-            break;
-        else
+        } else if (!n) {
+            break; // traverse_branch() exhausted the tree too - we're done!
+        } else {
             n = p; // Restore the copy of the previous node
+        }
     }
 
     /*
