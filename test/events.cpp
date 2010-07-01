@@ -9,6 +9,7 @@
 
 // libc
 #include <math.h> // For sqrt()
+#include <assert.h> // For assert()
 
 // STL
 using std::cout;
