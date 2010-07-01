@@ -51,7 +51,7 @@ class Scheduler
         /*
          * We already have a hash function in URL that identifies the
          * page, path and domain. TR1 requires the hash functor to
-         * take a key return and return a hash of type size_t. We
+         * take a key type and return a hash of type size_t. We
          * simply return the hash (because that's all we'll be passing
          * around outside of the Scheduler) or id() cast to size_t.
          */
