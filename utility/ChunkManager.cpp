@@ -24,6 +24,16 @@ ChunkManager::ChunkManager() :
 {
 }
 
+ChunkManager::~ChunkManager()
+{
+    vector<Chunk>::iterator i = chunks.begin(), j = chunks.end();
+
+    while (i != j) {
+        i->destroy_space();
+        ++i;
+    }
+}
+
 void*
 ChunkManager::allocate()
 {

@@ -15,6 +15,7 @@ class ChunkManager
     public:
         /* Member functions/methods */
         ChunkManager();
+        ~ChunkManager();
 
         void* allocate();
         void deallocate(void *block);
