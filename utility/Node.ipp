@@ -21,15 +21,17 @@ Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
     KeyCmp cmp;
-    iterator x = std::lower_bound(children.begin(), children.end(), v, cmp);
+    iterator b = children.begin(),
+             e = children.end(), q,
+             x = std::lower_bound(b, e, v, cmp);
 
     /*
-     * Check if lower_bound() returned an existing
+     * Check if lower_bound() returned an existing 
      * node with a key equal to this value...
      */
-    if (x != children.end()) {
+    if (x != e) {
         Node<T> &n = *(*x); // All items in 'children' are NodeBase pointers
-        
+
         if (n.value == v)
             return &n;
     }
@@ -43,8 +45,12 @@ Node<T>::create_child(const T &v, path_index_t i)
      * FIXME: Ack! We must re-index all child indicies after x
      * This is awful and will impact on performance terribly :(
      */
-    for (iterator q = children.insert(x, n) ; q != children.end() ; ++q)
-        (*q)->child_idx = q - children.begin();
+    q = children.insert(x, n);
+    b = children.begin();
+    e = children.end();
+
+    for ( ; q != e ; ++q)
+        (*q)->child_idx = q - b;
 
     return n;
 }
