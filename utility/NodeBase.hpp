@@ -2,9 +2,9 @@
 #define OODLES_NODEBASE_HPP
 
 // STL
-#include <vector>
 #include <iostream>
 
+// libc
 #include <stdint.h> // For int16_t
 
 namespace oodles {
@@ -21,23 +21,23 @@ class NodeBase
         /* Dependent typedefs */
         typedef int16_t path_index_t; // Depth
         typedef int32_t child_index_t; // Breadth
-        typedef std::vector<NodeBase*>::iterator iterator;
-        typedef std::vector<NodeBase*>::const_iterator const_iterator;
 
         /* Member functions/methods */
         NodeBase();
         virtual ~NodeBase();
 
         /*
-         * Ensure this is a pure virtual (abstract) class
+         * Ensure this is a pure virtual (abstract) class and
+         * indicate that these methods *must* be provided by
+         * derived Node types.
          */
+        virtual NodeBase& child(size_t index) = 0;
+        virtual const NodeBase& child(size_t index) const = 0;
+
+        virtual size_t size() const = 0;
         virtual void print(std::ostream &stream) const = 0;
 
-        size_t size() const { return children.size(); }
         bool leaf() const { return parent && size() == 0; }
-        
-        NodeBase& child(size_t index) { return *children[index]; }
-        const NodeBase& child(size_t index) const { return *children[index]; }
         
         /*
          * Cast operators for casting up the class hierarchy to
@@ -64,7 +64,6 @@ class NodeBase
         NodeBase *parent; // Pointer to parent node
         path_index_t path_idx; // Index of this node within it's path
         child_index_t child_idx; // Index of this node amoung it's siblings
-        std::vector<NodeBase*> children; // This node's children
 };
 
 } // oodles

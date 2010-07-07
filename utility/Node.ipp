@@ -8,49 +8,28 @@ namespace oodles {
 /*
  * Public methods
  */
-
-template<class T>
-void
-Node<T>::print(std::ostream &stream) const
-{
-    stream << value;
-}
-
 template<class T>
 Node<T>*
 Node<T>::create_child(const T &v, path_index_t i)
 {
-    KeyCmp cmp;
-    iterator b = children.begin(),
-             e = children.end(), q,
-             x = std::lower_bound(b, e, v, cmp);
-
-    /*
-     * Check if lower_bound() returned an existing 
-     * node with a key equal to this value...
-     */
-    if (x != e) {
-        Node<T> &n = *(*x); // All items in 'children' are NodeBase pointers
-
-        if (n.value == v)
-            return &n;
-    }
-
     Node *n = new_node(v);
+    const std::pair<size_t, bool> x(children.insert(n));
 
-    n->path_idx = i;
-    n->parent = this;
-
-    /*
-     * FIXME: Ack! We must re-index all child indicies after x
-     * This is awful and will impact on performance terribly :(
-     */
-    q = children.insert(x, n);
-    b = children.begin();
-    e = children.end();
-
-    for ( ; q != e ; ++q)
-        (*q)->child_idx = q - b;
+    if (!x.second) {
+        /*
+         * Node with value v already existed - return it.
+         */
+        Node &r = child(x.first);
+        delete n;
+        n = &r;
+    } else {
+        /*
+         * Node with value v is new - initialise it.
+         */
+        n->path_idx = i;
+        n->parent = this;
+        n->child_idx = x.first;
+    }
 
     return n;
 }
@@ -59,7 +38,7 @@ Node<T>::create_child(const T &v, path_index_t i)
  * Protected methods
  */
 template<class T>
-Node<T>::Node(const T &v) : NodeBase(), value(v)
+Node<T>::Node(const T &v) : NodeBase(), value(v), children(true)
 {
 }
 
@@ -90,7 +69,7 @@ Node<T>::new_node(const T &v) const
  * Private methods
  */
 template<class T>
-Node<T>::Node()
+Node<T>::Node() : children(true)
 {
 }
 

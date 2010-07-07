@@ -13,12 +13,6 @@ NodeBase::NodeBase() :
 
 NodeBase::~NodeBase()
 {
-    const_iterator i = children.begin(), j = children.end();
-
-    while (i != j) {
-        delete *i;
-        ++i;
-    }
 }
 
 } // oodles

@@ -3,6 +3,7 @@
 
 // oodles
 #include "NodeBase.hpp"
+#include "DistinctItem.hpp"
 
 // STL
 #include <functional>
@@ -16,8 +17,13 @@ class Node : public NodeBase
 {
     public:
         /* Member functions/methods */
-        void print(std::ostream &stream) const;
         Node* create_child(const T &v, path_index_t i);
+
+        NodeBase& child(size_t i) { return *children[i]; }
+        const NodeBase& child(size_t i) const { return *children[i]; }
+
+        size_t size() const { return children.size(); }
+        void print(std::ostream &stream) const { stream << value; }
 
         /* Member variables/attributes */
         const T value; // Value at this node
@@ -30,14 +36,17 @@ class Node : public NodeBase
         virtual Node* new_node(const T &v) const;
     private:
         /* Internal Data Structures */
-        struct KeyCmp : public std::binary_function<NodeBase, T, bool>
+        struct KeyCmp : public std::binary_function<NodeBase, NodeBase, bool>
         {
-            bool operator() (const NodeBase *lhs, const T &rhs) const
+            bool operator() (const NodeBase *lhs, const NodeBase *rhs) const
             {
-                const Node<T> &n = *lhs;
-                return n.value < rhs;
+                const Node<T> &l = *lhs, &r = *rhs;
+                return l.value < r.value;
             }
         };
+
+        /* Member variables/attributes */
+        DistinctItem<NodeBase*, KeyCmp> children;
 
         /* Member functions/methods */
         Node();
