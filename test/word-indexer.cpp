@@ -1,6 +1,6 @@
 // oodles
 #include "utility/file-ops.hpp"
-#include "utility/DistinctItemVector.hpp"
+#include "utility/DistinctItem.hpp"
 
 // STL
 #include <iostream>
@@ -30,13 +30,13 @@ tokenise_words(const string &path)
             return false;
 
         string word;
-        oodles::DistinctItemVector<string> words;
+        oodles::DistinctItem<string> words;
         string::const_iterator i = s.begin(), j = s.end();
 
         for (n = 0 ; i != j ; ++i) {
             if (isspace(*i)) {
                 if (!word.empty()) {
-                    words.append_item(word);
+                    words.insert(word);
                     word.clear();
                     ++n;
                 }
@@ -44,7 +44,7 @@ tokenise_words(const string &path)
                 word += *i;
         }
 
-        if (words.sequence_count() != n)
+        if (words.size() != n)
             return false;
     } catch (const exception &e) {
         cerr << e.what() << endl;
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     int rc = 0;
 
     for (int i = 1 ; i < argc ; ++i) {
-        cout << "DistinctItemVector test#" << i << " (" << argv[i] << ")...";
+        cout << "DistinctItem test#" << i << " (" << argv[i] << ")...";
 
         if (tokenise_words(argv[i])) {
             cout << "PASS.";
