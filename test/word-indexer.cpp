@@ -1,6 +1,6 @@
 // oodles
 #include "utility/file-ops.hpp"
-#include "utility/DistinctItem.hpp"
+#include "utility/IndexedSet.hpp"
 
 // STL
 #include <iostream>
@@ -30,7 +30,7 @@ tokenise_words(const string &path)
             return false;
 
         string word;
-        oodles::DistinctItem<string> words;
+        oodles::IndexedSet<string> words;
         string::const_iterator i = s.begin(), j = s.end();
 
         for (n = 0 ; i != j ; ++i) {
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
     int rc = 0;
 
     for (int i = 1 ; i < argc ; ++i) {
-        cout << "DistinctItem test#" << i << " (" << argv[i] << ")...";
+        cout << "IndexedSet test#" << i << " (" << argv[i] << ")...";
 
         if (tokenise_words(argv[i])) {
             cout << "PASS.";

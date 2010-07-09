@@ -1,5 +1,5 @@
-#ifndef OODLES_DISTINCTITEM_HPP // Interface
-#define OODLES_DISTINCTITEM_HPP
+#ifndef OODLES_INDEXEDSET_HPP // Interface
+#define OODLES_INDEXEDSET_HPP
 
 // STL
 #include <set>
@@ -11,11 +11,11 @@
 namespace oodles {
 
 template<class Type, class Compare = std::less<Type> >
-class DistinctItem
+class IndexedSet
 {
     public:
         /* Member functions/methods */
-        DistinctItem(bool unique = false);
+        IndexedSet(bool unique = false);
         std::pair<size_t, bool> insert(const Type &item);
 
         size_t size() const { return indicies.size(); }
@@ -69,6 +69,6 @@ class DistinctItem
 
 } // oodles
 
-#include "DistinctItem.ipp" // Implemention
+#include "IndexedSet.ipp" // Implemention
 
 #endif

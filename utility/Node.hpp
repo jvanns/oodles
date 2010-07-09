@@ -3,7 +3,7 @@
 
 // oodles
 #include "NodeBase.hpp"
-#include "DistinctItem.hpp"
+#include "IndexedSet.hpp"
 
 // STL
 #include <functional>
@@ -46,7 +46,7 @@ class Node : public NodeBase
         };
 
         /* Member variables/attributes */
-        DistinctItem<NodeBase*, KeyCmp> children;
+        IndexedSet<NodeBase*, KeyCmp> children;
 
         /* Member functions/methods */
         Node();

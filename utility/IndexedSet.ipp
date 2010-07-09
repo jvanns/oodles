@@ -1,5 +1,5 @@
-#ifndef OODLES_DISTINCTITEM_IPP // Implementation
-#define OODLES_DISTINCTITEM_IPP
+#ifndef OODLES_INDEXEDSET_IPP // Implementation
+#define OODLES_INDEXEDSET_IPP
 
 // libc
 #include <assert.h> // For assert()
@@ -7,13 +7,13 @@
 namespace oodles {
 
 template<class Type, class Compare>
-DistinctItem<Type, Compare>::DistinctItem(bool unique) : unique(unique)
+IndexedSet<Type, Compare>::IndexedSet(bool unique) : unique(unique)
 {
 }
 
 template<class Type, class Compare>
 std::pair<size_t, bool>
-DistinctItem<Type, Compare>::insert(const Type &item)
+IndexedSet<Type, Compare>::insert(const Type &item)
 {
     Item i(item, locations.size());
     std::pair<typename std::set<Item>::iterator, bool> x(items.insert(i));
@@ -37,7 +37,7 @@ DistinctItem<Type, Compare>::insert(const Type &item)
 
 template<class Type, class Compare>
 Type&
-DistinctItem<Type, Compare>::item(size_t i)
+IndexedSet<Type, Compare>::item(size_t i)
 {
     assert(i >= 0 && i < size());
     return const_cast<Type&>(locations.at(indicies.at(i))->data);
@@ -45,7 +45,7 @@ DistinctItem<Type, Compare>::item(size_t i)
 
 template<class Type, class Compare>
 const Type&
-DistinctItem<Type, Compare>::item(size_t i) const
+IndexedSet<Type, Compare>::item(size_t i) const
 {
     assert(i >= 0 && i < size());
     return locations.at(indicies.at(i))->data;
