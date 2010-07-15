@@ -14,7 +14,8 @@ sched/ - Crawler scheduler code
 
 First, copy .config-example to .config and modify it according to your
 development platform. For Linux and OSX 10.5 this should be pretty
-straight-forward.
+straight-forward. You must have Boost >= 1.42 installed as the .config
+may suggest...
 
 * mkdir -p bin/test
 * make -j2 all
