@@ -6,6 +6,7 @@
 
 namespace oodles {
 
+uint32_t fnv32(const char *input, size_t size, uint32_t seed = 0);
 uint64_t fnv64(const char *input, size_t size, uint64_t seed = 0);
 
 } // oodles
