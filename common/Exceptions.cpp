@@ -7,7 +7,19 @@ using std::string;
 namespace oodles {
 
 // General oodles exceptions
+OpenError::OpenError(const string &from, int error, const char *format, ...)
+{
+    va_start(list, format);
+    init(from, error, format); // va_end happens in here
+}
+
 ReadError::ReadError(const string &from, int error, const char *format, ...)
+{
+    va_start(list, format);
+    init(from, error, format); // va_end happens in here
+}
+
+WriteError::WriteError(const string &from, int error, const char *format, ...)
 {
     va_start(list, format);
     init(from, error, format); // va_end happens in here
