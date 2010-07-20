@@ -23,7 +23,7 @@ class URL
 {
     public:
         /* Dependent typedefs */
-        typedef uint64_t hash_t;
+        typedef uint32_t hash_t;
         typedef Iterator iterator;
         typedef TreeIterator tree_iterator;
 

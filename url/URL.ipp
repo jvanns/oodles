@@ -17,7 +17,7 @@ inline
 URL::hash_t
 hasher<value_type>(const value_type &input, URL::hash_t seed)
 {
-    return fnv64(input.data(), input.size(), seed);
+    return fnv32(input.data(), input.size(), seed);
 }
 
 template<>
