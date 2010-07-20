@@ -22,6 +22,7 @@ template<typename Integer> class FNV
         const Integer prime, offset;
 };
 
+#ifdef HAS_64_BITS
 /*
  * Common hashing method (FNV) to a 64-bit integer.
  * Refer to the following for algorithm details:
@@ -32,6 +33,7 @@ fnv64(const char *input, size_t size, uint64_t seed)
     FNV<uint64_t> f(1099511628211U, 14695981039346656037U);
     return f(input, size, seed);
 }
+#endif
 
 /*
  * Common hashing method (FNV) to a 32-bit integer.
