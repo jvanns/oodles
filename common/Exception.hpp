@@ -46,7 +46,7 @@ struct FatalException : public Exception
 struct NonFatalException : public Exception
 {
     NonFatalException();
-    virtual ~NonFatalException() throw();
+    ~NonFatalException() throw();
 };
 
 } // oodles
