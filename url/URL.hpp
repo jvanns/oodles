@@ -10,6 +10,13 @@
 // STL
 #include <iostream>
 
+// Test for 64-bit capability
+#ifdef __GNUG__
+#ifdef __LP64__
+#define HAS_64_BITS
+#endif
+#endif
+
 namespace oodles {
 namespace url {
 
@@ -23,7 +30,11 @@ class URL
 {
     public:
         /* Dependent typedefs */
+#ifdef HAS_64_BITS
+        typedef uint64_t hash_t;
+#else
         typedef uint32_t hash_t;
+#endif
         typedef Iterator iterator;
         typedef TreeIterator tree_iterator;
 

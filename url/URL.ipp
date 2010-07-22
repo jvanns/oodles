@@ -17,7 +17,11 @@ inline
 URL::hash_t
 hasher<value_type>(const value_type &input, URL::hash_t seed)
 {
+#ifdef HAS_64_BITS
+    return fnv64(input.data(), input.size(), seed);
+#else
     return fnv32(input.data(), input.size(), seed);
+#endif
 }
 
 template<>
