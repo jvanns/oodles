@@ -22,6 +22,16 @@ struct WriteError : public NonFatalException
     WriteError(const std::string &from, int error, const char *format, ...);
 };
 
+// Net-specific exceptions
+namespace net {
+
+struct InvalidService : public FatalException
+{
+    InvalidService(const std::string &from, int error, const char *format, ...);
+};
+
+} // net
+
 // URL-specific exceptions
 namespace url {
 

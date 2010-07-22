@@ -25,6 +25,20 @@ WriteError::WriteError(const string &from, int error, const char *format, ...)
     init(from, error, format); // va_end happens in here
 }
 
+// Net-specific exceptions
+namespace net {
+
+InvalidService::InvalidService(const string &from,
+                               int error,
+                               const char *format,
+                               ...)
+{
+    va_start(list, format);
+    init(from, error, format); // va_end happens in here
+}
+
+} // net
+
 // URL-specific exceptions
 namespace url {
 
