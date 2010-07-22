@@ -30,7 +30,7 @@ template<typename Integer> class FNV
 uint64_t
 fnv64(const char *input, size_t size, uint64_t seed)
 {
-    FNV<uint64_t> f(1099511628211U, 14695981039346656037U);
+    static const FNV<uint64_t> f(1099511628211U, 14695981039346656037U);
     return f(input, size, seed);
 }
 #endif
@@ -42,7 +42,7 @@ fnv64(const char *input, size_t size, uint64_t seed)
 uint32_t
 fnv32(const char *input, size_t size, uint32_t seed)
 {
-    FNV<uint32_t> f(16777619U, 2166136261U);
+    static const FNV<uint32_t> f(16777619U, 2166136261U);
     return f(input, size, seed);
 }
 

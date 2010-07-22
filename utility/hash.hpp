@@ -4,6 +4,7 @@
 #include <stdint.h> // For uint64_t
 #include <stdlib.h> // For size_t
 
+// Test for 64-bit capability
 #ifdef __GNUG__
 #ifdef __LP64__
 #define HAS_64_BITS
