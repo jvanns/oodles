@@ -42,6 +42,7 @@ ChunkManager::allocate()
         vector<Chunk>::iterator i = chunks.begin(), j = chunks.end();
         
         if (empty != NULL) {
+            assert(empty->empty());
             allocator = empty;
             acquired = true;
             empty = NULL;
@@ -168,7 +169,6 @@ ChunkManager::initialise(size_t block_size, size_t page_size)
         blocks = minimum_chunk_size();
 }
 
-inline
 Chunk*
 ChunkManager::find(void *block) const
 {
@@ -176,6 +176,9 @@ ChunkManager::find(void *block) const
     Chunk *l = deallocator, *u = l + 1;
     const size_t chunk_size = blocks * block_size;
     const Chunk *lb = &chunks.front(), *ub = &chunks.back();
+
+    if (l == ub)
+        u = NULL; // Seems deallocator pointed to the end of the n chunks
 
     /*
      * The constants above mark the Lower and Upper Bounds
@@ -187,20 +190,16 @@ ChunkManager::find(void *block) const
             if (l->owns_block(block, chunk_size))
                 return l;
 
-            if (l == lb)
+            if (--l < lb)
                 l = NULL; // Lower chunks exhausted
-            else
-                --l; // Next, try the preceeding chunk
         }
 
         if (u) { // Remember; u = upper
             if (u->owns_block(block, chunk_size))
                 return u;
 
-            if (u == ub)
+            if (++u > ub)
                 u = NULL; // Upper chunks exhausted
-            else
-                ++u; // Next, try the successive chunk
         }
 
         done = !l && !u;
