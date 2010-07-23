@@ -40,12 +40,15 @@ struct Chunk
      */
     bool owns_block(void *block, size_t chunk_size) const
     {
+        if (empty())
+            return false;
+
         const byte_t *p = static_cast<byte_t*>(block);
         return (p >= mem) && (p < (mem + chunk_size));
     }
 
     bool full() const { return available_blocks == 0; }
-    bool empty() const { return available_blocks == allocated_blocks; };
+    bool empty() const { return !mem || available_blocks == allocated_blocks; };
 
     /* Member variables/attributes */
     byte_t *mem, next_free_block, available_blocks, allocated_blocks;
