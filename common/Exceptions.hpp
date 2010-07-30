@@ -30,6 +30,11 @@ struct InvalidService : public FatalException
     InvalidService(const std::string &from, int error, const char *format, ...);
 };
 
+struct DNSFailure : public NonFatalException
+{
+    DNSFailure(const std::string &from, int error, const char *format, ...);
+};
+
 } // net
 
 // URL-specific exceptions

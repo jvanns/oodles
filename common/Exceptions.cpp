@@ -37,6 +37,13 @@ InvalidService::InvalidService(const string &from,
     init(from, error, format); // va_end happens in here
 }
 
+DNSFailure::DNSFailure(const string &from, int error, const char *format, ...)
+{
+    va_start(list, format);
+    init(from, error, format); // va_end happens in here
+}
+
+
 } // net
 
 // URL-specific exceptions
