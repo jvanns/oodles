@@ -1,14 +1,13 @@
 // oodles
 #include "common/Exceptions.hpp"
 
-#include "net/Client.hpp"
-#include "net/Server.hpp"
-#include "net/ProtocolCreator.hpp"
-#include "net/ProtocolHandler.hpp"
+#include "net/core/Client.hpp"
+#include "net/core/Server.hpp"
+#include "net/core/ProtocolCreator.hpp"
+#include "net/core/ProtocolHandler.hpp"
 
 // Boost
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
 
 // STL
 #include <queue>
@@ -137,7 +136,7 @@ TCPFileExchange::bytes_transferred(size_t n)
     if (pending())
         transfer_data(); // Send any remaining files
     else
-        finish(); // Will close the connection
+        stop(); // Will close the connection
 }
 
 size_t

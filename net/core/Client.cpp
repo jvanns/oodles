@@ -122,7 +122,7 @@ Client::connect_callback(const error_code &e, resolver::iterator i)
                              0,
                              "Failed to connect to (resolved) service.");
 
-        connection->close();
+        connection->stop();
         async_connect(i);
     }
 }

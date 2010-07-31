@@ -69,7 +69,7 @@ class ProtocolHandler
     protected:
         /* Member functions/methods */
         ProtocolHandler() {}
-        void finish() { endpoint->close(); }
+        void stop() { endpoint->stop(); }
     private:
         /* Member variables/attributes */
         Endpoint::Connection endpoint;

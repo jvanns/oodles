@@ -26,13 +26,15 @@ LDLIBS += $(LDLIBS_BOOST)
 %.o:	%.cpp
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
 
-# Compile object files
+# Compile oodles object files
 SCHEDULER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard sched/*.cpp))
 UTILITY_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard utility/*.cpp))
 COMMON_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard common/*.cpp))
-TEST_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard test/*.cpp))
+NET_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/*/*.cpp))
 URL_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard url/*.cpp))
-NET_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/*.cpp))
+
+# Compile unit test object files
+TEST_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard test/*.cpp))
 
 # Binary targets
 TESTS = test/html-parser \
