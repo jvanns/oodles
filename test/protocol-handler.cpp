@@ -16,6 +16,7 @@
 
 // libc
 #include <fcntl.h>
+#include <getopt.h>
 #include <sys/stat.h>
 
 // STL
@@ -278,41 +279,102 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
     return remainder;
 }
 
+static void print_usage(const char *program)
+{
+   cerr << program << " [-h|-c <host:port>|-s <ip:port>] <file file...>\n\n";
+
+    cerr << "Provide -c (or --client) and a host:port pair to run a client.\n";
+    cerr << "Provide -s (or --server) and an ip:port pair to run a server.\n";
+}
+
 int main(int argc, char *argv[])
 {
-    if (argc < 2) {
+    int ch = -1;
+    bool client_only = false,
+         server_only = false;
+    string listen_on("127.0.0.1:8888"),
+           connect_to("localhost:8888");
+    const char *short_options = "hc:s:";
+    const struct option long_options[4] = {
+        {"help", no_argument, NULL, short_options[0]},
+        {"client", required_argument, NULL, short_options[1]},
+        {"server", required_argument, NULL, short_options[3]},
+        {NULL, 0, NULL, 0}
+    };
+
+    while ((ch = getopt_long(argc, argv,
+                             short_options,
+                             long_options, NULL)) != -1)
+    {
+        switch (ch) {
+            case 'c':
+                connect_to = optarg;
+                client_only = true;
+                break;
+            case 's':
+                listen_on = optarg;
+                server_only = true;
+                break;
+            default:
+                print_usage(argv[0]);
+                return 1;
+        }
+    }
+
+    argc -= optind;
+    argv += optind;
+
+    const oodles::net::Protocol<TCPFileExchange> creator; // Creator
+    const bool send = (!client_only && !server_only) || client_only;
+    oodles::net::Endpoint::Protocol protocol(creator.create()); // Interface
+
+    if (send && argc == 0) {
         cerr << "Supply at least one file to transfer.\n";
         return 1;
     }
 
-    const oodles::net::Protocol<TCPFileExchange> creator; // Creator
-    oodles::net::Endpoint::Protocol protocol(creator.create()); // Interface
-
-    boost::asio::io_service service;
-    oodles::net::Server server(service, creator);
-    oodles::net::Client client(service, protocol);
-
-    for (int i = 1 ; i < argc ; ++i) {
-        if (!creator.handler(protocol)->load_file(argv[i]))
-            cerr << "Failed to load file '" << argv[i] << "'.\n";
-        else
-            cout << "Opened file '" << argv[i] << "'.\n";
-    }
-
-    server.start("127.0.0.1:8888");
-    client.start("localhost:8888");
-
-    cout << "NOTE: All received files can be found in " << tmp << ".\n";
-    cout << "Attempting to send "
-         << creator.handler(protocol)->pending()
-         << " files...\n";
+    oodles::net::Server *server = NULL;
+    oodles::net::Client *client = NULL;
 
     try {
+        boost::asio::io_service service;
+
+        if (!client_only)
+            server = new oodles::net::Server(service, creator);
+
+        if (!server_only)
+           client = new oodles::net::Client(service, protocol);
+
+        if (send) {
+            for (int i = 0 ; i < argc ; ++i) {
+                if (!creator.handler(protocol)->load_file(argv[i]))
+                    cerr << "Failed to load file '" << argv[i] << "'.\n";
+                else
+                    cout << "Opened file '" << argv[i] << "'.\n";
+            }
+        }
+
+        if (server) {
+            server->start(listen_on);
+            cout << "NOTE: All received files can be found in " << tmp << ".\n";
+        }
+
+        if (client) {
+            client->start(connect_to);
+
+            cout << "Attempting to send "
+                 << creator.handler(protocol)->pending()
+                 << " files...\n";
+        }
+
         service.run();
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
         return 1;
     }
+
+    delete client;
+    delete server;
 
     return 0;
 }
