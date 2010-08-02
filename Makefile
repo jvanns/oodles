@@ -13,13 +13,13 @@ LDLIBS += -lstdc++
 
 # Boost specific flags
 LDLIBS_BOOST += -lboost_system
-LDFLAGS_BOOST ?=
+LDFLAGS_BOOST ?= -I/opt/local/lib
 CPPFLAGS_BOOST ?= -I/opt/local/include
 
 # Compiler flags and optional additional Boost flags too!
-CXXFLAGS += -Wall -pedantic -ansi -Wno-long-long -MMD -MP
-CPPFLAGS += -I. $(CPPFLAGS_BOOST)
-LDFLAGS += $(LDFLAGS_BOOST)
+CXXFLAGS += -Wall -pedantic -ansi -Wno-long-long -MMD -MP -pthread
+CPPFLAGS += -I. $(CPPFLAGS_BOOST) -pthread
+LDFLAGS += $(LDFLAGS_BOOST) -pthread
 LDLIBS += $(LDLIBS_BOOST)
 
 # Suffix rules
