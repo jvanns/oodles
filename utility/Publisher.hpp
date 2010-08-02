@@ -1,6 +1,9 @@
 #ifndef OODLES_EVENT_PUBLISHER_HPP
 #define OODLES_EVENT_PUBLISHER_HPP
 
+// Boost.asio
+#include <boost/asio/io_service.hpp>
+
 // STL
 #include <set>
 
@@ -32,11 +35,14 @@ struct Event
 class Publisher
 {
     public:
+        /* Dependent typedefs */
+        typedef boost::asio::io_service Proactor;
+
         /* Member functions/methods */
-        Publisher(Event &e);
+        Publisher(Event &e, Proactor *p = NULL);
         ~Publisher();
 
-        void broadcast() const;
+        size_t broadcast() const;
         bool add_subscriber(Subscriber &s);
         bool remove_subscriber(Subscriber &s);
 
@@ -45,6 +51,7 @@ class Publisher
     private:
         /* Member variables/attributes */
         Event *object;
+        Proactor *proactor;
         std::set<Subscriber*> subscribers;
 };
 

@@ -92,7 +92,8 @@ struct Concatenate : public oodles::event::Subscriber
 int main(int argc, char *argv[])
 {
     Integers e; // Event object
-    oodles::event::Publisher p(e); // Publisher
+    oodles::event::Publisher::Proactor t;
+    oodles::event::Publisher p(e, &t); // Publisher
 
     Sum s; // Subscriber
     Deviation d; // Another, different Subscriber
@@ -128,7 +129,8 @@ int main(int argc, char *argv[])
     for (int n = 1 ; n <= size ; ++n)
         e.v.push_back(n);
 
-    p.broadcast();
+    if (p.broadcast())
+        t.run(); // Ideally, this should be executed in a thread
 
     return 0;
 }

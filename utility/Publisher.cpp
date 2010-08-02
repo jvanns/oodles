@@ -2,6 +2,12 @@
 #include "Publisher.hpp"
 #include "Subscriber.hpp"
 
+// Boost.bind
+#include <boost/bind.hpp>
+
+// Boost.asio
+using boost::bind;
+
 // STL
 using std::set;
 
@@ -16,7 +22,7 @@ Event::~Event()
 {
 }
 
-Publisher::Publisher(Event &e) : object(&e)
+Publisher::Publisher(Event &e, Proactor *p) : object(&e), proactor(p)
 {
 }
 
@@ -31,16 +37,27 @@ Publisher::~Publisher()
     }
 }
 
-void
+size_t
 Publisher::broadcast() const
 {
+    size_t n = 0;
+    const Publisher &p = *this;
     set<Subscriber*>::const_iterator i = subscribers.begin(),
                                      j = subscribers.end();
 
     while (i != j) {
-        (*i)->receive(*this);
+        Subscriber *s = *i;
+
+        if (proactor) {
+            proactor->post(bind(&Subscriber::receive, s, p)); // Non-blocking
+            ++n;
+        } else
+            s->receive(p); // Will block
+
         ++i;
     }
+
+    return n;
 }
 
 bool
