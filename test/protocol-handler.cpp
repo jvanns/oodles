@@ -47,12 +47,13 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
     private:
         struct WiredFile; // Forward declaration for public methods below
     public:
+        TCPFileExchange() : sent(0), loaded(0) {}
+
         bool load_file(const char *file_name);
         size_t pending() const { return outbound.size(); }
         void write_file(WiredFile &f, const char *buffer, size_t bytes);
 
         /* Override the pure virtual methods from ProtocolHandler */
-        void start();
         string name() const { return "TCPFEX"; }
 
         /* Writes */
@@ -73,9 +74,11 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
 
             WiredFile() : fd(-1), size(0), buffered(0), transferred(0) {}
             void close() { if (fd != -1) { ::close(fd); fd = -1; } }
+            void reset() { close(); *this = WiredFile(); }
         };
         
         WiredFile incoming;
+        size_t sent, loaded;
         queue<WiredFile> outbound;
         static const uint16_t name_size, file_size;
 };
@@ -89,28 +92,28 @@ TCPFileExchange::file_size = sizeof(uint32_t);
 bool
 TCPFileExchange::load_file(const char *file_name)
 {
-    WiredFile f;
+    int fd = -1;
     struct stat info;
 
-    if ((f.fd = open(file_name, O_RDONLY)) == -1)
+    if ((fd = open(file_name, O_RDONLY)) == -1)
         return false;
 
-    if (fstat(f.fd, &info) != 0)
+    if (fstat(fd, &info) != 0)
         return false;
 
+    if (info.st_size == 0)
+        return false; // Do not, for this trivial example, load empty files
+
+    WiredFile f;
+
+    f.fd = fd;
     f.name = file_name;
     f.size = name_size + f.name.size() + file_size + info.st_size;
 
+    ++loaded;
     outbound.push(f);
 
     return true;
-}
-
-void
-TCPFileExchange::start()
-{
-    if (pending())
-        transfer_data(); // Send some files
 }
 
 void
@@ -130,20 +133,27 @@ TCPFileExchange::bytes_transferred(size_t n)
         assert(f.transferred == f.buffered);
 
         cout << "Transfer of '" << f.name << "' complete.\n";
+
+        ++sent;
         f.close();
         outbound.pop();
     }
     
     if (pending())
         transfer_data(); // Send any remaining files
-    else
+    else {
         stop(); // Will close the connection
+        assert(sent == loaded); // Assert we sent all we should have
+
+        cout << "All files transferred successfully.\n";
+    }
 }
 
 size_t
 TCPFileExchange::message2buffer(char *& buffer, size_t max)
 {
-    assert(pending());
+    if (!pending())
+        return 0;
 
     size_t offset = 0;
     WiredFile &f = outbound.front();
@@ -168,7 +178,6 @@ TCPFileExchange::message2buffer(char *& buffer, size_t max)
 
     if (max > pending)
         max = pending;
-
     max -= offset;
 
     const int n = read(f.fd, buffer + offset, max);
@@ -219,7 +228,7 @@ TCPFileExchange::write_file(WiredFile &f, const char *buffer, size_t bytes)
 size_t
 TCPFileExchange::buffer2message(const char *buffer, size_t max)
 {
-    size_t offset = 0;
+    size_t offset = 0, used = 0;
 
     /*
      * If no name is set we must retrieve it from the buffer
@@ -228,16 +237,16 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
         uint16_t n = 0;
 
         if (max < name_size)
-            return max;
+            return 0;
 
         memcpy(&n, buffer, name_size);
-        max -= name_size;
+        used += name_size;
         n = ntohs(n);
 
-        if (max < n)
-            return max;
+        if (max - used < n)
+            return used;
 
-        max -= n;
+        used += n;
         incoming.name.reserve(n);
         incoming.name.assign(buffer + name_size, n);
     }
@@ -250,38 +259,37 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
     if (incoming.size == 0) {
         uint32_t s = 0;
 
-        if (max < file_size)
-            return max;
+        if (max - used < file_size)
+            return used;
 
-        max -= file_size;
+        used += file_size;
         offset = header_size;
 
         memcpy(&s, buffer + (offset - file_size), file_size);
         incoming.size = header_size + ntohl(s);
     }
 
-    size_t written = incoming.buffered, remainder = max, end = 0;
+    assert(!incoming.name.empty());
 
-    if (written + max > incoming.size - header_size)
+    size_t written = incoming.buffered, end = 0;
+
+    if (written + (max - used) > incoming.size - header_size)
         end = (incoming.size - header_size) - written;
 
-    write_file(incoming, buffer + offset, end > 0 ? end : max);
-
-    remainder = (max + offset) - ((incoming.buffered - written) + offset);
+    write_file(incoming, buffer + offset, end > 0 ? end : max - used);
+    used += incoming.buffered - written;
 
     if (incoming.buffered == incoming.size - header_size) {
         cout << "Download of '" << incoming.name << "' complete.\n";
-
-        incoming.close();
-        incoming = WiredFile();
+        incoming.reset();
     }
 
-    return remainder;
+    return used;
 }
 
 static void print_usage(const char *program)
 {
-   cerr << program << " [-h|-c <host:port>|-s <ip:port>] <file file...>\n\n";
+    cerr << program << " [-h|-c <host:port>|-s <ip:port>] <file file...>\n\n";
 
     cerr << "Provide -c (or --client) and a host:port pair to run a client.\n";
     cerr << "Provide -s (or --server) and an ip:port pair to run a server.\n";
@@ -324,6 +332,7 @@ int main(int argc, char *argv[])
     argc -= optind;
     argv += optind;
 
+    int rc = 0;
     const oodles::net::Protocol<TCPFileExchange> creator; // Creator
     const bool send = (!client_only && !server_only) || client_only;
     oodles::net::Endpoint::Protocol protocol(creator.create()); // Interface
@@ -343,7 +352,7 @@ int main(int argc, char *argv[])
             server = new oodles::net::Server(service, creator);
 
         if (!server_only)
-           client = new oodles::net::Client(service, protocol);
+            client = new oodles::net::Client(service, protocol);
 
         if (send) {
             for (int i = 0 ; i < argc ; ++i) {
@@ -370,11 +379,11 @@ int main(int argc, char *argv[])
         service.run();
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
-        return 1;
+        rc = 1;
     }
 
     delete client;
     delete server;
 
-    return 0;
+    return rc;
 }
