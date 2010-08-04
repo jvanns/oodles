@@ -152,7 +152,7 @@ Scheduler::select_best_child(Node &parent) const
         parent.visit_state = Node::Red;
 
         if ((n = parent_of(parent)))
-            ++n->visited;
+            ++n->visited; // Update the grandparent
 
         n = NULL;
     }
@@ -215,10 +215,9 @@ Scheduler::fill_crawler(Crawler &c, Node *&n)
                 break; // Terminate the loop if any unvisited children
 
             p->visit_state = Node::Red;
-            p = parent_of(*p);
 
-            if (p)
-                p->visited++; // Update the grandparent
+            if ((p = parent_of(*p)))
+                ++p->visited; // Update the grandparent
         }
     }
 
