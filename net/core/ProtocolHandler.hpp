@@ -26,13 +26,14 @@ class ProtocolHandler
          * for a write operation and the buffer area and size
          * allocated is passed to message2buffer(), called by
          * this method.
+         *
+         * The counter-par to transfer_data() is of course,
+         * receive_data(). Similarly it prepares the inbound
+         * buffer for a read operation and upon receiving any
+         * data will call buffer2message.
          */
+        void receive_data();
         void transfer_data();
-
-        /*
-         * Initial method called by a newly connected endpoint
-         */
-        virtual void start() = 0;
 
         /*
          * Return the protocol name/identifier such as
@@ -60,10 +61,9 @@ class ProtocolHandler
 
         /*
          * Read and process (block until finished with data) a message.
-         * Return the remainder of any unused bytes which will continue
-         * to be present in the next call to buffer2message. Upon return
-         * the buffer data will be overwritten by subsequent raw socket
-         * recv()s through the Endpoint, endpoint.
+         * Return the number of used bytes so the endpoint can preserve
+         * the remainder which will presented once again to this method
+         * upon the next receipt of incoming data.
          */
         virtual size_t buffer2message(const char *buffer, size_t max) = 0;
     protected:

@@ -27,7 +27,10 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Endpoint::Endpoint(io_service &s) : tcp_socket(s)
+Endpoint::Endpoint(io_service &s) :
+    tcp_socket(s),
+    read_strand(s),
+    write_strand(s)
 {
 }
 
@@ -51,10 +54,8 @@ Endpoint::start()
     tcp_socket.set_option(boost::asio::socket_base::send_buffer_size(OBS));
     tcp_socket.set_option(boost::asio::socket_base::receive_buffer_size(IBS));
     
-    protocol->start(); // May prepare messages for sending
-
-    async_send();
-    async_recv();
+    protocol->transfer_data();
+    protocol->receive_data();
 }
 
 void
@@ -67,54 +68,47 @@ Endpoint::set_protocol(Protocol p)
 }
 
 void
-Endpoint::async_recv()
+Endpoint::async_recv(char *ptr, size_t max)
 {
     assert(protocol);
 
-    if (inbound.locked || inbound.full())
+    if (!(ptr && max > 0))
         return;
 
-    tcp_socket.async_read_some(buffer(inbound.data(), inbound.size()),
+    tcp_socket.async_read_some(buffer(ptr, max),
+                                      read_strand.wrap(
                                       bind(&Endpoint::raw_recv_callback,
                                       shared_from_this(),
                                       placeholders::error,
-                                      placeholders::bytes_transferred));
-
-    inbound.locked = true;
+                                      placeholders::bytes_transferred)));
 }
 
 void
-Endpoint::async_send()
+Endpoint::async_send(const char *ptr, size_t max)
 {
     assert(protocol);
 
-    if (outbound.locked || outbound.empty())
+    if (!(ptr && max > 0))
         return;
 
-    tcp_socket.async_write_some(buffer(outbound.data(), outbound.offset),
+    tcp_socket.async_write_some(buffer(ptr, max),
+                                       write_strand.wrap(
                                        bind(&Endpoint::raw_send_callback,
                                        shared_from_this(),
                                        placeholders::error,
-                                       placeholders::bytes_transferred));
-
-    outbound.locked = true;
+                                       placeholders::bytes_transferred)));
 }
 
 void
 Endpoint::raw_recv_callback(const error_code& e, size_t b)
 {
-    if (!e) {
-        size_t n = inbound.offset + b; // Raw, readable data
-        size_t r = protocol->buffer2message(inbound.data(), n);
+    if (!e && b > 0) {
+        size_t n = inbound.producer().commit_buffer(b),
+               u = protocol->buffer2message(inbound.consumer().
+                                            yield_buffer(), n);
 
-        assert(r <= n);
-
-        inbound.consume(n - r); // Data will be invalidated
-        inbound.offset = r; // Data remaining after any message processing
-
-        inbound.locked = false;
-
-        async_recv(); // Ready the socket for more data
+        inbound.consumer().consume_buffer(u);
+        protocol->receive_data();
     } else {
         if (e != boost::asio::error::operation_aborted)
             stop();
@@ -124,28 +118,17 @@ Endpoint::raw_recv_callback(const error_code& e, size_t b)
 void
 Endpoint::raw_send_callback(const error_code& e, size_t b)
 {
-    if (!e) {
-        outbound.consume(b); // Always remove sent data from the buffer
-        outbound.offset -= b; // We may still have some data left to send
-        
+    if (!e && b > 0) {
+        size_t r = outbound.consumer().consume_buffer(b);
+
+        if (r)
+            async_send(outbound.consumer().yield_buffer(), r);
+
         protocol->bytes_transferred(b); // Inform the handler how much was sent
-
-        outbound.locked = false;
-
-        async_send(); // Continue sending if buffer still contains data
     } else {
         if (e != boost::asio::error::operation_aborted)
             stop();
     }
-}
-
-size_t
-Endpoint::prepare_outbound_buffer(byte_t *&buffer)
-{
-    buffer = outbound.buffer.begin() + outbound.offset;
-    outbound.offset = outbound.size() - outbound.offset;
-
-    return outbound.offset;
 }
 
 } // net

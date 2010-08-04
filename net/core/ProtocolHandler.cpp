@@ -4,6 +4,8 @@
 // libc
 #include <assert.h> // For assert()
 
+#include <iostream>
+
 // STL
 using std::string;
 
@@ -23,25 +25,29 @@ ProtocolHandler::set_endpoint(Endpoint::Connection e)
 }
 
 void
+ProtocolHandler::receive_data()
+{
+    assert(endpoint);
+
+    char *buffer = NULL;
+    size_t max = endpoint->inbound.producer().prepare_buffer(buffer);
+
+    endpoint->async_recv(buffer, max);
+}
+
+void
 ProtocolHandler::transfer_data()
 {
     assert(endpoint);
 
     char *buffer = NULL;
-    const size_t max = endpoint->prepare_outbound_buffer(buffer),
-                              used = message2buffer(buffer, max);
+    size_t max = endpoint->outbound.producer().prepare_buffer(buffer);
 
-    assert(used <= max);
-
-    if (used < max)
-        endpoint->set_outbound_offset(used); // Allow more writes
-
-    endpoint->async_send();
-}
-
-void
-ProtocolHandler::start()
-{
+    if (buffer && max > 0) {
+        size_t used = message2buffer(buffer, max);
+        max = endpoint->outbound.producer().commit_buffer(used);
+        endpoint->async_send(endpoint->outbound.consumer().yield_buffer(), max);
+    }
 }
 
 string
