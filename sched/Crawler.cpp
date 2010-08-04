@@ -8,7 +8,7 @@ using std::string;
 namespace oodles {
 namespace sched {
 
-Crawler::Crawler(const string &name) : name(name), endpoint(NULL)
+Crawler::Crawler(const string &name) : name(name)
 {
 }
 
