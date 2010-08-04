@@ -109,5 +109,6 @@ default: all
 all: $(TESTS)
 
 clean:
-	-rm -f */*.o */*.d
+	-find `pwd` -depth -type f -name '*.[od]' -prune \
+		\! -path "`pwd`[/].git/*" -exec rm -f {} \;
 	-rm -f bin/*/*
