@@ -8,8 +8,9 @@ using std::string;
 namespace oodles {
 namespace sched {
 
-Crawler::Crawler(const string &name) : name(name)
+Crawler::Crawler(const string &name) : cores(1), name(name)
 {
+    work_unit.reserve(max_unit_size());
 }
 
 Crawler::unit_t
@@ -23,7 +24,7 @@ Crawler::add_url(const url::URL &url)
               << " assigned\n";
 #endif
 
-    return unit_size();
+    return assigned();
 }
 
 bool
@@ -33,13 +34,13 @@ RankCrawler::operator() (const Crawler *lhs, const Crawler *rhs) const
      * First, be sure to check that the Crawlers have a valid Endpoint!
      */
     if (lhs->online() && rhs->online()) {
-        if (lhs->unit_size() == rhs->unit_size())
+        if (lhs->assigned() == rhs->assigned())
             return false; // Maintain a stable queue
 
         /*
          * Always prefer Crawlers with less work at the front of the queue
          */
-        return lhs->unit_size() > rhs->unit_size();
+        return lhs->assigned() > rhs->assigned();
     }
 
     /*

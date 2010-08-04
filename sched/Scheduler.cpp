@@ -50,14 +50,14 @@ Scheduler::run(BreadCrumbTrail *t)
 
     for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
 #ifdef DEBUG_SCHED
-        std::cerr << '[' << c->id() << "|PRE]: " << c->unit_size() << std::endl;
+        std::cerr << '[' << c->id() << "|PRE]: " << c->assigned() << std::endl;
 #endif
 
         if (c->online()) // Do not assign anything to offline Crawlers
             k += fill_crawler(*c, n); // Assign as much work (fill work unit)
 
 #ifdef DEBUG_SCHED
-        std::cerr << '[' << c->id() << "|PST]: " << c->unit_size() << std::endl;
+        std::cerr << '[' << c->id() << "|PST]: " << c->assigned() << std::endl;
 #endif
         crawlers.pop(); // Pop the top of the queue (i.e. remove 'c')
         crawlers.push(c); // Push c back onto the queue forcing rank order
@@ -182,7 +182,8 @@ Scheduler::fill_crawler(Crawler &c, Node *&n)
 
     Node *p = NULL;
     Crawler::unit_t assigned = 0;
-    while (c.unit_size() < Crawler::max_unit_size()) {
+
+    while (!c.full()) {
         if (!n)
             n = const_cast<Node*>(root); // At the top of the tree
         else

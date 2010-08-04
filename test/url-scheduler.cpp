@@ -37,7 +37,7 @@ run_scheduler(oodles::sched::Scheduler &s, oodles::BreadCrumbTrail &t)
 
     for (int i = 0 ; i < n ; ++i) {
         cout << '[' << crawlers[i]->id() << "]: "
-             << crawlers[i]->unit_size() << "\n";
+             << crawlers[i]->assigned() << "\n";
         delete crawlers[i];
     }
 }
