@@ -85,8 +85,7 @@ URL::print(ostream &stream) const
 bool
 URL::operator==(const URL &rhs) const
 {
-    // TODO: Flesh me out by perhaps using the ID/hash of all components
-    return true;
+    return page_id() == rhs.page_id();
 }
 
 bool
