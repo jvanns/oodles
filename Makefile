@@ -13,7 +13,7 @@ LDLIBS += -lstdc++
 
 # Boost specific flags
 LDLIBS_BOOST += -lboost_system
-LDFLAGS_BOOST ?=
+LDFLAGS_BOOST ?= -L/opt/local/lib
 CPPFLAGS_BOOST ?= -I/opt/local/include
 
 # Compiler flags and optional additional Boost flags too!
