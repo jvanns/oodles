@@ -4,6 +4,7 @@
 #
 
 -include .config
+-include */*/*.d
 -include */*.d
 
 # Compilers and mandatory libraries
