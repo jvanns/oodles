@@ -43,8 +43,8 @@ class URL
         /* Member functions/methods */
         URL(const std::string &url);
 
-        bool operator== (const URL &rhs) const;
-        bool operator!= (const URL &rhs) const;
+        bool operator== (URL &rhs);
+        bool operator!= (URL &rhs);
 
         hash_t page_id();
         hash_t path_id();

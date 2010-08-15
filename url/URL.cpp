@@ -83,13 +83,13 @@ URL::print(ostream &stream) const
 }
 
 bool
-URL::operator==(const URL &rhs) const
+URL::operator==(URL &rhs)
 {
     return page_id() == rhs.page_id();
 }
 
 bool
-URL::operator!=(const URL &rhs) const
+URL::operator!=(URL &rhs)
 {
     return !(operator==(rhs));
 }
