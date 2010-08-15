@@ -51,8 +51,6 @@ Endpoint::start()
     assert(tcp_socket.is_open()); // Can't do anything with a closed socket!
 
     tcp_socket.set_option(boost::asio::socket_base::keep_alive(true));
-    tcp_socket.set_option(boost::asio::socket_base::send_buffer_size(OBS));
-    tcp_socket.set_option(boost::asio::socket_base::receive_buffer_size(IBS));
     
     protocol->transfer_data();
     protocol->receive_data();
