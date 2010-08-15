@@ -24,7 +24,7 @@ class IndexedSet
         Type& operator[] (size_t i) { return item(i); }
         const Type& operator[] (size_t i) const { return item(i); }
     private:
-        /* Member variables/attributes */
+        /* Internal Data Structures */
         struct Item {
             Type data;
             Compare cmp;
@@ -33,6 +33,8 @@ class IndexedSet
             Item(const Type &x, size_t i = 0) : data(x), index(i) {}
             bool operator< (const Item &rh) const { return cmp(data, rh.data); }
         };
+
+        /* Member variables/attributes */
 
         /*
          * If true all containers will be distinct. That is, not only
