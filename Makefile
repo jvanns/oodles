@@ -28,10 +28,11 @@ LDLIBS += $(LDLIBS_BOOST)
 	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) -o $@ $<
 
 # Compile oodles object files
+NET_CORE_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/core/*.cpp))
+NET_OOP_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/oop/*.cpp))
 SCHEDULER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard sched/*.cpp))
 UTILITY_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard utility/*.cpp))
 COMMON_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard common/*.cpp))
-NET_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/*/*.cpp))
 URL_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard url/*.cpp))
 
 # Compile unit test object files
@@ -98,7 +99,7 @@ test/events: test/events.o \
 
 test/protocol-handler: test/protocol-handler.o \
 	$(COMMON_OBJECTS) \
-	$(NET_OBJECTS) ;\
+	$(NET_CORE_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Phony targets
