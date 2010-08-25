@@ -10,7 +10,6 @@
 
 // Boost.asio
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/asio/strand.hpp>
 
 // libc
 #include <stdint.h> // For uint16_t
@@ -73,7 +72,6 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         Buffer<IBS> inbound;
         Buffer<OBS> outbound;
         boost::asio::ip::tcp::socket tcp_socket;
-        boost::asio::io_service::strand read_strand, write_strand;
 
         /* Member functions/methods */
         Endpoint(boost::asio::io_service &s);

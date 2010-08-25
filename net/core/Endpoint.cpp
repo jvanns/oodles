@@ -27,10 +27,7 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Endpoint::Endpoint(io_service &s) :
-    tcp_socket(s),
-    read_strand(s),
-    write_strand(s)
+Endpoint::Endpoint(io_service &s) : tcp_socket(s)
 {
 }
 
@@ -74,11 +71,10 @@ Endpoint::async_recv(char *ptr, size_t max)
         return;
 
     tcp_socket.async_read_some(buffer(ptr, max),
-                                      read_strand.wrap(
-                                      bind(&Endpoint::raw_recv_callback,
-                                      shared_from_this(),
-                                      placeholders::error,
-                                      placeholders::bytes_transferred)));
+                               bind(&Endpoint::raw_recv_callback,
+                               shared_from_this(),
+                               placeholders::error,
+                               placeholders::bytes_transferred));
 }
 
 void
@@ -90,11 +86,10 @@ Endpoint::async_send(const char *ptr, size_t max)
         return;
 
     tcp_socket.async_write_some(buffer(ptr, max),
-                                       write_strand.wrap(
-                                       bind(&Endpoint::raw_send_callback,
-                                       shared_from_this(),
-                                       placeholders::error,
-                                       placeholders::bytes_transferred)));
+                                bind(&Endpoint::raw_send_callback,
+                                shared_from_this(),
+                                placeholders::error,
+                                placeholders::bytes_transferred));
 }
 
 void
@@ -102,8 +97,7 @@ Endpoint::raw_recv_callback(const error_code& e, size_t b)
 {
     if (!e && b > 0) {
         size_t n = inbound.producer().commit_buffer(b),
-               u = protocol->buffer2message(inbound.consumer().
-                                            yield_buffer(), n);
+               u = protocol->buffer2message(inbound.consumer().data(), n);
 
         inbound.consumer().consume_buffer(u);
         protocol->receive_data();
@@ -117,12 +111,9 @@ void
 Endpoint::raw_send_callback(const error_code& e, size_t b)
 {
     if (!e && b > 0) {
-        size_t r = outbound.consumer().consume_buffer(b);
-
-        if (r)
-            async_send(outbound.consumer().yield_buffer(), r);
-
-        protocol->bytes_transferred(b); // Inform the handler how much was sent
+        outbound.consumer().consume_buffer(b);
+        protocol->bytes_transferred(b);
+        protocol->transfer_data();
     } else {
         if (e != boost::asio::error::operation_aborted)
             stop();

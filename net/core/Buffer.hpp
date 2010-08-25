@@ -65,11 +65,11 @@ template<size_t max> class Buffer
                 /*
                  * Returns the input sequence of the buffer for reading
                  */
-                const char* yield_buffer() const
+                const char* data() const
                 {
                     return boost::asio::buffer_cast<const char*>(buffer.data());
                 }
-
+                
                 /*
                  * Consumes data from the input sequence of the buffer
                  * effectively removing and creating space for new data

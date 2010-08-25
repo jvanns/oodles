@@ -41,13 +41,15 @@ ProtocolHandler::transfer_data()
     assert(endpoint);
 
     char *buffer = NULL;
-    size_t max = endpoint->outbound.producer().prepare_buffer(buffer);
+    size_t max = endpoint->outbound.producer().prepare_buffer(buffer), used = 0;
 
-    if (buffer && max > 0) {
-        size_t used = message2buffer(buffer, max);
-        max = endpoint->outbound.producer().commit_buffer(used);
-        endpoint->async_send(endpoint->outbound.consumer().yield_buffer(), max);
-    }
+    if (buffer && max > 0)
+        used = message2buffer(buffer, max);
+        
+    max = endpoint->outbound.producer().commit_buffer(used);
+
+    if (max > 0)
+        endpoint->async_send(endpoint->outbound.consumer().data(), max);
 }
 
 string
