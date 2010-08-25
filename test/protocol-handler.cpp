@@ -29,7 +29,7 @@ using std::string;
 /* 
  * Gah! A global variable :p
  */
-static const string tmp("/tmp/");
+static const string tmp("/tmp/TCPFEX/");
 
 /*
  * Test protocol handler abstraction; This protocol, set
@@ -121,9 +121,13 @@ TCPFileExchange::bytes_transferred(size_t n)
 {
     assert(pending());
 
+    size_t excess = 0;
     WiredFile &f = outbound.front();
 
-    f.transferred += n;
+    if (f.transferred + n > f.size)
+        excess = n - (f.size - f.transferred);
+
+    f.transferred += (excess > 0 ? excess : n);
 
     cout << "Transferred " << f.transferred
          << " bytes of " << f.size << " (" << n
@@ -137,15 +141,19 @@ TCPFileExchange::bytes_transferred(size_t n)
         ++sent;
         f.close();
         outbound.pop();
+
+        if (excess)
+            bytes_transferred(excess);
     }
     
-    if (pending())
-        transfer_data(); // Send any remaining files
-    else {
+    /*
+     * No need to call transfer_data() from here - the Endpoint does it for us
+     */
+    if (!pending()) {
         stop(); // Will close the connection
         assert(sent == loaded); // Assert we sent all we should have
 
-        cout << "All files transferred successfully.\n";
+        cout << "All " << loaded << " files transferred successfully.\n";
     }
 }
 
@@ -178,6 +186,7 @@ TCPFileExchange::message2buffer(char *& buffer, size_t max)
 
     if (max > pending)
         max = pending;
+
     max -= offset;
 
     const int n = read(f.fd, buffer + offset, max);
@@ -280,7 +289,11 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
     used += incoming.buffered - written;
 
     if (incoming.buffered == incoming.size - header_size) {
-        cout << "Download of '" << incoming.name << "' complete.\n";
+        ++loaded;
+        
+        cout << "Download of '" << incoming.name << "' complete, "
+             << loaded << " files received in total.\n";
+
         incoming.reset();
     }
 
