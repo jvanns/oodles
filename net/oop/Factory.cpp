@@ -14,12 +14,17 @@ Factory::~Factory()
 {
 }
 
-
 Factory&
 Factory::instance()
 {
     static Factory singleton;
     return singleton;
+}
+
+size_t
+Factory::size() const
+{
+    return registry.size();
 }
 
 bool
@@ -39,12 +44,23 @@ Factory::enroll(const Message *m)
 }
 
 const Message*
-Factory::operator[] (size_t subscript) const
+Factory::lookup(size_t subscript) const
 {
     if (subscript > registry.size())
         return NULL;
 
     return registry[subscript];
+}
+
+Message*
+Factory::create(const Message::Header &h) const
+{
+    int32_t i = index.index_of(h.message_id);
+
+    if (i == -1)
+        return NULL;
+    
+    return registry[i]->create(h.body_size);
 }
 
 } // oop

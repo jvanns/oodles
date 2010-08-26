@@ -2,6 +2,8 @@
 #define OODLES_NET_OOP_FACTORY_HPP
 
 // oodles
+#include "id_t.hpp"
+#include "Message.hpp"
 #include "utility/BitSet.hpp"
 
 // STL
@@ -10,8 +12,6 @@
 namespace oodles {
 namespace net {
 namespace oop {
-
-class Message; // Forward declaration for Factory
 
 class Factory
 {
@@ -22,8 +22,8 @@ class Factory
         size_t size() const;
         bool enroll(const Message *m);
 
-        Message* operator[] (size_t subscript);
-        const Message* operator[] (size_t subscript) const;
+        const Message* lookup(size_t subscript) const;
+        Message* create(const Message::Header &h) const;
     private:
         /* Member functions/methods */
         Factory();
