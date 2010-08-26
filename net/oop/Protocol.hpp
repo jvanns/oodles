@@ -17,15 +17,23 @@ class Protocol : public ProtocolHandler
 {
     public:
         /* Member functions/methods */
-        const Message* pop_message();
-        void push_message(const Message *m);
+        Protocol();
         
+        Message* pop_message();
+        void push_message(Message *m);
+        
+        /*
+         * These methods override the pure virtual interface
+         * provided by the base class, ProtocolHandler.
+         */
+        std::string name() const;
         void bytes_transferred(size_t n);
         size_t message2buffer(char* &buffer, size_t max);
-        size_t buffer2message(const char* &buffer, size_t max);
+        size_t buffer2message(const char *buffer, size_t max);
     private:
         /* Member variables/attributes */
-        std::queue<const Message*> inbound_messages, outbound_messages;
+        Message *incoming;
+        std::queue<Message*> inbound_messages, outbound_messages;
 };
    
 } // oop
