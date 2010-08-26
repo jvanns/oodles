@@ -13,7 +13,7 @@ CC ?= $(CXX)
 LDLIBS += -lstdc++
 
 # Boost specific flags
-LDLIBS_BOOST += -lboost_system
+LDLIBS_BOOST += -lboost_system -lboost_serialization
 LDFLAGS_BOOST ?= -L/opt/local/lib
 CPPFLAGS_BOOST ?= -I/opt/local/include
 
@@ -46,7 +46,8 @@ TESTS = test/html-parser \
 	test/url-scheduler \
 	test/allocator \
 	test/events \
-	test/protocol-handler
+	test/protocol-handler \
+	test/oop-messages
 
 test/html-parser: test/html-parser.o \
 	$(COMMON_OBJECTS) \
@@ -100,6 +101,15 @@ test/events: test/events.o \
 test/protocol-handler: test/protocol-handler.o \
 	$(COMMON_OBJECTS) \
 	$(NET_CORE_OBJECTS) ;\
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+
+test/oop-messages: test/oop-messages.o \
+	$(COMMON_OBJECTS) \
+	$(UTILITY_OBJECTS) \
+	$(SCHEDULER_OBJECTS) \
+	$(URL_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Phony targets
