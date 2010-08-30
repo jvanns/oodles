@@ -49,7 +49,6 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
     public:
         /* Dependent typedefs */
         typedef boost::shared_ptr<Endpoint> Connection;
-        typedef boost::shared_ptr<ProtocolHandler> Protocol;
 
         /* Member functions/methods */
         ~Endpoint();
@@ -65,12 +64,13 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
 
         void stop(); // Close socket cancelling pending handlers
         void start(); // Must be called to register reads/writes
-        void set_protocol(Protocol p); // Pair protocol with handler
+        void set_protocol(ProtocolHandler *p); // Pair protocol with endpoint
+        ProtocolHandler* get_protocol() const { return protocol; }
     private:
         /* Member variables/attributes */
-        Protocol protocol;
         Buffer<IBS> inbound;
         Buffer<OBS> outbound;
+        ProtocolHandler *protocol;
         boost::asio::ip::tcp::socket tcp_socket;
 
         /* Member functions/methods */
@@ -105,7 +105,7 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         raw_send_callback(const boost::system::error_code& e, size_t b);
 
         /* Friend class declarations */
-        friend class ProtocolHandler; // ProtocolHandler will modify buffers
+        friend class ProtocolHandler; // Needs access to inbound and outbound
 };
 
 } // net

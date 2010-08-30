@@ -27,12 +27,13 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Endpoint::Endpoint(io_service &s) : tcp_socket(s)
+Endpoint::Endpoint(io_service &s) : protocol(NULL), tcp_socket(s)
 {
 }
 
 Endpoint::~Endpoint()
 {
+    delete protocol;
 }
 
 void
@@ -54,12 +55,12 @@ Endpoint::start()
 }
 
 void
-Endpoint::set_protocol(Protocol p)
+Endpoint::set_protocol(ProtocolHandler *p)
 {
     assert(!protocol); // Must be set only once
 
     p->set_endpoint(shared_from_this());
-    protocol = p;
+    protocol = p; // Ownership is transferred
 }
 
 void
