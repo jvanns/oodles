@@ -11,8 +11,16 @@ namespace oodles {
 namespace net {
 
 // Public methods
+ProtocolHandler::ProtocolHandler(const DialectCreator &c) :
+    dialect(c.create(*this))
+{
+    dialect->set_handler(*this);
+}
+
 ProtocolHandler::~ProtocolHandler()
 {
+    if (dialect != this)
+        delete dialect;
 }
 
 void

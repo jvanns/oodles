@@ -3,6 +3,7 @@
 
 // oodles
 #include "Endpoint.hpp"
+#include "ProtocolCreator.hpp"
 
 // STL
 #include <string>
@@ -10,16 +11,24 @@
 namespace oodles {
 namespace net {
 
-class ProtocolHandler
+struct DialectCreator; // Forward declaration for ProtocolHandler
+
+class ProtocolHandler : public ProtocolDialect
 {
     public:
         /* Member functions/methods */
+        ProtocolHandler(const DialectCreator &c);
         virtual ~ProtocolHandler();
 
         /*
          * Pair endpoint with protocol handler
          */
         void set_endpoint(Endpoint::Connection e);
+
+        /*
+         * Return the internal dialect object
+         */
+        ProtocolDialect* get_dialect() const { return dialect; }
 
         /*
          * Begin a transfer. The (outbound) buffer is prepared
@@ -67,8 +76,10 @@ class ProtocolHandler
          */
         virtual size_t buffer2message(const char *buffer, size_t max) = 0;
     protected:
+        /* Member variables/attributes */
+        ProtocolDialect *dialect;
+        
         /* Member functions/methods */
-        ProtocolHandler() {}
         void stop() { endpoint->stop(); }
     private:
         /* Member variables/attributes */
