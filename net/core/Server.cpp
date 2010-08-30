@@ -1,6 +1,5 @@
 // oodles
 #include "Server.hpp"
-#include "ProtocolHandler.hpp"
 #include "ProtocolCreator.hpp"
 
 // Boost.bind (TR1 is incompatible)
@@ -127,9 +126,7 @@ Server::async_resolve(Endpoint::Connection c)
 void
 Server::detatch_client(Endpoint::Connection c) const
 {
-    Endpoint::Protocol handler(protocol_creator.create());
-
-    c->set_protocol(handler);
+    c->set_protocol(protocol_creator.create());
     c->start();
 }
 
