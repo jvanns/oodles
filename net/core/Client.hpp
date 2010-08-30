@@ -7,14 +7,19 @@
 namespace oodles {
 namespace net {
 
+class ProtocolCreator; // Forward declaration for Client
+struct ProtocolDialect; // Forward declaration for Client
+
 class Client
 {
     public:
         /* Member functions/methods */
-        Client(boost::asio::io_service &s, Endpoint::Protocol p);
+        Client(boost::asio::io_service &s, const ProtocolCreator &c);
 
         void start(const std::string &service);
         void stop();
+        
+        ProtocolDialect& dialect() const;
     private:
         /* Member variables/attributes */
         Endpoint::Connection connection;

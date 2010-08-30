@@ -1,5 +1,7 @@
 // oodles
 #include "Client.hpp"
+#include "ProtocolCreator.hpp"
+#include "ProtocolHandler.hpp"
 #include "common/Exceptions.hpp"
 
 // Boost.bind (TR1 is incompatible)
@@ -56,11 +58,11 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Client::Client(io_service &s, Endpoint::Protocol p) :
+Client::Client(io_service &s, const ProtocolCreator &c) :
     connection(Endpoint::create(s)),
     resolver(s)
 {
-    connection->set_protocol(p);
+    connection->set_protocol(c.create());
 }
 
 void
@@ -73,6 +75,15 @@ void
 Client::stop()
 {
     resolver.cancel();
+}
+
+ProtocolDialect&
+Client::dialect() const
+{
+    ProtocolDialect *d = connection->get_protocol()->get_dialect();
+    assert(d);
+
+    return *d;
 }
 
 void
