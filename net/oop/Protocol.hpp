@@ -17,7 +17,7 @@ class Protocol : public ProtocolHandler
 {
     public:
         /* Member functions/methods */
-        Protocol();
+        Protocol(const DialectCreator &c);
         
         Message* pop_message();
         void push_message(Message *m);

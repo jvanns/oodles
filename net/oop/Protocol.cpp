@@ -9,7 +9,7 @@ namespace oodles {
 namespace net {
 namespace oop {
 
-Protocol::Protocol() : incoming(NULL)
+Protocol::Protocol(const DialectCreator &c) : ProtocolHandler(c), incoming(NULL)
 {
 }
 
