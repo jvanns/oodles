@@ -47,7 +47,10 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
     private:
         struct WiredFile; // Forward declaration for public methods below
     public:
-        TCPFileExchange() : sent(0), loaded(0) {}
+        TCPFileExchange(const oodles::net::DialectCreator &c) :
+            ProtocolHandler(c),
+            loaded(0),
+            sent(0) {}
 
         bool load_file(const char *file_name);
         size_t pending() const { return outbound.size(); }
@@ -78,7 +81,7 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
         };
         
         WiredFile incoming;
-        size_t sent, loaded;
+        size_t loaded, sent;
         queue<WiredFile> outbound;
         static const uint16_t name_size, file_size;
 };
@@ -348,7 +351,6 @@ int main(int argc, char *argv[])
     int rc = 0;
     const oodles::net::Protocol<TCPFileExchange> creator; // Creator
     const bool send = (!client_only && !server_only) || client_only;
-    oodles::net::Endpoint::Protocol protocol(creator.create()); // Interface
 
     if (send && argc == 0) {
         cerr << "Supply at least one file to transfer.\n";
@@ -365,11 +367,13 @@ int main(int argc, char *argv[])
             server = new oodles::net::Server(service, creator);
 
         if (!server_only)
-            client = new oodles::net::Client(service, protocol);
+            client = new oodles::net::Client(service, creator);
 
         if (send) {
+            TCPFileExchange &tcpfex = client->dialect();
+            
             for (int i = 0 ; i < argc ; ++i) {
-                if (!creator.handler(protocol)->load_file(argv[i]))
+                if (!tcpfex.load_file(argv[i]))
                     cerr << "Failed to load file '" << argv[i] << "'.\n";
                 else
                     cout << "Opened file '" << argv[i] << "'.\n";
@@ -377,16 +381,16 @@ int main(int argc, char *argv[])
         }
 
         if (server) {
-            server->start(listen_on);
             cout << "NOTE: All received files can be found in " << tmp << ".\n";
+            
+            server->start(listen_on);
         }
 
         if (client) {
+            TCPFileExchange &tcpfex = client->dialect();
+            cout << "Attempting to send " << tcpfex.pending() << " files...\n";
+            
             client->start(connect_to);
-
-            cout << "Attempting to send "
-                 << creator.handler(protocol)->pending()
-                 << " files...\n";
         }
 
         service.run();
