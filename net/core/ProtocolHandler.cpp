@@ -4,8 +4,6 @@
 // libc
 #include <assert.h> // For assert()
 
-#include <iostream>
-
 // STL
 using std::string;
 
