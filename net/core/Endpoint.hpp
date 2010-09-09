@@ -60,6 +60,7 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
             return new Endpoint(s);
         }
 
+        bool online() const { return tcp_socket.is_open(); }
         boost::asio::ip::tcp::socket& socket() { return tcp_socket; }
 
         void stop(); // Close socket cancelling pending handlers
