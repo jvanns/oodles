@@ -21,6 +21,7 @@ Protocol::pop_message()
 
     Message *m = inbound_messages.front();
     inbound_messages.pop();
+    m->reconstruct();
 
     return m;
 }
@@ -28,8 +29,11 @@ Protocol::pop_message()
 void
 Protocol::push_message(Message *m)
 {
-    if (m)
+    if (m) {
         outbound_messages.push(m);
+        m->deconstruct();
+        transfer_data();
+    }
 }
 
 string
@@ -44,7 +48,7 @@ Protocol::bytes_transferred(size_t n)
 }
 
 size_t
-Protocol::message2buffer(char* &buffer, size_t max)
+Protocol::message2buffer(char *buffer, size_t max)
 {
     if (max == 0 || outbound_messages.empty())
         return 0;
@@ -56,9 +60,8 @@ Protocol::message2buffer(char* &buffer, size_t max)
      * Try to buffer as many (last may be partial) messages as we can
      */
     while (m) {
-        m->deconstruct();
         buffered = m->to_buffer(buffer + used, max);
-
+        
         used += buffered;
         max -= buffered;
         
@@ -71,7 +74,7 @@ Protocol::message2buffer(char* &buffer, size_t max)
             outbound_messages.pop();
             delete m;
 
-            if (max)
+            if (max && !outbound_messages.empty())
                 m = outbound_messages.front();
             else
                 m = NULL;
@@ -89,26 +92,36 @@ Protocol::buffer2message(const char *buffer, size_t max)
     
     size_t used = 0, buffered = 0;
     static const Factory &factory = Factory::instance();
+    bool done = (max - used) < Message::Header::header_size;
 
-    while (used < max) {
+    while (!done) {
         if (!incoming) {
-            if (max - used >= Message::Header::header_size) {
+            done = (max - used) < Message::Header::header_size;
+
+            if (!done) {
                 const Message::Header h(Message::buffer2header(buffer + used));
                 incoming = factory.create(h);
                 buffered = h.header_size;
-            } else
-                max = used; // Terminate the loop safely
+                used += buffered;
+            }
         }
+        
+        if (!done) {
+            const size_t n = incoming->from_buffer(buffer + used, max - used);
+            buffered += n;
+            used += n;
 
-        used += buffered;
-        buffered += incoming->from_buffer(buffer + used, max - used);
-
-        if (buffered == incoming->size()) {
-            inbound_messages.push(incoming);
-            incoming->reconstruct();
-            incoming = NULL;
+            if (buffered == incoming->size()) {
+                inbound_messages.push(incoming);
+                incoming = NULL;
+            }
+            
+            done = used == max;
         }
     }
+    
+    if (!inbound_messages.empty() && dialect != this)
+        dialect->translate();
 
     return used;
 }

@@ -28,7 +28,7 @@ class Protocol : public ProtocolHandler
          */
         std::string name() const;
         void bytes_transferred(size_t n);
-        size_t message2buffer(char* &buffer, size_t max);
+        size_t message2buffer(char *buffer, size_t max);
         size_t buffer2message(const char *buffer, size_t max);
     private:
         /* Member variables/attributes */
