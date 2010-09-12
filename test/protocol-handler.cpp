@@ -61,7 +61,7 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
 
         /* Writes */
         void bytes_transferred(size_t n);
-        size_t message2buffer(char *& buffer, size_t max);
+        size_t message2buffer(char *buffer, size_t max);
 
         /* Reads */
         size_t buffer2message(const char *buffer, size_t max);
@@ -161,7 +161,7 @@ TCPFileExchange::bytes_transferred(size_t n)
 }
 
 size_t
-TCPFileExchange::message2buffer(char *& buffer, size_t max)
+TCPFileExchange::message2buffer(char *buffer, size_t max)
 {
     if (!pending())
         return 0;
