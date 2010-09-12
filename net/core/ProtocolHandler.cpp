@@ -34,6 +34,9 @@ void
 ProtocolHandler::receive_data()
 {
     assert(endpoint);
+    
+    if (!endpoint->online())
+        return; // Not to worry, receive_data() will be called again by start()
 
     char *buffer = NULL;
     size_t max = endpoint->inbound.producer().prepare_buffer(buffer);
@@ -46,12 +49,15 @@ ProtocolHandler::transfer_data()
 {
     assert(endpoint);
 
+    if (!endpoint->online())
+        return; // Not to worry, transfer_data() will be called again by start()
+
     char *buffer = NULL;
     size_t max = endpoint->outbound.producer().prepare_buffer(buffer), used = 0;
 
     if (buffer && max > 0)
         used = message2buffer(buffer, max);
-        
+    
     max = endpoint->outbound.producer().commit_buffer(used);
 
     if (max > 0)
@@ -70,7 +76,7 @@ ProtocolHandler::bytes_transferred(size_t n)
 }
 
 size_t
-ProtocolHandler::message2buffer(char *&buffer, size_t max)
+ProtocolHandler::message2buffer(char *buffer, size_t max)
 {
     return 0;
 }

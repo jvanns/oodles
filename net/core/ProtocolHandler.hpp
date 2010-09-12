@@ -66,7 +66,7 @@ class ProtocolHandler : public ProtocolDialect
          * your message exceeds max then, from bytes_transferred(),
          * you must call transfer_data() until all data is sent.
          */
-        virtual size_t message2buffer(char *& buffer, size_t max) = 0;
+        virtual size_t message2buffer(char *buffer, size_t max) = 0;
 
         /*
          * Read and process (block until finished with data) a message.
