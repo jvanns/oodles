@@ -1,6 +1,7 @@
 // oodles
 #include "Endpoint.hpp"
 #include "ProtocolHandler.hpp"
+#include "common/Exceptions.hpp"
 
 // Boost.bind
 #include <boost/bind.hpp>
@@ -103,8 +104,14 @@ Endpoint::raw_recv_callback(const error_code& e, size_t b)
         inbound.consumer().consume_buffer(u);
         protocol->receive_data();
     } else {
-        if (e != boost::asio::error::operation_aborted)
-            stop();
+        if (e == boost::asio::error::operation_aborted)
+            return;
+        
+        stop();
+    
+        throw ReadError("Endpoint::raw_recv_callback",
+                        e.value(),
+                        e.message().c_str());
     }
 }
 
@@ -116,8 +123,14 @@ Endpoint::raw_send_callback(const error_code& e, size_t b)
         protocol->bytes_transferred(b);
         protocol->transfer_data();
     } else {
-        if (e != boost::asio::error::operation_aborted)
-            stop();
+        if (e == boost::asio::error::operation_aborted)
+            return;
+        
+        stop();
+        
+        throw WriteError("Endpoint::raw_send_callback",
+                         e.value(),
+                         e.message().c_str());
     }
 }
 
