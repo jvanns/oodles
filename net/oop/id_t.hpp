@@ -14,9 +14,11 @@ enum {
     INVALID_ID = 0,
 
     /*
-     * Message IDs for OOP dialog from a Crawler to a Scheduler (one way C->S)
+     * Message IDs for OOP dialect between Crawler and Scheduler
      */
-    REGISTER_CRAWLER = 10,
+    REGISTER_CRAWLER = 10, // Crawler registers itself for work with Scheduler
+    BEGIN_CRAWL,
+    END_CRAWL,
     
     MAX_MESSAGE_ID // Always maintain this as the last item
 };
