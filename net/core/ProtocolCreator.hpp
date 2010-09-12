@@ -18,6 +18,7 @@ struct ProtocolDialect
     ProtocolDialect() : handler(NULL) {}
     virtual ~ProtocolDialect() {}
 
+    virtual void translate() {}
     void set_handler(ProtocolHandler &p) { handler = &p; }
 
     /*
