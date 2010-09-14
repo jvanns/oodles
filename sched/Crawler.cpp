@@ -1,6 +1,7 @@
 // oodles
 #include "Crawler.hpp"
 #include "url/URL.hpp"
+#include "net/oop/Protocol.hpp"
 
 // STL
 using std::string;
@@ -11,6 +12,13 @@ namespace sched {
 Crawler::Crawler(const string &name) : cores(1), name(name)
 {
     work_unit.reserve(max_unit_size());
+}
+
+void
+Crawler::begin_crawl()
+{
+    net::ProtocolDialect *dialect = endpoint->get_protocol()->get_dialect();
+    // TODO: Use (yet to be written) real Crawler/Scheduler dialect class
 }
 
 Crawler::unit_t

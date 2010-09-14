@@ -28,6 +28,7 @@ class Crawler
         /* Member functions/methods */
         Crawler(const std::string &name);
 
+        void begin_crawl();
         unit_t add_url(const url::URL &url);
 
         bool online() const { return !offline(); }
