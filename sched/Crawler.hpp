@@ -38,7 +38,7 @@ class Crawler
         bool full() const { return assigned() == max_unit_size(); }
     private:
         /* Member functions/methods */
-        bool offline() const { return !endpoint; }
+        bool offline() const { return !endpoint || !endpoint->online(); }
 
         /* Member variables/attributes */
         uint16_t cores;
