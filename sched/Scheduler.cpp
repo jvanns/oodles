@@ -44,17 +44,21 @@ Scheduler::run(BreadCrumbTrail *t)
      * we can do no more.
      */
     Node *n = NULL;
+    vector<Crawler*> deferred_crawls;
     uint32_t i = 0, j = crawlers.size(), k = 0;
 
     trail = t; // Set the BCT, if any
+    deferred_crawls.reserve(j); // Avoid potential (re)allocations
 
     for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PRE]: " << c->assigned() << std::endl;
 #endif
 
-        if (c->online()) // Do not assign anything to offline Crawlers
+        if (c->online()) { // Do not assign anything to offline Crawlers
             k += fill_crawler(*c, n); // Assign as much work (fill work unit)
+            deferred_crawls.push_back(c); // Don't send messages just yet...
+        }
 
 #ifdef DEBUG_SCHED
         std::cerr << '[' << c->id() << "|PST]: " << c->assigned() << std::endl;
@@ -64,6 +68,9 @@ Scheduler::run(BreadCrumbTrail *t)
     }
 
     trail = NULL; // Clear the BCT
+
+    for (i = 0, j = deferred_crawls.size() ; i < j ; ++i)
+        deferred_crawls[i]->begin_crawl();
 
     return k;
 }
