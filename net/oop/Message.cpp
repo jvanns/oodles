@@ -3,6 +3,7 @@
 
 // libc
 #include <string.h> // For memcpy()
+#include <arpa/inet.h> // For htonl() etc.
 
 namespace oodles {
 namespace net {
