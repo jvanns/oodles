@@ -1,7 +1,7 @@
 // oodles
 #include "Crawler.hpp"
 #include "url/URL.hpp"
-#include "net/oop/Protocol.hpp"
+#include "net/oop/SchedulerCrawler.hpp"
 
 // STL
 using std::string;
@@ -17,12 +17,14 @@ Crawler::Crawler(const string &name) : cores(1), name(name)
 void
 Crawler::begin_crawl()
 {
-    net::ProtocolDialect *dialect = endpoint->get_protocol()->get_dialect();
-    // TODO: Use (yet to be written) real Crawler/Scheduler dialect class
+    using net::oop::dialect::SchedulerCrawler;
+
+    SchedulerCrawler &dialect = *endpoint->get_protocol()->get_dialect();
+    dialect.begin_crawl(work_unit); // All scheduled URLs will be sent
 }
 
 Crawler::unit_t
-Crawler::add_url(const url::URL &url)
+Crawler::add_url(url::URL &url)
 {
     work_unit.push_back(&url);
 
