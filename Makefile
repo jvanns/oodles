@@ -53,6 +53,8 @@ test/html-parser: test/html-parser.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
@@ -60,6 +62,8 @@ test/word-indexer: test/word-indexer.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
@@ -67,6 +71,8 @@ test/url-parser: test/url-parser.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
@@ -74,6 +80,8 @@ test/url-tree: test/url-tree.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
  
@@ -81,6 +89,8 @@ test/url-scheduler: test/url-scheduler.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
@@ -88,6 +98,8 @@ test/allocator: test/allocator.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
@@ -95,6 +107,8 @@ test/events: test/events.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
@@ -105,11 +119,11 @@ test/protocol-handler: test/protocol-handler.o \
 
 test/oop-messages: test/oop-messages.o \
 	$(COMMON_OBJECTS) \
-	$(UTILITY_OBJECTS) \
-	$(SCHEDULER_OBJECTS) \
 	$(URL_OBJECTS) \
+	$(UTILITY_OBJECTS) \
 	$(NET_CORE_OBJECTS) \
-	$(NET_OOP_OBJECTS) ;\
+	$(NET_OOP_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Phony targets
