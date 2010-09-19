@@ -1,6 +1,8 @@
 #ifndef OODLES_NODE_IPP // Implementation
 #define OODLES_NODE_IPP
 
+// STL
+#include <typeinfo>
 #include <algorithm>
 
 namespace oodles {
@@ -32,6 +34,35 @@ Node<T>::create_child(const T &v, path_index_t i)
     }
 
     return n;
+}
+ 
+template<class T>
+void
+Node<T>::print(std::ostream &s, const io::PrinterBase &p) const
+{
+    if (typeid(p) == typeid(io::DotMatrix)) {
+        /*
+         * Declare a node (using the pointer address as the ID)
+         */
+        const ptrdiff_t nid = reinterpret_cast<ptrdiff_t>(this);
+        s << nid << " [label=\"" << value << '"';
+
+        switch (visit_state) {
+            case NodeBase::Red:
+                s << ", color=red";
+                break;
+            case NodeBase::Green:
+                s << ", color=green";
+                break;
+            case NodeBase::Amber:
+                s << ", color=orange";
+                break;
+        }
+        
+        s << "];\n";
+    } else {
+        s << value;
+    }
 }
 
 /*

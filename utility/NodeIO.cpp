@@ -1,18 +1,10 @@
 // oodles
 #include "Tree.hpp"
 #include "NodeIO.hpp"
-#include "sched/Node.hpp"
 #include "BreadCrumbTrail.hpp"
 
 // STL
 using std::ostream;
-
-static
-const oodles::sched::Node*
-is_scheduler_node(const oodles::NodeBase *node)
-{
-    return dynamic_cast<const oodles::sched::Node*>(node);
-}
 
 namespace oodles {
 namespace io {
@@ -50,7 +42,7 @@ ASCIIArt::print(ostream &s, const NodeBase &n) const
         }
 
         s << branch;
-        n.print(s);
+        n.print(s, *this);
         s << std::endl;
     }
 
@@ -154,38 +146,7 @@ DotMatrix::node_from_trail(const NodeBase *&n)
 void
 DotMatrix::print_vertex(ostream &s, const NodeBase &n) const
 {
-    const ptrdiff_t nid = reinterpret_cast<ptrdiff_t>(&n);
-    const oodles::sched::Node *node = is_scheduler_node(&n);
-
-    /*
-     * Declare a node (using the pointer address as the ID)
-     */
-    s << nid << " [label=\"";
-    n.print(s);
-    s <<  '"';
-
-    if (node != NULL) {
-        if (node->page && node->page->crawler)
-            s << ", color=blue"; // An assignment was made
-        else
-            node = NULL; // Rely on the traffic lights below ;)
-    }
-
-    if (!node) {
-        switch (n.visit_state) {
-            case NodeBase::Red:
-                s << ", color=red";
-                break;
-            case NodeBase::Green:
-                s << ", color=green";
-                break;
-            case NodeBase::Amber:
-                s << ", color=orange";
-                break;
-        }
-    }
-
-    s << "];\n";
+    n.print(s, *this);
 }
 
 void

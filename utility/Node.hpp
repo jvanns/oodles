@@ -2,6 +2,7 @@
 #define OODLES_NODE_HPP
 
 // oodles
+#include "NodeIO.hpp"
 #include "NodeBase.hpp"
 #include "IndexedSet.hpp"
 
@@ -23,7 +24,7 @@ class Node : public NodeBase
         const NodeBase& child(size_t i) const { return *children[i]; }
 
         size_t size() const { return children.size(); }
-        void print(std::ostream &stream) const { stream << value; }
+        void print(std::ostream &s, const io::PrinterBase &p) const;
 
         /* Member variables/attributes */
         const T value; // Value at this node

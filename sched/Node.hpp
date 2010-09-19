@@ -21,7 +21,11 @@ class Node : public oodles::Node<url::value_type>
         Node(const value_type &v);
         ~Node();
 
+        /* Override print() method from NodeBase */
+        void print(std::ostream &s, const io::PrinterBase &p) const;
+        
         float calculate_weight() const;
+        bool assigned() const { return page && page->crawler; }
         bool eligible() const { return page ? page->crawler == NULL : false; }
 
         /* Member variables/attributes */

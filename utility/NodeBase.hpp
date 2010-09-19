@@ -8,6 +8,11 @@
 #include <stdint.h> // For int16_t
 
 namespace oodles {
+namespace io {
+    
+class PrinterBase; // Forward declration for Node
+
+} // io
 
 /*
  * Bare-bones base class for any Node type.
@@ -35,7 +40,7 @@ class NodeBase
         virtual const NodeBase& child(size_t index) const = 0;
 
         virtual size_t size() const = 0;
-        virtual void print(std::ostream &stream) const = 0;
+        virtual void print(std::ostream &s, const io::PrinterBase &p) const = 0;
 
         bool leaf() const { return parent && size() == 0; }
         

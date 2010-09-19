@@ -2,6 +2,9 @@
 #include "Node.hpp"
 #include "utility/math.hpp"
 
+// STL
+using std::ostream;
+
 namespace oodles {
 namespace sched {
 
@@ -18,6 +21,24 @@ Node::Node(const value_type &v) :
 Node::~Node()
 {
     delete page; // If set, ownership is implicitly transferred
+}
+
+void
+Node::print(ostream &s, const io::PrinterBase &p) const
+{
+    if (typeid(p) == typeid(io::DotMatrix)) {
+        if (!assigned()) {
+            oodles::Node<value_type>::print(s, p);
+        } else {
+            /*
+             * Declare a node (using the pointer address as the ID)
+             */
+            const ptrdiff_t nid = reinterpret_cast<ptrdiff_t>(this);
+            s << nid << " [label=\"" << value << "\", color=blue];\n";
+        }
+    } else {
+        s << value;
+    }
 }
 
 // Private methods
