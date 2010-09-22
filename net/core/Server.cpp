@@ -110,6 +110,7 @@ Server::async_accept()
                                             this,
                                             placeholders::error,
                                             c));
+    extend_link_to(c.get());
 }
 
 void

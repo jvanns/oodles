@@ -1,6 +1,9 @@
-// oodles
+// OOP (oodles protocol)
 #include "Messages.hpp"
 #include "SchedulerCrawler.hpp"
+
+// oodles scheduler
+#include "sched/Scheduler.hpp"
 
 // STL
 using std::string;
@@ -79,6 +82,18 @@ SchedulerCrawler::protocol() const
 {
     assert(handler != NULL);
     return *handler;
+}
+
+sched::Scheduler&
+SchedulerCrawler::scheduler() const
+{
+    assert(coupling != NULL);
+
+    Linker *l = coupling->complement_of(*this);
+
+    assert(l != NULL);
+    
+    return static_cast<sched::Scheduler&>(*l);
 }
 
 void

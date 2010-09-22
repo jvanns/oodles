@@ -5,6 +5,7 @@
 #include "Node.hpp"
 #include "Crawler.hpp"
 #include "utility/Tree.hpp"
+#include "utility/Linker.hpp"
 #include "utility/Subscriber.hpp"
 
 // STL
@@ -18,7 +19,7 @@ class BreadCrumbTrail; // Forward declaration for Scheduler
 
 namespace sched {
 
-class Scheduler : public event::Subscriber
+class Scheduler : public event::Subscriber, public Linker
 {
     public:
         /* Member functions/methods */

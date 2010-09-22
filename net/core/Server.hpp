@@ -3,6 +3,7 @@
 
 // oodles
 #include "Endpoint.hpp"
+#include "utility/Linker.hpp"
 #include "common/Exceptions.hpp"
 
 namespace oodles {
@@ -10,7 +11,7 @@ namespace net {
 
 class ProtocolCreator; // Forward declaration for Server
 
-class Server
+class Server : public Linker
 {
     public:
         /* Member functions/methods */

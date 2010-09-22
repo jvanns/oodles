@@ -3,6 +3,7 @@
 
 // oodles
 #include "Buffer.hpp"
+#include "utility/Linker.hpp"
 
 // Boost.shared
 #include <boost/shared_ptr.hpp>
@@ -44,7 +45,7 @@ static const uint16_t IBS = /* Inbound buffer size */
 
 class ProtocolHandler; // Forward declaration for Endpoint
 
-class Endpoint : public boost::enable_shared_from_this<Endpoint>
+class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
 {
     public:
         /* Dependent typedefs */

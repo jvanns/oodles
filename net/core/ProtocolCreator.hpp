@@ -1,6 +1,9 @@
 #ifndef OODLES_NET_PROTOCOLCREATOR_HPP
 #define OODLES_NET_PROTOCOLCREATOR_HPP
 
+// oodles
+#include "utility/Linker.hpp"
+
 // STL
 #include <typeinfo>
 
@@ -12,7 +15,7 @@ namespace net {
 
 struct ProtocolHandler; // Forward declaration for ProtocolCreator
 
-struct ProtocolDialect
+struct ProtocolDialect : public Linker
 {
     /* Member functions/methods */
     ProtocolDialect() : handler(NULL) {}

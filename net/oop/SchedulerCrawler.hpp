@@ -10,6 +10,14 @@
 #include <vector>
 
 namespace oodles {
+
+namespace sched {
+
+class Crawler; // Forward declaraton for SchedulerCrawler
+class Scheduler; // Forward declaraton for SchedulerCrawler
+   
+} // sched
+   
 namespace net {
 namespace oop {
 namespace dialect {
@@ -43,6 +51,7 @@ class SchedulerCrawler : public ProtocolDialect
         /* Member functions/methods */
         void send(Message *m);
         Protocol& protocol() const;
+        sched::Scheduler& scheduler() const;
         
         /*
          * Message handling methods
