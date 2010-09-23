@@ -49,6 +49,9 @@ TESTS = test/html-parser \
 	test/protocol-handler \
 	test/oop-messages
 
+# Production system components
+PROGRAMS = prog/scheduler
+
 test/html-parser: test/html-parser.o \
 	$(COMMON_OBJECTS) \
 	$(UTILITY_OBJECTS) ;\
@@ -92,10 +95,20 @@ test/events: test/events.o \
 
 test/protocol-handler: test/protocol-handler.o \
 	$(COMMON_OBJECTS) \
+	$(UTILITY_OBJECTS) \
 	$(NET_CORE_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 test/oop-messages: test/oop-messages.o \
+	$(COMMON_OBJECTS) \
+	$(URL_OBJECTS) \
+	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+
+prog/scheduler: prog/scheduler.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
@@ -110,7 +123,7 @@ test/oop-messages: test/oop-messages.o \
 # Make targets
 default: all
 
-all: $(TESTS)
+all: $(TESTS) $(PROGRAMS)
 
 clean:
 	-find `pwd` -depth -type f -name '*.[od]' -prune \
