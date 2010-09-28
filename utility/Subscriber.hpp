@@ -31,7 +31,7 @@ class Subscriber
         bool unsubscribe_from(Publisher &p);
         void clear_publisher() { publisher = NULL; }
 
-        /* Member variables/attributes */
+        /* Friend class declarations */
         friend class Publisher; // Publisher (only) can call subscribe_*()
 };
 
