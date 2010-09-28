@@ -19,13 +19,16 @@ class BreadCrumbTrail; // Forward declaration for Scheduler
 
 namespace sched {
 
+class Context; // Forward declaration for Scheduler
+
 class Scheduler : public event::Subscriber, public Linker
 {
     public:
         /* Member functions/methods */
-        Scheduler();
+        Scheduler(Context *c = NULL);
         ~Scheduler();
 
+        Context* context() { return ctxt; }
         const TreeBase& url_tree() const { return tree; }
         void register_crawler(Crawler &c) { crawlers.push(&c); }
 
@@ -36,6 +39,7 @@ class Scheduler : public event::Subscriber, public Linker
         uint32_t run(BreadCrumbTrail *t = NULL); // Performs a scheduling run
     private:
         /* Member variables/attributes */
+        Context *ctxt;
         size_t leaves;
         BreadCrumbTrail *trail;
         Tree<Node::value_type> tree;

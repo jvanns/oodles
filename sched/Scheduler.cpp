@@ -21,7 +21,11 @@ parent_of(oodles::sched::Node::Base &node)
 namespace oodles {
 namespace sched {
 
-Scheduler::Scheduler() : leaves(0), trail(NULL), tree(new Node("ROOT"))
+Scheduler::Scheduler(Context *c) :
+    ctxt(c),
+    leaves(0),
+    trail(NULL),
+    tree(new Node("ROOT"))
 {
 }
 
@@ -37,6 +41,9 @@ Scheduler::receive(const event::Publisher &p)
 uint32_t
 Scheduler::run(BreadCrumbTrail *t)
 {
+    if (crawlers.empty())
+        return 0; // Short-cut! Don't bother continuing if 0 crawlers.
+    
     /*
      * In our priority queue, crawlers, the top most item will
      * be the one with the least amount of work (therefore able
