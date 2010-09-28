@@ -9,7 +9,7 @@ using std::string;
 namespace oodles {
 namespace sched {
 
-Crawler::Crawler(const string &name) : cores(1), name(name)
+Crawler::Crawler(const string &name, uint16_t cores) : cores(cores), name(name)
 {
     work_unit.reserve(max_unit_size());
 }
@@ -35,6 +35,13 @@ Crawler::add_url(url::URL &url)
 #endif
 
     return assigned();
+}
+
+void
+Crawler::set_endpoint(net::Endpoint::Connection e)
+{
+    assert(!endpoint);
+    endpoint = e;
 }
 
 bool

@@ -26,10 +26,11 @@ class Crawler
         typedef uint16_t unit_t;
 
         /* Member functions/methods */
-        Crawler(const std::string &name);
+        Crawler(const std::string &name, uint16_t cores = 1);
 
         void begin_crawl();
         unit_t add_url(url::URL &url);
+        void set_endpoint(net::Endpoint::Connection e);
 
         bool online() const { return !offline(); }
         const std::string& id() const { return name; }
@@ -42,8 +43,8 @@ class Crawler
         bool offline() const { return !endpoint || !endpoint->online(); }
 
         /* Member variables/attributes */
-        uint16_t cores;
-        std::string name; // Identifier for this Crawler (i.e. hostname)
+        const uint16_t cores;
+        const std::string name; // Identifier for this Crawler (i.e. hostname)
         std::vector<url::URL*> work_unit; // Units of work (URLs to crawl)
         net::Endpoint::Connection endpoint; // Network session for this Crawler
 };
