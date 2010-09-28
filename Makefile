@@ -100,7 +100,8 @@ test/oop-messages: test/oop-messages.o \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
 	$(NET_CORE_OBJECTS) \
-	$(NET_OOP_OBJECTS) ;\
+	$(NET_OOP_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Phony targets
