@@ -3,6 +3,7 @@
 #include "SchedulerCrawler.hpp"
 
 // oodles scheduler
+#include "sched/Context.hpp"
 #include "sched/Scheduler.hpp"
 
 // STL
@@ -187,6 +188,12 @@ SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
      * Register, with the sched/Scheduler, a new sched/Crawler
      * based on this incoming data (name, cores etc.)
      */
+    sched::Context *context = scheduler().context();
+    
+    assert(context != NULL);
+    
+    sched::Crawler &crawler = context->create_crawler(m.name, m.cores);
+    scheduler().register_crawler(crawler);
 }
 
 void
