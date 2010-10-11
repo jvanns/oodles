@@ -95,6 +95,7 @@ void
 Context::start_crawling(int interval)
 {
     ProactorTask t(proactor, scheduler, interval);
+    proactor.wait();
 }
 
 void
