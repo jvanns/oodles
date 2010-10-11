@@ -21,7 +21,19 @@ Proactor::Proactor(size_t threads) : work(ios)
 
 Proactor::~Proactor()
 {
+    stop();
+    wait();
+}
+
+void
+Proactor::stop()
+{
     ios.stop();
+}
+
+void
+Proactor::wait()
+{
     threads.join_all();
 }
  

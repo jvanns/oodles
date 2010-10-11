@@ -16,6 +16,8 @@ class Proactor
         Proactor(size_t threads = boost::thread::hardware_concurrency());
         ~Proactor();
 
+        void stop();
+        void wait();
         boost::asio::io_service& io_service() { return ios; }
     private:
         /* Member variables/attributes */
