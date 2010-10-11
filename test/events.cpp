@@ -1,4 +1,5 @@
 // oodles
+#include "utility/Proactor.hpp"
 #include "utility/Publisher.hpp"
 #include "utility/Subscriber.hpp"
 
@@ -92,7 +93,7 @@ struct Concatenate : public oodles::event::Subscriber
 int main(int argc, char *argv[])
 {
     Integers e; // Event object
-    oodles::event::Publisher::Proactor t;
+    oodles::Proactor t;
     oodles::event::Publisher p(e, &t); // Publisher
 
     Sum s; // Subscriber
@@ -129,8 +130,8 @@ int main(int argc, char *argv[])
     for (int n = 1 ; n <= size ; ++n)
         e.v.push_back(n);
 
-    if (p.broadcast())
-        t.run(); // Ideally, this should be executed in a thread
+    p.broadcast();
+    t.wait();
 
     return 0;
 }

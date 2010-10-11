@@ -1,13 +1,13 @@
 #ifndef OODLES_EVENT_PUBLISHER_HPP
 #define OODLES_EVENT_PUBLISHER_HPP
 
-// Boost.asio
-#include <boost/asio/io_service.hpp>
-
 // STL
 #include <set>
 
 namespace oodles {
+
+class Proactor; // Forward declaration for Publisher
+
 namespace event {
 
 class Subscriber; // Forward declaration for Publisher
@@ -35,9 +35,6 @@ struct Event
 class Publisher
 {
     public:
-        /* Dependent typedefs */
-        typedef boost::asio::io_service Proactor;
-
         /* Member functions/methods */
         Publisher(Event &e, Proactor *p = NULL);
         ~Publisher();

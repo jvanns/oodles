@@ -1,4 +1,5 @@
 // oodles
+#include "Proactor.hpp"
 #include "Publisher.hpp"
 #include "Subscriber.hpp"
 
@@ -49,7 +50,7 @@ Publisher::broadcast() const
         Subscriber *s = *i;
 
         if (proactor) {
-            proactor->post(bind(&Subscriber::receive, s, p)); // Non-blocking
+            proactor->io_service().post(bind(&Subscriber::receive, s, p));
             ++n;
         } else
             s->receive(p); // Will block
