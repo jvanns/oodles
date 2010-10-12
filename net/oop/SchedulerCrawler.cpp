@@ -7,6 +7,7 @@
 #include "sched/Scheduler.hpp"
 
 // STL
+using std::map;
 using std::string;
 using std::vector;
 using std::exception;
@@ -193,7 +194,13 @@ SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
     assert(context != NULL);
     
     sched::Crawler &crawler = context->create_crawler(m.name, m.cores);
+    crawler.set_endpoint(handler->get_endpoint());
     scheduler().register_crawler(crawler);
+    
+#ifdef DEBUG_SCHED
+    std::cerr << "Registered crawler '" << m.name
+              << "' with " << m.cores << " cores.\n";
+#endif
 }
 
 void
@@ -204,6 +211,14 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      * all URLs given in m as scheduled by the Scheduler that
      * sent this message.
      */
+#ifdef DEBUG_CRAWL
+    map<url::URL::hash_t, std::list<BeginCrawl::URL> >::const_iterator i, j;
+
+    for (i = m.urls.begin(), j = m.urls.end() ; i != j ; ++i) {
+        std::cerr << "Will crawl " << i->second.size() 
+                  << " URLs from the domain ID of " << i->first << std::endl;
+    }
+#endif
 }
 
 void
