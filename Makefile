@@ -50,7 +50,8 @@ TESTS = test/html-parser \
 	test/oop-messages
 
 # Production system components
-PROGRAMS = prog/scheduler
+PROGRAMS = prog/scheduler \
+	prog/crawler
 
 test/html-parser: test/html-parser.o \
 	$(COMMON_OBJECTS) \
@@ -109,6 +110,15 @@ test/oop-messages: test/oop-messages.o \
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 prog/scheduler: prog/scheduler.o \
+	$(COMMON_OBJECTS) \
+	$(URL_OBJECTS) \
+	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_OOP_OBJECTS) \
+	$(SCHEDULER_OBJECTS) ;\
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+
+prog/crawler: prog/crawler.o \
 	$(COMMON_OBJECTS) \
 	$(URL_OBJECTS) \
 	$(UTILITY_OBJECTS) \
