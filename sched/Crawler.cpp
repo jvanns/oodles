@@ -19,7 +19,7 @@ Crawler::begin_crawl()
 {
     using net::oop::dialect::SchedulerCrawler;
 
-    SchedulerCrawler &dialect = *endpoint->get_protocol()->get_dialect();
+    SchedulerCrawler &dialect = *(endpoint->get_protocol()->get_dialect());
     dialect.begin_crawl(work_unit); // All scheduled URLs will be sent
 }
 

@@ -47,8 +47,16 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
         
         void operator() ()
         {
+#ifdef DEBUG_SCHED
+            std::cerr << "Performing scheduling run...";
+#endif
+            
             BreadCrumbTrail trail;
             size_t then = time(NULL), assigned = scheduler.run(&trail), d = 0;
+            
+#ifdef DEBUG_SCHED
+            std::cerr << assigned << " URLs assigned.\n";
+#endif
             
             if ((d = time(NULL) - then) < interval) {
                 sleeper.expires_from_now(seconds(interval - d));
