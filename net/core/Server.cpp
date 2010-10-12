@@ -110,7 +110,6 @@ Server::async_accept()
                                             this,
                                             placeholders::error,
                                             c));
-    extend_link_to(c.get());
 }
 
 void
@@ -125,9 +124,12 @@ Server::async_resolve(Endpoint::Connection c)
 }
 
 void
-Server::detatch_client(Endpoint::Connection c) const
+Server::detatch_client(Endpoint::Connection c)
 {
-    c->set_protocol(protocol_creator.create());
+    ProtocolHandler *p = protocol_creator.create();
+    
+    extend_link_to(c.get());
+    c->set_protocol(p);
     c->start();
 }
 

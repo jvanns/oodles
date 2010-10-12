@@ -15,7 +15,6 @@ ProtocolHandler::ProtocolHandler(const DialectCreator &c) :
     dialect(c.create(*this))
 {
     dialect->set_handler(*this);
-    extend_link_to(dialect);
 }
 
 ProtocolHandler::~ProtocolHandler()

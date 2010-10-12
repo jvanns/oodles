@@ -37,7 +37,7 @@ class Server : public Linker
          */
         void async_accept();
         void async_resolve(Endpoint::Connection c);
-        void detatch_client(Endpoint::Connection c) const;
+        void detatch_client(Endpoint::Connection c);
 
         /*
          * Handler executed by io_service when accept operation is performed.

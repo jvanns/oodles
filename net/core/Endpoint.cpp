@@ -60,10 +60,11 @@ Endpoint::set_protocol(ProtocolHandler *p)
 {
     assert(!protocol); // Must be set only once
 
-    protocol = p; // Ownership is transferred
-    protocol->set_endpoint(shared_from_this());
+    extend_link_to(p);
+    p->extend_link_to(p->get_dialect());
+    p->set_endpoint(shared_from_this());
     
-    extend_link_to(protocol);
+    protocol = p; // Ownership is transferred
 }
 
 void

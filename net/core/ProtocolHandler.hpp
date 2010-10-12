@@ -24,6 +24,7 @@ class ProtocolHandler : public ProtocolDialect
          * Pair endpoint with protocol handler
          */
         void set_endpoint(Endpoint::Connection e);
+        Endpoint::Connection get_endpoint() const { return endpoint; }
 
         /*
          * Return the internal dialect object
