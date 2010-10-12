@@ -19,7 +19,10 @@ Linker::~Linker()
 bool
 Linker::extend_link_to(Linker *l)
 {
-    if (!coupling)
+    if (!coupling || !l)
+        return false;
+    
+    if (l == this)
         return false;
 
     const Link link(l, coupling->complement_of(*this));

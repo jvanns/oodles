@@ -11,12 +11,11 @@ class Linker
         /* Member functions/methods */
         Linker();
         ~Linker();
+        
+        bool extend_link_to(Linker *l);
     protected:
         /* Member variables/attributes */
         Link *coupling;
-        
-        /* Member functions/methods */
-        bool extend_link_to(Linker *l);
     private:
         /* Member functions/methods */
         void unlink();
