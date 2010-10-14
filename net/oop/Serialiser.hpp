@@ -118,7 +118,7 @@ template<typename Type> class Serialiser : public Message, public Type
         
         size_t to_buffer(char *buffer, size_t max)
         {
-            size_t offset = 0, pending = header.body_size - stream.tellg();
+            size_t offset = 0;
             
             if (!header.processed && max >= header.header_size) {
                 header2buffer(buffer, header);
@@ -127,20 +127,24 @@ template<typename Type> class Serialiser : public Message, public Type
             
             max -= offset;
 
-            if (max > pending)
-                max = pending;
+            if (max > pending())
+                max = pending();
             
             return offset + stream.rdbuf()->sgetn(buffer + offset, max);
         }
 
         size_t from_buffer(const char *buffer, size_t max)
         {
-            size_t pending = header.body_size - stream.tellp();
-            
-            if (max > pending)
-                max = pending;
+            if (max > pending())
+                max = pending();
             
             return stream.rdbuf()->sputn(buffer, max);
+        }
+        
+        size_t pending()
+        {
+            return header.body_size - 
+                   (serialised ? stream.tellg() : stream.tellp());
         }
     private:
         /* Member variables/attributes */

@@ -62,13 +62,11 @@ Protocol::message2buffer(char *buffer, size_t max)
     while (m) {
         buffered = m->to_buffer(buffer + used, max);
         
+        if (m->pending() && buffered == max)
+            m = NULL; // Our message size was greater than the buffer size
+
         used += buffered;
         max -= buffered;
-        
-        if (buffered < m->size()) {
-            if (buffered == max)
-                m = NULL; // Our message size was greater than the buffer size
-        }
 
         if (m) {
             outbound_messages.pop();
@@ -91,33 +89,27 @@ Protocol::buffer2message(const char *buffer, size_t max)
         return 0;
     
     size_t used = 0, buffered = 0;
+    bool done = max < Message::Header::header_size;
     static const Factory &factory = Factory::instance();
-    bool done = (max - used) < Message::Header::header_size;
 
     while (!done) {
         if (!incoming) {
-            done = (max - used) < Message::Header::header_size;
-
-            if (!done) {
-                const Message::Header h(Message::buffer2header(buffer + used));
-                incoming = factory.create(h);
-                buffered = h.header_size;
-                used += buffered;
-            }
+            const Message::Header h(Message::buffer2header(buffer + used));
+            incoming = factory.create(h);
+            used += h.header_size;
+            max -= h.header_size;
         }
         
-        if (!done) {
-            const size_t n = incoming->from_buffer(buffer + used, max - used);
-            buffered += n;
-            used += n;
+        buffered = incoming->from_buffer(buffer + used, max);
+        used += buffered;
+        max -= buffered;
 
-            if (buffered == incoming->size()) {
-                inbound_messages.push(incoming);
-                incoming = NULL;
-            }
-            
-            done = used == max;
+        if (!incoming->pending()) {
+            inbound_messages.push(incoming);
+            incoming = NULL;
         }
+        
+        done = !max || max < Message::Header::header_size;
     }
     
     if (!inbound_messages.empty() && dialect != this)

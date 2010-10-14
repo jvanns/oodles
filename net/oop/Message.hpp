@@ -45,6 +45,7 @@ class Message
         virtual size_t to_buffer(char *buffer, size_t max) = 0;
         virtual size_t from_buffer(const char *buffer, size_t max) = 0;
         
+        virtual size_t pending() = 0;
         size_t size() const { return header.header_size + header.body_size; }
     protected:
         /* Member variables/attributes */
