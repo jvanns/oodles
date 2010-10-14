@@ -213,7 +213,7 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      * sent this message.
      */
 #ifdef DEBUG_CRAWL
-    map<url::URL::hash_t, std::list<BeginCrawl::URL> >::const_iterator i, j;
+    BeginCrawl::URLs::const_iterator i, j;
 
     for (i = m.urls.begin(), j = m.urls.end() ; i != j ; ++i) {
         std::cerr << "Will crawl " << i->second.size() 

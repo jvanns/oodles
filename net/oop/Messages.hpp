@@ -42,6 +42,8 @@ struct BeginCrawl_
     /* Dependent typedefs */
     //................Page ID...........Page URL
     typedef std::pair<url::URL::hash_t, std::string> URL;
+    //...............Domain ID.........URLs
+    typedef std::map<url::URL::hash_t, std::list<URL> > URLs;
     
     /* Member functions/methods */
     static id_t id() { return BEGIN_CRAWL; }
@@ -49,15 +51,16 @@ struct BeginCrawl_
     void serialize(Deconstructor &archive, unsigned int /* version */) const;
     
     /* Member variables/attributes */
-    //.......Domain ID.........URLs
-    std::map<url::URL::hash_t, std::list<URL> > urls;
+    URLs urls;
 };
 
 struct EndCrawl_
 {
     /* Dependent typedefs */
-    //................Page URL.....Crawled?
-    typedef std::pair<std::string, bool> URL;
+    //..............Page ID...........Success?
+    typedef std::map<url::URL::hash_t, bool> ScheduledURLs;
+    //..........................Page URL.....Crawled?
+    typedef std::list<std::pair<std::string, bool> > NewURLs;
     
     /* Member functions/methods */
     static id_t id() { return END_CRAWL; }
@@ -65,9 +68,8 @@ struct EndCrawl_
     void serialize(Deconstructor &archive, unsigned int /* version */) const;
     
     /* Member variables/attributes */
-    std::list<URL> new_urls;
-    //.......Page ID...........Success?
-    std::map<url::URL::hash_t, bool> scheduled_urls;
+    NewURLs new_urls;
+    ScheduledURLs scheduled_urls;
 };
 
 } // msg
