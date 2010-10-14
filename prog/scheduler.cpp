@@ -78,6 +78,9 @@ int main(int argc, char *argv[])
         Context context;
         string::size_type b = 0, e = s.find_first_of('\n', b), t = string::npos;
 
+        /* Allow Crawlers to sit connected */
+        context.start_server(listen_on);
+
         while (e != t) {
             context.seed_scheduler(s.substr(b, e - b));
             
@@ -85,8 +88,8 @@ int main(int argc, char *argv[])
             e = s.find_first_of('\n', b);
         }
 
-        context.start_server(listen_on);
-        context.start_crawling(5);
+        s.clear(); // We no longer need this data
+        context.start_crawling(5); // 5s interval between scheduling runs
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
         rc = 1;
