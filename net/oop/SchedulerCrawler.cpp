@@ -41,6 +41,7 @@ SchedulerCrawler::translate()
         }
     } catch (const exception &e) {
         delete m;
+        throw;
     }
 }
 
@@ -113,15 +114,15 @@ throw (DialectError)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
                                    "Conversation initialised by Scheduler!?");
-                
-            if (context[Inbound] != INVALID_ID ||
+            
+            if (context[Inbound] != INVALID_ID &&
                 context[Inbound] != BEGIN_CRAWL)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
                                    "Invalid dialog context at message #%d.",
                                    m->id());
             
-            if (context[Outbound] != END_CRAWL ||
+            if (context[Outbound] != END_CRAWL &&
                 context[Outbound] != REGISTER_CRAWLER)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
