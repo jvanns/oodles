@@ -52,7 +52,7 @@ Scheduler::run(BreadCrumbTrail *t)
      */
     Node *n = NULL;
     vector<Crawler*> deferred_crawls;
-    uint32_t i = 0, j = crawlers.size(), k = 0;
+    uint32_t i = 0, j = crawlers.size(), k = 0, l = 0;
 
     trail = t; // Set the BCT, if any
     deferred_crawls.reserve(j); // Avoid potential (re)allocations
@@ -63,8 +63,12 @@ Scheduler::run(BreadCrumbTrail *t)
 #endif
 
         if (c->online()) { // Do not assign anything to offline Crawlers
-            k += fill_crawler(*c, n); // Assign as much work (fill work unit)
-            deferred_crawls.push_back(c); // Don't send messages just yet...
+            l = fill_crawler(*c, n); // Assign as much work (fill work unit)
+
+            if (l) {
+                k += l;
+                deferred_crawls.push_back(c); // Don't send messages just yet...
+            }
         }
 
 #ifdef DEBUG_SCHED
