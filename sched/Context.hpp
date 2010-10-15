@@ -13,6 +13,7 @@
 
 // STL
 #include <map>
+#include <iostream>
 
 namespace oodles {
 namespace sched {
@@ -23,10 +24,10 @@ class Context
         /* Member functions/methods */
         Context();
         
-        void start_crawling(int interval = 1);
         void seed_scheduler(const std::string &url);
         void start_server(const std::string &service);
         Crawler& create_crawler(const std::string &name, uint16_t cores);
+        void start_crawling(std::ostream *dot_stream = NULL, int interval = 1);
     private:
         /* Dependent typedefs */
         typedef net::Server Server;
@@ -45,7 +46,7 @@ class Context
          */
         Server server;
         const net::Protocol<OOP, SchedulerCrawler> creator;
-        
+
         /*
          * Scheduler layer
          */

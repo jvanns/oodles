@@ -1,5 +1,6 @@
 // oodles
 #include "Context.hpp"
+#include "utility/NodeIO.hpp"
 #include "utility/Linker.hpp"
 
 // Boost
@@ -13,6 +14,7 @@
 using std::map;
 using std::pair;
 using std::string;
+using std::ostream;
 
 namespace {
 
@@ -22,6 +24,7 @@ namespace {
 
 // oodles   
 using oodles::Proactor;
+using oodles::io::DotMatrix;
 using oodles::BreadCrumbTrail;
 using oodles::sched::Scheduler;
 
@@ -36,9 +39,10 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
 {
     public:
         /* Member functions/methods */
-        ProactorTask(Proactor &p, Scheduler &s, int interval) :
+        ProactorTask(Proactor &p, Scheduler &s, ostream *dot, int interval) :
             proactor(p),
             scheduler(s),
+            dot_stream(dot),
             interval(interval),
             sleeper(p.io_service())
         {
@@ -58,6 +62,12 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
             std::cerr << assigned << " URLs assigned.\n";
 #endif
             
+            if (dot_stream) {
+                DotMatrix dot(scheduler.url_tree());
+                dot.set_trail(trail);
+                *dot_stream << dot;
+            }
+               
             if ((d = time(NULL) - then) < interval) {
                 sleeper.expires_from_now(seconds(interval - d));
                 sleeper.async_wait(bind(&ProactorTask::new_task,
@@ -77,6 +87,7 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
         Proactor &proactor;
         Scheduler &scheduler;
         
+        ostream *dot_stream;
         const int interval;
         deadline_timer sleeper;
 
@@ -84,6 +95,7 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
         ProactorTask(const ProactorTask &t) :
             proactor(t.proactor),
             scheduler(t.scheduler),
+            dot_stream(t.dot_stream),
             interval(t.interval),
             sleeper(t.proactor.io_service())
         {
@@ -100,9 +112,9 @@ Context::Context() : server(proactor.io_service(), creator), scheduler(this)
 }
 
 void
-Context::start_crawling(int interval)
+Context::start_crawling(ostream *dot_stream, int interval)
 {
-    ProactorTask t(proactor, scheduler, interval);
+    ProactorTask t(proactor, scheduler, dot_stream, interval);
     proactor.wait();
 }
 
