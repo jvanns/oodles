@@ -112,9 +112,10 @@ Endpoint::raw_recv_callback(const error_code& e, size_t b)
         
         stop();
     
-        throw ReadError("Endpoint::raw_recv_callback",
-                        e.value(),
-                        e.message().c_str());
+        if (e != boost::asio::error::eof)
+            throw ReadError("Endpoint::raw_recv_callback",
+                            e.value(),
+                            e.message().c_str());
     }
 }
 
@@ -131,9 +132,10 @@ Endpoint::raw_send_callback(const error_code& e, size_t b)
         
         stop();
         
-        throw WriteError("Endpoint::raw_send_callback",
-                         e.value(),
-                         e.message().c_str());
+        if (e != boost::asio::error::eof)
+            throw WriteError("Endpoint::raw_send_callback",
+                             e.value(),
+                             e.message().c_str());
     }
 }
 
