@@ -26,6 +26,51 @@ using oodles::read_file_data;
 // oodles scheduler
 using oodles::sched::Context;
 
+static Context *g_context = NULL;
+
+static void signal_handler(int signal)
+{
+    bool stop = false;
+
+    switch (signal) {
+        case SIGINT:
+        case SIGTERM:
+        case SIGQUIT:
+            stop = true;
+            break;
+        default:
+            break;
+    }
+
+    if (stop && g_context)
+        g_context->stop_crawling();
+}
+
+static void set_signal_handler(Context &c)
+{
+    sigset_t blocked;
+    struct sigaction action;
+
+    sigemptyset(&blocked);
+    memset(&action, '\0', sizeof(struct sigaction));
+
+    // Block these signals when actually in the handler
+    sigaddset(&blocked, SIGINT);
+    sigaddset(&blocked, SIGTERM);
+    sigaddset(&blocked, SIGQUIT);
+
+    action.sa_mask = blocked;
+    action.sa_handler = &signal_handler;
+    action.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+
+    // We have special ways of handling these signals
+    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGQUIT, &action, NULL);
+
+    g_context = &c;
+}
+
 static void print_usage(const char *program)
 {
     cerr << program
@@ -96,6 +141,12 @@ int main(int argc, char *argv[])
         
         Context context;
         string::size_type b = 0, e = s.find_first_of('\n', b), t = string::npos;
+
+        /*
+         * We must allow the signal handler to stop the
+         * proactor service and join all the threads.
+         */
+        set_signal_handler(context);
 
         /* Allow Crawlers to sit connected */
         context.start_server(listen_on);
