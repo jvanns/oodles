@@ -25,6 +25,51 @@ using oodles::net::oop::dialect::SchedulerCrawler;
 
 typedef oodles::net::oop::Protocol OOP;
 
+static Proactor *g_proactor = NULL;
+
+static void signal_handler(int signal)
+{
+    bool stop = false;
+
+    switch (signal) {
+        case SIGINT:
+        case SIGTERM:
+        case SIGQUIT:
+            stop = true;
+            break;
+        default:
+            break;
+    }
+
+    if (stop && g_proactor)
+        g_proactor->stop();
+}
+
+static void set_signal_handler(Proactor &p)
+{
+    sigset_t blocked;
+    struct sigaction action;
+
+    sigemptyset(&blocked);
+    memset(&action, '\0', sizeof(struct sigaction));
+
+    // Block these signals when actually in the handler
+    sigaddset(&blocked, SIGINT);
+    sigaddset(&blocked, SIGTERM);
+    sigaddset(&blocked, SIGQUIT);
+
+    action.sa_mask = blocked;
+    action.sa_handler = &signal_handler;
+    action.sa_flags = SA_RESTART | SA_NOCLDSTOP;
+
+    // We have special ways of handling these signals
+    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGQUIT, &action, NULL);
+
+    g_proactor = &p;
+}
+
 static void print_usage(const char *program)
 {
     cerr << program
@@ -68,11 +113,17 @@ int main(int argc, char *argv[])
     
     try {
         Proactor proactor(cores);
+
+        /*
+         * We must allow the signal handler to stop the
+         * proactor service and join all the threads.
+         */
+        set_signal_handler(proactor);
         
         const Protocol<OOP, SchedulerCrawler> creator;
         Client client(proactor.io_service(), creator);
         SchedulerCrawler &dialect = client.dialect();
-        
+
         client.start(connect_to);
         dialect.register_crawler("tarantula", cores);
 
