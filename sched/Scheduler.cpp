@@ -58,10 +58,6 @@ Scheduler::run(BreadCrumbTrail *t)
     deferred_crawls.reserve(j); // Avoid potential (re)allocations
 
     for (Crawler *c = crawlers.top() ; i < j ; c = crawlers.top(), ++i) {
-#ifdef DEBUG_SCHED
-        std::cerr << '[' << c->id() << "|PRE]: " << c->assigned() << std::endl;
-#endif
-
         if (c->online()) { // Do not assign anything to offline Crawlers
             l = fill_crawler(*c, n); // Assign as much work (fill work unit)
 
@@ -71,9 +67,6 @@ Scheduler::run(BreadCrumbTrail *t)
             }
         }
 
-#ifdef DEBUG_SCHED
-        std::cerr << '[' << c->id() << "|PST]: " << c->assigned() << std::endl;
-#endif
         crawlers.pop(); // Pop the top of the queue (i.e. remove 'c')
         crawlers.push(c); // Push c back onto the queue forcing rank order
     }
@@ -148,14 +141,7 @@ Scheduler::select_best_child(Node &parent) const
         Node &c = parent.child(i);
 
         if (c.visit_state == Node::Red) // Skip-over any visited branch
-#ifdef DEBUG_SCHED
-        {
-            std::cerr << '[' << c.value << "]: marked RED\n";
-#endif
             continue;
-#ifdef DEBUG_SCHED
-        }
-#endif
 
         c.visit_state = Node::Amber; // Node visited but not all children
 
@@ -175,11 +161,6 @@ Scheduler::select_best_child(Node &parent) const
         n = NULL;
     }
 
-#ifdef DEBUG_SCHED
-    if (n)
-        std::cerr << '[' << n->value << "]: Selected\n";
-#endif
-
     return n;
 }
 
@@ -189,14 +170,7 @@ Scheduler::fill_crawler(Crawler &c, Node *&n)
     static const Node *root = static_cast<const Node*>(&tree.root());
 
     if (root->visit_state == Node::Red) // Every single node has been traversed
-#ifdef DEBUG_SCHED
-    {
-        std::cerr << "[ROOT]: Entire tree marked RED!\n";
-#endif
         return 0;
-#ifdef DEBUG_SCHED
-    }
-#endif
 
     Node *p = NULL;
     Crawler::unit_t assigned = 0;
