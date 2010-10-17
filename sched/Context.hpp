@@ -27,6 +27,8 @@ class Context
         void seed_scheduler(const std::string &url);
         void start_server(const std::string &service);
         Crawler& create_crawler(const std::string &name, uint16_t cores);
+
+        void stop_crawling();
         void start_crawling(std::ostream *dot_stream = NULL, int interval = 1);
     private:
         /* Dependent typedefs */
