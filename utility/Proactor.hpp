@@ -18,9 +18,11 @@ class Proactor
 
         void stop();
         void wait();
+        bool stopped() const { return !running; }
         boost::asio::io_service& io_service() { return ios; }
     private:
         /* Member variables/attributes */
+        bool running;
         boost::thread_group threads;
         boost::asio::io_service ios;
         boost::asio::io_service::work work;
