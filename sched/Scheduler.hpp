@@ -6,7 +6,6 @@
 #include "Crawler.hpp"
 #include "utility/Tree.hpp"
 #include "utility/Linker.hpp"
-#include "utility/Subscriber.hpp"
 
 // STL
 #include <queue>
@@ -21,7 +20,7 @@ namespace sched {
 
 class Context; // Forward declaration for Scheduler
 
-class Scheduler : public event::Subscriber, public Linker
+class Scheduler : public Linker
 {
     public:
         /* Member functions/methods */
@@ -35,7 +34,6 @@ class Scheduler : public event::Subscriber, public Linker
         void schedule_from_seed(const std::string &url);
         void schedule_from_crawl(const std::string &url);
 
-        void receive(const event::Publisher &p);
         uint32_t run(BreadCrumbTrail *t = NULL); // Performs a scheduling run
     private:
         /* Member variables/attributes */
