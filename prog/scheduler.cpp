@@ -11,6 +11,7 @@
 
 // libc
 #include <getopt.h>
+#include <signal.h> // For sigaddset() etc.
 
 // STL
 using std::cout;
