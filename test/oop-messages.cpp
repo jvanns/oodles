@@ -23,6 +23,7 @@ using std::cout;
 using std::cerr;
 using std::endl;
 using std::string;
+using std::make_pair;
 
 namespace {
 
@@ -129,9 +130,9 @@ class TestOOPDialect : public oodles::net::ProtocolDialect
             using oodles::net::oop::EndCrawl;
 
             EndCrawl *m = new EndCrawl;
-            m->scheduled_urls[a.page_id()] = true;
-            m->scheduled_urls[y.page_id()] = true;
-            m->scheduled_urls[f.page_id()] = true;
+            m->scheduled_urls.push_back(make_pair(a.page_id(), true));
+            m->scheduled_urls.push_back(make_pair(y.page_id(), true));
+            m->scheduled_urls.push_back(make_pair(f.page_id(), true));
 
             send(m); // Non-blocking
         }
