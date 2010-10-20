@@ -132,6 +132,9 @@ Scheduler::select_best_child(Node &parent) const
 {
     Node *n = NULL;
 
+    /*
+     * Linear search over the breadth of this parent branch
+     */
     for (size_t i = 0 ; i < parent.size() ; ++i) {
         Node &c = parent.child(i);
 
@@ -162,34 +165,27 @@ Scheduler::select_best_child(Node &parent) const
 Crawler::unit_t
 Scheduler::fill_crawler(Crawler &c, Node *&n)
 {
-    static const Node *root = static_cast<const Node*>(&tree.root());
-
-    if (root->visit_state == Node::Red) // Every single node has been traversed
-        return 0;
+    static const Node &const_root = static_cast<const Node&>(tree.root());
+    static Node *root = const_cast<Node*>(&const_root);
 
     Node *p = NULL;
     Crawler::unit_t assigned = 0;
+    bool exhausted = root->visit_state == Node::Red;
 
-    while (!c.full()) {
-        if (!n)
-            n = const_cast<Node*>(root); // At the top of the tree
-        else
-            n = parent_of(*n); // Begin to backtrack
+    for (n = !n ? root : n ; !exhausted ; n = !n ? root : parent_of(*n)) {
+        if (!(exhausted = !n || c.full())) {
+            p = n; // Keep a copy of our current position
+            n = traverse_branch(*n); // Locate best candidate for crawling
 
-        if (!n)
-            break; // We've exhausted the tree (root's parent is NULL)
-
-        p = n; // Keep a copy of our current position
-        n = traverse_branch(*n); // Traverse to find best candidate for crawling
-
-        if (n && n->eligible()) {
-            page_table[n->page->url.page_id()] = n; // Cache it
-            n->page->assign_crawler(&c);
-            ++assigned;
-        } else if (!n) {
-            break; // traverse_branch() exhausted the tree too - we're done!
-        } else {
-            n = p; // Restore the copy of the previous node
+            if (n && n->eligible()) {
+                page_table[n->page->url.page_id()] = n; // Cache it
+                n->page->assign_crawler(&c);
+                ++assigned;
+            } else if (!n) {
+                exhausted = true; // traverse_branch() exhausted the tree
+            } else {
+                n = p; // Restore the copy of the previous node
+            }
         }
     }
 
