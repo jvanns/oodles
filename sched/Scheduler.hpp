@@ -31,8 +31,8 @@ class Scheduler : public Linker
         const TreeBase& url_tree() const { return tree; }
         void register_crawler(Crawler &c) { crawlers.push(&c); }
 
-        void schedule_from_seed(const std::string &url);
-        void schedule_from_crawl(const std::string &url);
+        url::URL::hash_t schedule_from_seed(const std::string &url);
+        url::URL::hash_t schedule_from_crawl(const std::string &url);
 
         uint32_t run(BreadCrumbTrail *t = NULL); // Performs a scheduling run
     private:
@@ -64,7 +64,7 @@ class Scheduler : public Linker
         Node* select_best_child(Node &parent) const;
         
         Crawler::unit_t fill_crawler(Crawler &c, Node *&n);
-        void schedule(const std::string &url, bool from_seed);
+        url::URL::hash_t schedule(const std::string &url, bool from_seed);
 };
 
 } // sched

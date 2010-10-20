@@ -74,16 +74,16 @@ Scheduler::run(BreadCrumbTrail *t)
     return k;
 }
 
-void
+url::URL::hash_t
 Scheduler::schedule_from_seed(const string &url)
 {
-    schedule(url, true);
+    return schedule(url, true);
 }
 
-void
+url::URL::hash_t
 Scheduler::schedule_from_crawl(const string &url)
 {
-    schedule(url, false);
+    return schedule(url, false);
 }
 
 Node*
@@ -208,7 +208,7 @@ Scheduler::fill_crawler(Crawler &c, Node *&n)
     return assigned;
 }
 
-void
+url::URL::hash_t
 Scheduler::schedule(const string &url, bool from_seed)
 {
     bool duplicate = true;
@@ -231,6 +231,8 @@ Scheduler::schedule(const string &url, bool from_seed)
         ++page->links; // If we're from a seed it doesn't count as a link!
         weigh_tree_branch(*node); // Calculates branch schedule index (weight)
     }
+
+    return page->url.page_id();
 }
 
 } // sched
