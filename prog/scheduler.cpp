@@ -83,15 +83,16 @@ static void print_usage(const char *program)
 
 int main(int argc, char *argv[])
 {
-    int ch = -1;
+    int ch = -1, interval = 5;
     string seed_file, dot_file;
     string listen_on("127.0.0.1:8888");
-    const char *short_options = "hs:f:d:";
-    const struct option long_options[5] = {
+    const char *short_options = "hs:f:d:i:";
+    const struct option long_options[6] = {
         {"help", no_argument, NULL, short_options[0]},
         {"service", required_argument, NULL, short_options[1]},
         {"seed-file", required_argument, NULL, short_options[3]},
         {"dot-file", required_argument, NULL, short_options[5]},
+        {"interval", required_argument, NULL, short_options[7]},
         {NULL, 0, NULL, 0}
     };
 
@@ -108,6 +109,9 @@ int main(int argc, char *argv[])
                 break;
             case 's':
                 listen_on = optarg;
+                break;
+            case 'i':
+                interval = atoi(optarg);
                 break;
             default:
                 print_usage(argv[0]);
@@ -159,7 +163,7 @@ int main(int argc, char *argv[])
         }
 
         s.clear(); // We no longer need this data
-        context.start_crawling(dot_stream, 5); // 5s interval between runs
+        context.start_crawling(dot_stream, interval); // interval between runs
 
         delete dot_stream;
     } catch (const exception &e) {
