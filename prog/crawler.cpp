@@ -20,6 +20,7 @@ using std::string;
 // oodles
 using oodles::Proactor;
 using oodles::net::Client;
+using oodles::net::hostname;
 using oodles::net::Protocol;
 using oodles::net::oop::dialect::SchedulerCrawler;
 
@@ -83,12 +84,14 @@ int main(int argc, char *argv[])
 {
     int ch = -1;
     uint16_t cores = 1;
+    string name(hostname());
     string connect_to("127.0.0.1:8888");
-    const char *short_options = "hc:s:";
-    const struct option long_options[4] = {
+    const char *short_options = "hn:c:s:";
+    const struct option long_options[5] = {
         {"help", no_argument, NULL, short_options[0]},
-        {"cores", required_argument, NULL, short_options[1]},
-        {"scheduler", required_argument, NULL, short_options[3]},
+        {"name", required_argument, NULL, short_options[1]},
+        {"cores", required_argument, NULL, short_options[3]},
+        {"scheduler", required_argument, NULL, short_options[5]},
         {NULL, 0, NULL, 0}
     };
 
@@ -99,6 +102,9 @@ int main(int argc, char *argv[])
         switch (ch) {
             case 'c':
                 cores = atoi(optarg);
+                break;
+            case 'n':
+                name = optarg;
                 break;
             case 's':
                 connect_to = optarg;
@@ -125,7 +131,7 @@ int main(int argc, char *argv[])
         SchedulerCrawler &dialect = client.dialect();
 
         client.start(connect_to);
-        dialect.register_crawler("tarantula", cores);
+        dialect.register_crawler(name, cores);
 
         proactor.wait();
     } catch (const std::exception &e) {
