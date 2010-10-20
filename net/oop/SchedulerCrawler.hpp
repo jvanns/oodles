@@ -70,6 +70,7 @@ class SchedulerCrawler : public ProtocolDialect
         /* Member variables/attributes */
         bool initiator;
         id_t context[2];
+        sched::Crawler *crawler;
         static const id_t message_subset[];
 };
    

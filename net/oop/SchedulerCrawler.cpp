@@ -4,6 +4,7 @@
 
 // oodles scheduler
 #include "sched/Context.hpp"
+#include "sched/Crawler.hpp"
 #include "sched/Scheduler.hpp"
 
 // STL
@@ -24,7 +25,7 @@ const id_t SchedulerCrawler::message_subset[] = {
     END_CRAWL
 };
 
-SchedulerCrawler::SchedulerCrawler() : initiator(false)
+SchedulerCrawler::SchedulerCrawler() : initiator(false), crawler(NULL)
 {
     context[Inbound] = context[Outbound] = INVALID_ID;
 }
@@ -194,9 +195,9 @@ SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
     
     assert(context != NULL);
     
-    sched::Crawler &crawler = context->create_crawler(m.name, m.cores);
-    crawler.set_endpoint(handler->get_endpoint());
-    scheduler().register_crawler(crawler);
+    crawler = &(context->create_crawler(m.name, m.cores));
+    crawler->set_endpoint(handler->get_endpoint());
+    scheduler().register_crawler(*crawler);
     
 #ifdef DEBUG_SCHED
     std::cerr << "Registered crawler '" << m.name
@@ -230,6 +231,7 @@ SchedulerCrawler::continue_dialog(const EndCrawl &m)
      * contained in the received message, m, as sent
      * by the Crawler.
      */
+    assert(crawler != NULL);
 }
 
 } // dialect
