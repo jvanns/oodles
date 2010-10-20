@@ -57,10 +57,10 @@ struct BeginCrawl_
 struct EndCrawl_
 {
     /* Dependent typedefs */
-    //..............Page ID...........Success?
-    typedef std::map<url::URL::hash_t, bool> ScheduledURLs;
     //..........................Page URL.....Crawled?
     typedef std::list<std::pair<std::string, bool> > NewURLs;
+    //..........................Page ID...........Success?
+    typedef std::list<std::pair<url::URL::hash_t, bool> > ScheduledURLs;
     
     /* Member functions/methods */
     static id_t id() { return END_CRAWL; }
