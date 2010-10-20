@@ -10,6 +10,10 @@
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+// libc
+#include <sys/time.h>
+#include <sys/resource.h>
+
 // STL
 using std::map;
 using std::pair;
@@ -22,7 +26,7 @@ namespace {
  * This namespace exists for this unit only so pull-in these types...
  */
 
-// oodles   
+// oodles 
 using oodles::Proactor;
 using oodles::io::DotMatrix;
 using oodles::BreadCrumbTrail;
@@ -54,12 +58,21 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
 #ifdef DEBUG_SCHED
             std::cerr << "Performing scheduling run...";
 #endif
-            
+            struct rusage x, y;
             BreadCrumbTrail trail;
-            size_t then = time(NULL), assigned = scheduler.run(&trail), d = 0;
+            size_t then = time(NULL), assigned = 0, d = 0;
+
+            getrusage(RUSAGE_SELF, &x);
+            assigned = scheduler.run(&trail);
+            getrusage(RUSAGE_SELF, &y);
             
 #ifdef DEBUG_SCHED
             std::cerr << assigned << " URLs assigned.\n";
+            std::cerr << "\tRun took " << y.ru_utime.tv_sec - x.ru_utime.tv_sec
+                      << '.' << abs(y.ru_utime.tv_usec - x.ru_utime.tv_usec)
+                      << "s/u, " << y.ru_stime.tv_sec - x.ru_stime.tv_sec
+                      << '.' << abs(y.ru_stime.tv_usec - x.ru_stime.tv_usec)
+                      << "s/s\n";
 #endif
             
             if (dot_stream) {
