@@ -11,6 +11,7 @@
 
 // Boost.asio
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/ip/host_name.hpp>
 
 // libc
 #include <stdint.h> // For uint16_t
@@ -42,6 +43,9 @@ static const uint16_t IBS = /* Inbound buffer size */
 #else
        MIN_BUFFER_SIZE;
 #endif
+
+/* Free function for returning the local hostname of this endpoint */
+inline std::string hostname() { return boost::asio::ip::host_name(); }
 
 class ProtocolHandler; // Forward declaration for Endpoint
 
