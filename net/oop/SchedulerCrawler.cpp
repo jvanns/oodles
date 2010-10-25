@@ -9,8 +9,10 @@
 
 // STL
 using std::map;
+using std::list;
 using std::string;
 using std::vector;
+using std::make_pair;
 using std::exception;
 
 namespace oodles {
@@ -25,6 +27,35 @@ const id_t SchedulerCrawler::message_subset[] = {
     END_CRAWL
 };
 
+// GarbageCollector
+void
+SchedulerCrawler::GarbageCollector::receive(const event::Event &e)
+{
+    const sched::Update &d = e;
+    map<sched::Deferable::key_t, Message*>::iterator i = garbage.find(d.key);
+
+    if (i == garbage.end()) {
+        std::cerr << "FAILURE: d.key = " << d.key << ", garbage.size = "
+                  << garbage.size() << std::endl;
+    }
+    assert(i != garbage.end());
+
+    delete i->second;
+    garbage.erase(i);
+}
+
+void
+SchedulerCrawler::GarbageCollector::trash(Message *m, bool delete_now)
+{
+    sched::Deferable::key_t k = reinterpret_cast<sched::Deferable::key_t>(m);
+    
+    if (delete_now)
+        delete m;
+    else
+        garbage[k] = m;
+}
+
+// SchedulerCrawler
 SchedulerCrawler::SchedulerCrawler() : initiator(false), crawler(NULL)
 {
     context[Inbound] = context[Outbound] = INVALID_ID;
@@ -37,7 +68,8 @@ SchedulerCrawler::translate()
     
     try {
         while (m) {
-            continue_dialog(m);
+            bool delete_now = continue_dialog(m);
+            garbage.trash(m, delete_now);
             m = protocol().pop_message();
         }
     } catch (const exception &e) {
@@ -100,10 +132,18 @@ SchedulerCrawler::scheduler() const
     return static_cast<sched::Scheduler&>(*l);
 }
 
-void
+bool
 SchedulerCrawler::continue_dialog(const Message *m)
 throw (DialectError)
 {
+   /*
+    * Return code of continue_dialog handlers indicate whether or not to
+    * delete and free-up the message immediately or rely on the event-driven
+    * garbage collector to defer it until later once the data has been used
+    * and released.
+    */
+    bool rc = true;
+    
     /*
      * Verify the context is valid based on this *incoming* message,
      * the previous outbound message and previous inbound message.
@@ -130,7 +170,7 @@ throw (DialectError)
                                    "Invalid dialog context at message #%d.",
                                    m->id());
             
-            continue_dialog(static_cast<const BeginCrawl&>(*m));
+            rc = continue_dialog(static_cast<const BeginCrawl&>(*m));
             break;
         /* Scheduler Inbound */
         case REGISTER_CRAWLER:
@@ -151,7 +191,7 @@ throw (DialectError)
                                    "Invalid dialog context at message #%d.",
                                    m->id());
 
-            continue_dialog(static_cast<const RegisterCrawler&>(*m));
+            rc = continue_dialog(static_cast<const RegisterCrawler&>(*m));
             break;
         case END_CRAWL:
            if (initiator)
@@ -173,7 +213,7 @@ throw (DialectError)
                                    "Invalid dialog context at message #%d.",
                                    m->id());
 
-            continue_dialog(static_cast<const EndCrawl&>(*m));
+            rc = continue_dialog(static_cast<const EndCrawl&>(*m));
             break;
         default:
             throw DialectError("SchedulerCrawler::continue_dialog",
@@ -183,10 +223,11 @@ throw (DialectError)
     }
     
     context[Inbound] = m->id();
-    delete m;
+
+    return rc;
 }
 
-void
+bool
 SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
 {
     /*
@@ -205,9 +246,11 @@ SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
     std::cerr << "Registered crawler '" << m.name
               << "' with " << m.cores << " cores.\n";
 #endif
+
+    return true;
 }
 
-void
+bool
 SchedulerCrawler::continue_dialog(const BeginCrawl &m)
 {
     /*
@@ -215,25 +258,41 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      * all URLs given in m as scheduled by the Scheduler that
      * sent this message.
      */
-#ifdef DEBUG_CRAWL
+    EndCrawl *e = new EndCrawl;
     BeginCrawl::URLs::const_iterator i, j;
-    
+
     for (i = m.urls.begin(), j = m.urls.end() ; i != j ; ++i) {
+#ifdef DEBUG_CRAWL
         std::cerr << "Will crawl " << i->second.size() 
                   << " URLs from the domain ID of " << i->first << std::endl;
-    }
 #endif
+
+        list<BeginCrawl::URL>::const_iterator k, l;
+        for (k = i->second.begin(), l = i->second.end() ; k != l ; ++k)
+            e->scheduled_urls.push_back(make_pair(k->first, true));
+    }
+
+    send(e);
+
+    return true;
 }
 
-void
+bool
 SchedulerCrawler::continue_dialog(const EndCrawl &m)
 {
     /*
      * Update the URL-tree in the scheduler with the data
      * contained in the received message, m, as sent
-     * by the Crawler.
+     * by the Crawler. We defer the update, however.
      */
     assert(crawler != NULL);
+
+    sched::Deferable::key_t k = reinterpret_cast<sched::Deferable::key_t>(&m);
+    const sched::Deferable update = {k, m.new_urls, m.scheduled_urls};
+
+    scheduler().defer_update(update, garbage);
+
+    return false; // We delete later, upon the garbage collector receive()
 }
 
 } // dialect

@@ -5,8 +5,11 @@
 #include "Protocol.hpp"
 #include "Messages.hpp"
 #include "common/Exceptions.hpp"
+#include "utility/Subscriber.hpp"
+#include "sched/DeferredUpdate.hpp"
 
 // STL
+#include <map>
 #include <vector>
 
 namespace oodles {
@@ -17,7 +20,7 @@ class Crawler; // Forward declaraton for SchedulerCrawler
 class Scheduler; // Forward declaraton for SchedulerCrawler
    
 } // sched
-   
+ 
 namespace net {
 namespace oop {
 namespace dialect {
@@ -48,6 +51,24 @@ class SchedulerCrawler : public ProtocolDialect
          */
         void begin_crawl(const std::vector<url::URL*> &urls);
     private:
+        /* Internal Data Structures */
+        class GarbageCollector : public event::Subscriber
+        {
+            public:
+                /* Member functions/methods */
+                
+                /*
+                 * Receives instruction from the publisher that it is done
+                 * with a pointer passed to it and it can now be deleted at
+                 * the dialects leisure.
+                 */
+                void receive(const event::Event &e);
+                void trash(Message *m, bool delete_now);
+            private:
+                /* Member variables/attributes */
+                std::map<key_t, Message*> garbage;
+        };
+        
         /* Member functions/methods */
         void send(Message *m);
         Protocol& protocol() const;
@@ -56,10 +77,10 @@ class SchedulerCrawler : public ProtocolDialect
         /*
          * Message handling methods
          */
-        void continue_dialog(const Message *m) throw(DialectError);
-        void continue_dialog(const RegisterCrawler &m);
-        void continue_dialog(const BeginCrawl &m);
-        void continue_dialog(const EndCrawl &m);
+        bool continue_dialog(const Message *m) throw(DialectError);
+        bool continue_dialog(const RegisterCrawler &m);
+        bool continue_dialog(const BeginCrawl &m);
+        bool continue_dialog(const EndCrawl &m);
         
         /* Internal Data Structures */
         enum {
@@ -71,6 +92,7 @@ class SchedulerCrawler : public ProtocolDialect
         bool initiator;
         id_t context[2];
         sched::Crawler *crawler;
+        GarbageCollector garbage;
         static const id_t message_subset[];
 };
    
