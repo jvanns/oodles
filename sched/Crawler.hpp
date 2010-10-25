@@ -30,6 +30,7 @@ class Crawler
 
         void begin_crawl();
         unit_t add_url(url::URL &url);
+        unit_t remove_url(url::URL &url);
         void set_endpoint(net::Endpoint::Connection e);
 
         bool online() const { return !offline(); }

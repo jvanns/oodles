@@ -5,6 +5,8 @@
 
 // STL
 using std::string;
+using std::vector;
+using std::lower_bound;
 
 namespace oodles {
 namespace sched {
@@ -26,7 +28,22 @@ Crawler::begin_crawl()
 Crawler::unit_t
 Crawler::add_url(url::URL &url)
 {
-    work_unit.push_back(&url);
+    work_unit.insert(lower_bound(work_unit.begin(),
+                                 work_unit.end(),
+                                 &url), &url);
+    return assigned();
+}
+
+Crawler::unit_t
+Crawler::remove_url(url::URL &url)
+{
+    vector<url::URL*>::iterator i = lower_bound(work_unit.begin(),
+                                                work_unit.end(),
+                                                &url);
+
+    assert(i != work_unit.end() && *i == &url);
+    work_unit.erase(i);
+
     return assigned();
 }
 
