@@ -1,6 +1,8 @@
 // oodles
+#include "Context.hpp"
 #include "PageData.hpp"
 #include "Scheduler.hpp"
+#include "DeferredUpdate.hpp"
 #include "utility/BreadCrumbTrail.hpp"
 
 #include <time.h> // For time()
@@ -25,12 +27,16 @@ Scheduler::Scheduler(Context *c) :
     ctxt(c),
     leaves(0),
     trail(NULL),
+    update(NULL),
     tree(new Node("ROOT"))
 {
+    if (c)
+        update = new DeferredUpdate(c->proactor());
 }
 
 Scheduler::~Scheduler()
 {
+    delete update;
 }
 
 uint32_t
@@ -72,6 +78,33 @@ Scheduler::run(BreadCrumbTrail *t)
         deferred_crawls[i]->begin_crawl();
 
     return k;
+}
+
+uint32_t
+Scheduler::update_schedule()
+{
+    assert(update);
+    return update->update(*this);
+}
+
+void
+Scheduler::update_node(url::URL::hash_t id, time_t time)
+{
+    Node *n = page_table[id];
+    PageData *p = n->page;
+
+    p->last_crawl = time;
+    ++p->crawl_count;
+
+    p->unassign_crawler();
+    weigh_tree_branch(*n);
+}
+
+void
+Scheduler::defer_update(const Deferable &d, event::Subscriber &s)
+{
+    assert(update);
+    update->defer(d, s);
 }
 
 url::URL::hash_t

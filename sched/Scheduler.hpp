@@ -16,9 +16,17 @@ namespace oodles {
 
 class BreadCrumbTrail; // Forward declaration for Scheduler
 
+namespace event {
+
+class Subscriber; // Forward declaration for Scheduler
+   
+} // event
+
 namespace sched {
 
 class Context; // Forward declaration for Scheduler
+class Deferable; // Forward declaration for Scheduler
+class DeferredUpdate; // Forward declaration for Scheduler
 
 class Scheduler : public Linker
 {
@@ -35,11 +43,16 @@ class Scheduler : public Linker
         url::URL::hash_t schedule_from_crawl(const std::string &url);
 
         uint32_t run(BreadCrumbTrail *t = NULL); // Performs a scheduling run
+        
+        uint32_t update_schedule();
+        void update_node(url::URL::hash_t id, time_t time);
+        void defer_update(const Deferable &d, event::Subscriber &s);
     private:
         /* Member variables/attributes */
         Context *ctxt;
         size_t leaves;
         BreadCrumbTrail *trail;
+        DeferredUpdate *update;
         Tree<Node::value_type> tree;
         std::priority_queue<Crawler*,
                             std::deque<Crawler*>,
