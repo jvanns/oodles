@@ -30,6 +30,8 @@ class Context
 
         void stop_crawling();
         void start_crawling(std::ostream *dot_stream = NULL, int interval = 1);
+
+        Proactor& proactor() { return dispatcher; }
     private:
         /* Dependent typedefs */
         typedef net::Server Server;
@@ -41,7 +43,7 @@ class Context
         /*
          * Asynchronous task dispatcher
          */
-        Proactor proactor;
+        Proactor dispatcher;
 
         /*
          * Network layers

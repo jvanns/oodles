@@ -120,21 +120,21 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
 namespace oodles {
 namespace sched {
 
-Context::Context() : server(proactor.io_service(), creator), scheduler(this)
+Context::Context() : server(proactor().io_service(), creator), scheduler(this)
 {
 }
 
 void
 Context::stop_crawling()
 {
-    proactor.stop();
+    proactor().stop();
 }
 
 void
 Context::start_crawling(ostream *dot_stream, int interval)
 {
-    ProactorTask t(proactor, scheduler, dot_stream, interval);
-    proactor.wait();
+    ProactorTask t(proactor(), scheduler, dot_stream, interval);
+    proactor().wait();
 }
 
 void
