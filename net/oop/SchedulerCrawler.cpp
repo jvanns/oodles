@@ -159,13 +159,15 @@ throw (DialectError)
                                    0,
                                    "Conversation initialised by Scheduler!?");
             
-            if (context[Inbound] != REGISTER_CRAWLER)
+            if (context[Inbound] != END_CRAWL &&
+                context[Inbound] != REGISTER_CRAWLER)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
                                    "Invalid dialog context at message #%d.",
                                    m->id());
             
-            if (context[Outbound] != BEGIN_CRAWL)
+            if (context[Outbound] != INVALID_ID &&
+                context[Outbound] != BEGIN_CRAWL)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
                                    "Invalid dialog context at message #%d.",
@@ -215,7 +217,7 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      */
 #ifdef DEBUG_CRAWL
     BeginCrawl::URLs::const_iterator i, j;
-
+    
     for (i = m.urls.begin(), j = m.urls.end() ; i != j ; ++i) {
         std::cerr << "Will crawl " << i->second.size() 
                   << " URLs from the domain ID of " << i->first << std::endl;
