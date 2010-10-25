@@ -26,5 +26,12 @@ PageData::assign_crawler(Crawler *c)
     crawler->add_url(url);
 }
 
+void
+PageData::unassign_crawler()
+{
+    assert(crawler);
+    crawler->remove_url(url);
+}
+
 } // oodles
 } // sched

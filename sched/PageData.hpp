@@ -26,6 +26,7 @@ struct PageData
 
     PageData(const std::string &url);
     void assign_crawler(Crawler *c);
+    void unassign_crawler();
 };
 
 } // sched
