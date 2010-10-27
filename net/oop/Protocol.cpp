@@ -45,6 +45,13 @@ Protocol::name() const
 void
 Protocol::bytes_transferred(size_t n)
 {
+    /*
+     * FIXME: In message2buffer transfer the message written to the buffer
+     * to a new queue called 'buffered' or something. Then from this method
+     * check the message at the front of the buffered queue and it's size
+     * against the number of bytes (n) that were sent. If n >= size() then
+     * delete the message and move on to the next.
+     */
 }
 
 size_t
@@ -53,29 +60,27 @@ Protocol::message2buffer(char *buffer, size_t max)
     if (max == 0 || outbound_messages.empty())
         return 0;
     
+    bool done = false;
+    Message *outgoing = NULL;
     size_t used = 0, buffered = 0;
-    Message *m = outbound_messages.front();
-
+    
     /*
      * Try to buffer as many (last may be partial) messages as we can
      */
-    while (m) {
-        buffered = m->to_buffer(buffer + used, max);
-        
-        if (m->pending() && buffered == max)
-            m = NULL; // Our message size was greater than the buffer size
+    while (!done) {
+        if (!outgoing)
+            outgoing = outbound_messages.front();
 
+        buffered = outgoing->to_buffer(buffer + used, max);
         used += buffered;
         max -= buffered;
-
-        if (m) {
+        done = max == 0;
+        
+        if (!outgoing->pending()) {
+            delete outgoing;
+            outgoing = NULL;
             outbound_messages.pop();
-            delete m;
-
-            if (max && !outbound_messages.empty())
-                m = outbound_messages.front();
-            else
-                m = NULL;
+            done = !(!outbound_messages.empty() && max > 0);
         }
     }
 
@@ -88,8 +93,8 @@ Protocol::buffer2message(const char *buffer, size_t max)
     if (max == 0)
         return 0;
     
+    bool done = false;
     size_t used = 0, buffered = 0;
-    bool done = max < Message::Header::header_size;
     static const Factory &factory = Factory::instance();
 
     while (!done) {
@@ -99,17 +104,17 @@ Protocol::buffer2message(const char *buffer, size_t max)
             used += h.header_size;
             max -= h.header_size;
         }
-        
+
         buffered = incoming->from_buffer(buffer + used, max);
         used += buffered;
         max -= buffered;
+        done = max == 0;
 
         if (!incoming->pending()) {
+            done = max < Message::Header::header_size;
             inbound_messages.push(incoming);
             incoming = NULL;
         }
-        
-        done = !max || max < Message::Header::header_size;
     }
     
     if (!inbound_messages.empty() && dialect != this)
