@@ -123,9 +123,9 @@ void
 Endpoint::raw_send_callback(const error_code& e, size_t b)
 {
     if (!e && b > 0) {
-        outbound.consumer().consume_buffer(b);
+        size_t n = outbound.consumer().consume_buffer(b);
         protocol->bytes_transferred(b);
-        protocol->transfer_data();
+        protocol->transfer_data(n);
     } else {
         if (e == boost::asio::error::operation_aborted)
             return;

@@ -45,23 +45,26 @@ ProtocolHandler::receive_data()
 }
 
 void
-ProtocolHandler::transfer_data()
+ProtocolHandler::transfer_data(size_t pending)
 {
     assert(endpoint);
 
     if (!endpoint->online())
         return; // Not to worry, transfer_data() will be called again by start()
 
-    char *buffer = NULL;
-    size_t max = endpoint->outbound.producer().prepare_buffer(buffer), used = 0;
+    if (!pending) {
+        char *buffer = NULL;
+        size_t max = endpoint->outbound.producer().prepare_buffer(buffer);
 
-    if (buffer && max > 0)
-        used = message2buffer(buffer, max);
-    
-    max = endpoint->outbound.producer().commit_buffer(used);
+        if (buffer && max) {
+            pending = message2buffer(buffer, max);
+            max = endpoint->outbound.producer().commit_buffer(pending);
+        }
 
-    if (max > 0)
-        endpoint->async_send(endpoint->outbound.consumer().data(), max);
+        pending = max;
+    }
+
+    endpoint->async_send(endpoint->outbound.consumer().data(), pending);
 }
 
 string

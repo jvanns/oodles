@@ -43,7 +43,7 @@ class ProtocolHandler : public ProtocolDialect
          * data will call buffer2message.
          */
         void receive_data();
-        void transfer_data();
+        void transfer_data(size_t pending = 0);
 
         /*
          * Return the protocol name/identifier such as
