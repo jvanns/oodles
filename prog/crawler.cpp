@@ -76,6 +76,7 @@ static void print_usage(const char *program)
     cerr << program
          << ":\n"
          << "\n-h\t--help"
+         << "\n-n\t--name <name>"
          << "\n-c\t--cores <#cores>"
          << "\n-s\t--scheduler <hostname:port>\n";
 }
