@@ -33,7 +33,10 @@ class Protocol : public ProtocolHandler
     private:
         /* Member variables/attributes */
         Message *incoming;
-        std::queue<Message*> inbound_messages, outbound_messages;
+        size_t transferred;
+        std::queue<Message*> inbound_messages,
+                             outbound_messages,
+                             buffered_messages;
 };
    
 } // oop

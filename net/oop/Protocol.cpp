@@ -9,7 +9,10 @@ namespace oodles {
 namespace net {
 namespace oop {
 
-Protocol::Protocol(const DialectCreator &c) : ProtocolHandler(c), incoming(NULL)
+Protocol::Protocol(const DialectCreator &c) :
+    ProtocolHandler(c),
+    incoming(NULL),
+    transferred(0)
 {
 }
 
@@ -29,11 +32,14 @@ Protocol::pop_message()
 void
 Protocol::push_message(Message *m)
 {
-    if (m) {
-        outbound_messages.push(m);
-        m->deconstruct();
+    if (!m)
+        return;
+
+    outbound_messages.push(m);
+    m->deconstruct();
+    
+    if (buffered_messages.empty())
         transfer_data();
-    }
 }
 
 string
@@ -45,13 +51,34 @@ Protocol::name() const
 void
 Protocol::bytes_transferred(size_t n)
 {
+    if (!n)
+        return;
+
+    Message *outgoing = NULL;
+    bool done = buffered_messages.empty();
+    size_t message_size = 0, buffered = transferred + n;
+
     /*
-     * FIXME: In message2buffer transfer the message written to the buffer
-     * to a new queue called 'buffered' or something. Then from this method
-     * check the message at the front of the buffered queue and it's size
-     * against the number of bytes (n) that were sent. If n >= size() then
-     * delete the message and move on to the next.
+     * Delete all fully-transferred outbound messages
      */
+    while (!done) {
+        if (!outgoing) {
+            outgoing = buffered_messages.front();
+            message_size = outgoing->size();
+        }
+
+        done = buffered < message_size;
+
+        if (!done) {
+            delete outgoing;
+            outgoing = NULL;
+            buffered_messages.pop();
+            buffered -= message_size;
+            done = buffered_messages.empty();
+        }
+    }
+
+    transferred = buffered;
 }
 
 size_t
@@ -63,7 +90,7 @@ Protocol::message2buffer(char *buffer, size_t max)
     bool done = false;
     Message *outgoing = NULL;
     size_t used = 0, buffered = 0;
-    
+
     /*
      * Try to buffer as many (last may be partial) messages as we can
      */
@@ -77,10 +104,10 @@ Protocol::message2buffer(char *buffer, size_t max)
         done = max == 0;
         
         if (!outgoing->pending()) {
-            delete outgoing;
-            outgoing = NULL;
+            done = max > 0 && !outbound_messages.empty();
+            buffered_messages.push(outgoing);
             outbound_messages.pop();
-            done = !(!outbound_messages.empty() && max > 0);
+            outgoing = NULL;
         }
     }
 
@@ -97,6 +124,9 @@ Protocol::buffer2message(const char *buffer, size_t max)
     size_t used = 0, buffered = 0;
     static const Factory &factory = Factory::instance();
 
+    /*
+     * Try to buffer as many (last may be partial) messages as we can
+     */
     while (!done) {
         if (!incoming) {
             const Message::Header h(Message::buffer2header(buffer + used));
