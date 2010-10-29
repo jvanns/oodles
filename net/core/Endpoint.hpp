@@ -3,6 +3,7 @@
 
 // oodles
 #include "Buffer.hpp"
+#include "common/page.hpp"
 #include "utility/Linker.hpp"
 
 // Boost.shared
@@ -16,33 +17,10 @@
 // libc
 #include <stdint.h> // For uint16_t
 
-namespace {
-    
-static const uint32_t MIN_BUFFER_SIZE = 4096; // 4KiB
-static const uint32_t MAX_BUFFER_SIZE = 1024 * 1024; // 1MiB
-
-} // anonymous
-
 namespace oodles {
 namespace net {
 
-static const uint16_t OBS =  /* Outbound buffer size */
-#ifdef OUTBOUND_BUFFER_SIZE
-       OUTBOUND_BUFFER_SIZE <= MAX_BUFFER_SIZE
-       ? OUTBOUND_BUFFER_SIZE
-       : MAX_BUFFER_SIZE;
-#else
-       MIN_BUFFER_SIZE;
-#endif
-
-static const uint16_t IBS = /* Inbound buffer size */
-#ifdef INBOUND_BUFFER_SIZE
-       INBOUND_BUFFER_SIZE <= MAX_BUFFER_SIZE
-       ? INBOUND_BUFFER_SIZE
-       : MAX_BUFFER_SIZE;
-#else
-       MIN_BUFFER_SIZE;
-#endif
+static const uint16_t NBS = OODLES_PAGE_SIZE; // Network buffer size
 
 /* Free function for returning the local hostname of this endpoint */
 inline std::string hostname() { return boost::asio::ip::host_name(); }
@@ -74,8 +52,8 @@ class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
         ProtocolHandler* get_protocol() const { return protocol; }
     private:
         /* Member variables/attributes */
-        Buffer<IBS> inbound;
-        Buffer<OBS> outbound;
+        Buffer<NBS> inbound;
+        Buffer<NBS> outbound;
         ProtocolHandler *protocol;
         boost::asio::ip::tcp::socket tcp_socket;
 

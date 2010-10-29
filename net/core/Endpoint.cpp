@@ -48,9 +48,14 @@ Endpoint::start()
 {
     assert(protocol); // Can't do anything without a protocol
     assert(tcp_socket.is_open()); // Can't do anything with a closed socket!
-
+    /*
+     * Disable Nagles algorithm (no_delay) when setting our own buffer sizes
+     */
+    tcp_socket.set_option(boost::asio::ip::tcp::no_delay(true));
     tcp_socket.set_option(boost::asio::socket_base::keep_alive(true));
-    
+    tcp_socket.set_option(boost::asio::socket_base::send_buffer_size(NBS));
+    tcp_socket.set_option(boost::asio::socket_base::receive_buffer_size(NBS));
+
     protocol->transfer_data();
     protocol->receive_data();
 }
