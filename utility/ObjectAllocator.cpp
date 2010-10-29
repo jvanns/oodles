@@ -1,4 +1,5 @@
 // oodles
+#include "common/page.hpp"
 #include "ObjectAllocator.hpp"
 
 // STL
@@ -7,27 +8,10 @@
 #endif
 
 #include <assert.h> // For assert()
-#include <unistd.h> // For sysconf()
 
-/*
- * You should only specify PAGE_SIZE to the
- * pre-processor for testing - rely on either
- * your OS to determine it for you or use the
- * hard-coded oodles default of 4k
- */
 static inline unsigned long page_size()
 {
-    static const unsigned long x =
-#ifdef PAGE_SIZE
-    PAGE_SIZE;
-#else
-    #ifndef WINDOWS
-        sysconf(_SC_PAGESIZE);
-    #else
-        4096;
-    #endif
-#endif
-    return x;
+    return OODLES_PAGE_SIZE;
 }
 
 static inline void* native_alloc(size_t bytes)
