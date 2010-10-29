@@ -1,36 +1,52 @@
 // oodles
+#include "Event.hpp"
 #include "Publisher.hpp"
 #include "Subscriber.hpp"
+
+// STL
+using std::map;
+using std::pair;
 
 namespace oodles {
 namespace event {
 
-Subscriber::Subscriber() : publisher(NULL)
+Subscriber::Subscriber()
 {
 }
 
 Subscriber::~Subscriber()
 {
-}
+    map<Event*, Locator>::const_iterator i = events.begin(), j = events.end();
 
-bool
-Subscriber::subscribe_to(Publisher &p)
-{
-    if (!subscribed()) {
-        publisher = &p;
-        return true;
+    while (i != j) {
+        i->first->subscribers.erase(i->second);
+        ++i;
     }
-
-    if (subscribed_to(p))
-        return true; // We already are!
-
-    return false; // We're already subscribed to something else!
 }
 
 bool
-Subscriber::unsubscribe_from(Publisher &p)
+Subscriber::subscribe_to(Event &e)
 {
-    return p.remove_subscriber(*this);
+    static const Locator l; // Default placeholder
+    const pair<Event*, Locator> item(&e, l);
+    pair<map<Event*, Locator>::iterator, bool> x(events.insert(item));
+
+    if (x.second)
+        x.first->second = e.subscribers.insert(this).first;
+
+    return x.second;
+}
+
+bool
+Subscriber::unsubscribe_from(Event &e)
+{
+    map<Event*, Locator>::iterator i = events.find(&e);
+    bool found = i != events.end();
+
+    if (found)
+        e.subscribers.erase(i->second);
+
+    return found;
 }
 
 } // event

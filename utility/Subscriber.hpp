@@ -1,12 +1,14 @@
 #ifndef OODLES_EVENT_SUBSCRIBER_HPP
 #define OODLES_EVENT_SUBSCRIBER_HPP
 
-// libc
-#include <stdlib.h> // For NULL
+// STL
+#include <set>
+#include <map>
 
 namespace oodles {
 namespace event {
 
+class Event; // // Forward declaration for Subscriber
 class Publisher; // Forward declaration for Subscriber
 
 class Subscriber
@@ -17,22 +19,23 @@ class Subscriber
         virtual ~Subscriber();
 
         /*
-         * Override this method to receive events
-         * from the publisher by calling p.event().
+         * Override this method to receive events dispatched from the publisher.
          */
-        virtual void receive(const Publisher &p) = 0;
-        bool subscribed() const { return publisher != NULL; }
-        bool subscribed_to(Publisher &p) const { return publisher == &p; }
+        virtual void receive(const Event &e) = 0;
+        size_t subscribed_to() const { return events.size(); }
     private:
-        /* Member variables/attributes */
-        Publisher *publisher;
+        /* Member functions/methods */
+        bool subscribe_to(Event &e);
+        bool unsubscribe_from(Event &e);
 
-        bool subscribe_to(Publisher &p);
-        bool unsubscribe_from(Publisher &p);
-        void clear_publisher() { publisher = NULL; }
+         /* Dependent typedefs */
+        typedef std::set<Subscriber*>::iterator Locator;
+
+        /* Member variables/attributes */
+        std::map<Event*, Locator> events;
 
         /* Friend class declarations */
-        friend class Publisher; // Publisher (only) can call subscribe_*()
+        friend class Event; // Calls the two private methods above
 };
 
 } // event

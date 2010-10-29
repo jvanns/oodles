@@ -1,4 +1,5 @@
 // oodles
+#include "utility/Event.hpp"
 #include "utility/Proactor.hpp"
 #include "utility/Publisher.hpp"
 #include "utility/Subscriber.hpp"
@@ -27,9 +28,9 @@ struct Integers : public oodles::event::Event
 
 struct Sum : public oodles::event::Subscriber
 {
-    void receive(const oodles::event::Publisher &p)
+    void receive(const oodles::event::Event &e)
     {
-        const Integers &m = p.event();
+        const Integers &m = e;
         cout << "Sum: " << calculate_sum(m) << std::endl;
     };
 
@@ -49,9 +50,9 @@ struct Sum : public oodles::event::Subscriber
 
 struct Deviation : public oodles::event::Subscriber
 {
-    void receive(const oodles::event::Publisher &p)
+    void receive(const oodles::event::Event &e)
     {
-        const Integers &m = p.event();
+        const Integers &m = e;
         cout << "Standard deviation: " << calculate_deviation(m) << std::endl;
     };
 
@@ -69,9 +70,9 @@ struct Deviation : public oodles::event::Subscriber
 
 struct Concatenate : public oodles::event::Subscriber
 {
-    void receive(const oodles::event::Publisher &p)
+    void receive(const oodles::event::Event &e)
     {
-        const Integers &m = p.event();
+        const Integers &m = e;
         cout << "Concatenation: " << concatenate_integers(m) << std::endl;
     };
 
@@ -93,32 +94,31 @@ struct Concatenate : public oodles::event::Subscriber
 int main(int argc, char *argv[])
 {
     Integers e; // Event object
-    oodles::Proactor t;
-    oodles::event::Publisher p(e, &t); // Publisher
+    oodles::Proactor t; // Task dispatcher
+    oodles::event::Publisher p(&t); // Publisher
 
     Sum s; // Subscriber
     Deviation d; // Another, different Subscriber
     Concatenate c; // Yet another, different Subscriber ;)
 
-    if (!p.add_subscriber(s)) {
+    if (!e.add_subscriber(s)) {
         cerr << "Sum failed to subscribe to publisher!" << endl;
         return 1;
     }
 
-    if (!p.add_subscriber(d)) {
+    if (!e.add_subscriber(d)) {
         cerr << "Deviation failed to subscribe to publisher!" << endl;
         return 1;
     }
 
-    if (!p.add_subscriber(c)) {
+    if (!e.add_subscriber(c)) {
         cerr << "Concatenate failed to subscribe to publisher!" << endl;
         return 1;
     }
 
-    assert(s.subscribed_to(p));
-    assert(d.subscribed_to(p));
-    assert(c.subscribed_to(p));
-    assert(p.subscribed() == 3);
+    assert(s.subscribed_to() == 1);
+    assert(d.subscribed_to() == 1);
+    assert(c.subscribed_to() == 1);
 
     static const int size = (1024 * 1024) / sizeof(int);
     e.v.reserve(size);
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     for (int n = 1 ; n <= size ; ++n)
         e.v.push_back(n);
 
-    p.broadcast();
+    e.publish(p);
     t.wait();
 
     return 0;

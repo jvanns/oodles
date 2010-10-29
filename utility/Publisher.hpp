@@ -1,8 +1,8 @@
 #ifndef OODLES_EVENT_PUBLISHER_HPP
 #define OODLES_EVENT_PUBLISHER_HPP
 
-// STL
-#include <set>
+// libc
+#include <stdlib.h> // For NULL
 
 namespace oodles {
 
@@ -10,46 +10,17 @@ class Proactor; // Forward declaration for Publisher
 
 namespace event {
 
-class Subscriber; // Forward declaration for Publisher
-
-struct Event
-{
-    /* Member functions/methods */
-    Event();
-    virtual ~Event() = 0;
-
-    /*
-     * Templated cast operator will automatically,
-     * given the correct (related) type, cast this
-     * base class object to your derived subclass.
-     *
-     * Publisher::event() will call this below...
-     */
-    template<typename Derived>
-    operator const Derived& () const
-    {
-        return *static_cast<const Derived*>(this);
-    }
-};
+class Event; // Forward declaration for Publisher
 
 class Publisher
 {
     public:
         /* Member functions/methods */
-        Publisher(Event &e, Proactor *p = NULL);
-        ~Publisher();
-
-        size_t broadcast() const;
-        bool add_subscriber(Subscriber &s);
-        bool remove_subscriber(Subscriber &s);
-
-        const Event& event() const { return *object; }
-        size_t subscribed() const { return subscribers.size(); }
+        Publisher(Proactor *p = NULL);
+        void broadcast(const Event &e) const;
     private:
         /* Member variables/attributes */
-        Event *object;
         Proactor *proactor;
-        std::set<Subscriber*> subscribers;
 };
 
 } // event
