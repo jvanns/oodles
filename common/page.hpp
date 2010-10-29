@@ -1,0 +1,3 @@
+#ifndef OODLES_PAGE_SIZE
+#define OODLES_PAGE_SIZE 4096
+#endif
