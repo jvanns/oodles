@@ -10,6 +10,7 @@
 // libc
 #include <stdlib.h> // For atoi()
 #include <getopt.h> // For getopt()
+#include <signal.h> // For sigaddset() etc.
 
 // STL
 using std::cout;
