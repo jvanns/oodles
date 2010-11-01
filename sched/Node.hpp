@@ -24,7 +24,7 @@ class Node : public oodles::Node<url::value_type>
         /* Override print() method from NodeBase */
         void print(std::ostream &s, const io::PrinterBase &p) const;
         
-        float calculate_weight() const;
+        float calculate_weight(time_t now) const;
         bool assigned() const { return page && page->crawler; }
         bool eligible() const { return page ? page->crawler == NULL : false; }
 

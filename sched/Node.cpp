@@ -53,19 +53,19 @@ Node::visit()
  * scoring/weighting math. May be a simpler (+/- 1) solution?
  */
 float
-Node::calculate_weight() const
+Node::calculate_weight(time_t now) const
 {
     if (!page)
         return 0.0f;
 
-    const time_t now = time(NULL),
-                 max = std::max(now - page->epoch,
-                                now - page->last_crawl),
-                 min = std::min(now - page->epoch, max),
-                 score = (page->links * (now - (max - min)))
-                                    / page->crawl_count + 1;
+    float creat_diff = now - page->epoch,
+          crawl_diff = page->last_crawl ?
+               now - page->last_crawl : 0,
+          max = crawl_diff ? crawl_diff : creat_diff,
+          min = !crawl_diff ? crawl_diff : creat_diff,
+          score = ((page->links + 1) * (max - min)) / (page->crawl_count + 1);
 
-    return normalise<time_t> (score, 0, 1, min, max);
+    return normalise<float> (score, 0.0f, 1.0f, min, max);
 }
 
 inline
