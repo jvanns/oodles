@@ -34,10 +34,6 @@ SchedulerCrawler::GarbageCollector::receive(const event::Event &e)
     const sched::Update &d = e;
     map<sched::Deferable::key_t, Message*>::iterator i = garbage.find(d.key);
 
-    if (i == garbage.end()) {
-        std::cerr << "FAILURE: d.key = " << d.key << ", garbage.size = "
-                  << garbage.size() << std::endl;
-    }
     assert(i != garbage.end());
 
     delete i->second;
