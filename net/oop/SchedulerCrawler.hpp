@@ -66,7 +66,7 @@ class SchedulerCrawler : public ProtocolDialect
                 void trash(Message *m, bool delete_now);
             private:
                 /* Member variables/attributes */
-                std::map<key_t, Message*> garbage;
+                std::map<sched::Deferable::key_t, Message*> garbage;
         };
         
         /* Member functions/methods */
