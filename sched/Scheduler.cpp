@@ -93,11 +93,12 @@ Scheduler::update_node(url::URL::hash_t id, time_t time)
     Node *n = page_table[id];
     PageData *p = n->page;
 
-    p->last_crawl = time;
-    ++p->crawl_count;
+    weigh_tree_branch(*n, time);
+    clean_tree_branch(*n);
 
     p->unassign_crawler();
-    weigh_tree_branch(*n);
+    p->last_crawl = time;
+    p->crawl_count++;
 }
 
 void
@@ -146,18 +147,21 @@ Scheduler::traverse_branch(Node &n)
 }
 
 void
-Scheduler::weigh_tree_branch(Node &n) const
+Scheduler::clean_tree_branch(Node &n) const
 {
-    if (!n.parent)
+    if (!n.parent) {
+        n.visit_state = Node::Amber;
         return;
+    }
 
     Node *parent = parent_of(n);
 
-    parent->weight -= n.weight;
-    n.weight = n.calculate_weight();
-    parent->weight = parent->weight + (n.weight / (n.size() + 1));
+    if (n.size() > 1)
+        n.visit_state = Node::Amber;
+    else
+        n.visit_state = Node::Green;
 
-    weigh_tree_branch(*parent);
+    clean_tree_branch(*parent);
 }
 
 Node*
@@ -193,6 +197,21 @@ Scheduler::select_best_child(Node &parent) const
     }
 
     return n;
+}
+
+void
+Scheduler::weigh_tree_branch(Node &n, time_t now) const
+{
+    if (!n.parent)
+        return;
+
+    Node *parent = parent_of(n);
+
+    parent->weight -= n.weight;
+    n.weight = n.calculate_weight(now);
+    parent->weight = parent->weight + (n.weight / (n.size() + 1));
+
+    weigh_tree_branch(*parent);
 }
 
 Crawler::unit_t
