@@ -22,15 +22,19 @@ PageData::PageData(const string &url) :
 void
 PageData::assign_crawler(Crawler *c)
 {
+    assert(!crawler);
+    
+    c->add_url(url);
     crawler = c;
-    crawler->add_url(url);
 }
 
 void
 PageData::unassign_crawler()
 {
     assert(crawler);
+    
     crawler->remove_url(url);
+    crawler = NULL;
 }
 
 } // oodles
