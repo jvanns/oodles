@@ -55,12 +55,29 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
         
         void operator() ()
         {
-#ifdef DEBUG_SCHED
-            std::cerr << "Performing scheduling run...";
-#endif
             struct rusage x, y;
             BreadCrumbTrail trail;
             size_t then = time(NULL), assigned = 0, d = 0;
+            
+#ifdef DEBUG_SCHED
+            std::cerr << "Performing schedule update...";
+#endif
+            getrusage(RUSAGE_SELF, &x);
+            assigned = scheduler.update_schedule();
+            getrusage(RUSAGE_SELF, &y);
+
+#ifdef DEBUG_SCHED
+            std::cerr << assigned << " URLs updated.\n";
+            std::cerr << "\tRun took " << y.ru_utime.tv_sec - x.ru_utime.tv_sec
+                      << '.' << abs(y.ru_utime.tv_usec - x.ru_utime.tv_usec)
+                      << "s/u, " << y.ru_stime.tv_sec - x.ru_stime.tv_sec
+                      << '.' << abs(y.ru_stime.tv_usec - x.ru_stime.tv_usec)
+                      << "s/s\n";
+#endif
+            
+#ifdef DEBUG_SCHED
+            std::cerr << "Performing scheduling run...";
+#endif
 
             getrusage(RUSAGE_SELF, &x);
             assigned = scheduler.run(&trail);
@@ -86,23 +103,7 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
                 std::cerr << "done.\n";
 #endif
             }
-
-#ifdef DEBUG_SCHED
-            std::cerr << "Performing schedule update...";
-#endif
-            getrusage(RUSAGE_SELF, &x);
-            assigned = scheduler.update_schedule();
-            getrusage(RUSAGE_SELF, &y);
-
-#ifdef DEBUG_SCHED
-            std::cerr << assigned << " URLs updated.\n";
-            std::cerr << "\tRun took " << y.ru_utime.tv_sec - x.ru_utime.tv_sec
-                      << '.' << abs(y.ru_utime.tv_usec - x.ru_utime.tv_usec)
-                      << "s/u, " << y.ru_stime.tv_sec - x.ru_stime.tv_sec
-                      << '.' << abs(y.ru_stime.tv_usec - x.ru_stime.tv_usec)
-                      << "s/s\n";
-#endif
-
+            
             if ((d = time(NULL) - then) < interval) {
                 sleeper.expires_from_now(seconds(interval - d));
                 sleeper.async_wait(bind(&ProactorTask::new_task,
