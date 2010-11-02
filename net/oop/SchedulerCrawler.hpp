@@ -28,6 +28,9 @@ namespace dialect {
 class SchedulerCrawler : public ProtocolDialect
 {
     public:
+        /* Dependent typedefs */
+        typedef sched::Deferable::key_t key_t;
+        
         /* Member functions/methods */
         SchedulerCrawler();
 
@@ -63,10 +66,10 @@ class SchedulerCrawler : public ProtocolDialect
                  * the dialects leisure.
                  */
                 void receive(const event::Event &e);
-                void trash(Message *m, bool delete_now);
+                void trash(Message *m, SchedulerCrawler::key_t k);
             private:
                 /* Member variables/attributes */
-                std::map<key_t, Message*> garbage;
+                std::map<SchedulerCrawler::key_t, Message*> garbage;
         };
         
         /* Member functions/methods */
@@ -77,10 +80,10 @@ class SchedulerCrawler : public ProtocolDialect
         /*
          * Message handling methods
          */
-        bool continue_dialog(const Message *m) throw(DialectError);
-        bool continue_dialog(const RegisterCrawler &m);
-        bool continue_dialog(const BeginCrawl &m);
-        bool continue_dialog(const EndCrawl &m);
+        key_t continue_dialog(const Message *m) throw(DialectError);
+        key_t continue_dialog(const RegisterCrawler &m);
+        key_t continue_dialog(const BeginCrawl &m);
+        key_t continue_dialog(const EndCrawl &m);
         
         /* Internal Data Structures */
         enum {

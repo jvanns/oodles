@@ -32,7 +32,7 @@ void
 SchedulerCrawler::GarbageCollector::receive(const event::Event &e)
 {
     const sched::Update &d = e;
-    map<sched::Deferable::key_t, Message*>::iterator i = garbage.find(d.key);
+    map<SchedulerCrawler::key_t, Message*>::iterator i = garbage.find(d.key);
 
     assert(i != garbage.end());
 
@@ -41,11 +41,9 @@ SchedulerCrawler::GarbageCollector::receive(const event::Event &e)
 }
 
 void
-SchedulerCrawler::GarbageCollector::trash(Message *m, bool delete_now)
+SchedulerCrawler::GarbageCollector::trash(Message *m, key_t k)
 {
-    sched::Deferable::key_t k = reinterpret_cast<sched::Deferable::key_t>(m);
-    
-    if (delete_now)
+    if (k == 0)
         delete m;
     else
         garbage[k] = m;
@@ -64,8 +62,7 @@ SchedulerCrawler::translate()
     
     try {
         while (m) {
-            bool delete_now = continue_dialog(m);
-            garbage.trash(m, delete_now);
+            garbage.trash(m, continue_dialog(m));
             m = protocol().pop_message();
         }
     } catch (const exception &e) {
@@ -128,17 +125,17 @@ SchedulerCrawler::scheduler() const
     return static_cast<sched::Scheduler&>(*l);
 }
 
-bool
+SchedulerCrawler::key_t
 SchedulerCrawler::continue_dialog(const Message *m)
 throw (DialectError)
 {
    /*
-    * Return code of continue_dialog handlers indicate whether or not to
+    * Returned key from continue_dialog handlers indicate whether or not to
     * delete and free-up the message immediately or rely on the event-driven
     * garbage collector to defer it until later once the data has been used
     * and released.
     */
-    bool rc = true;
+    key_t k = 0;
     
     /*
      * Verify the context is valid based on this *incoming* message,
@@ -166,7 +163,7 @@ throw (DialectError)
                                    "Invalid dialog context at message #%d.",
                                    m->id());
             
-            rc = continue_dialog(static_cast<const BeginCrawl&>(*m));
+            k = continue_dialog(static_cast<const BeginCrawl&>(*m));
             break;
         /* Scheduler Inbound */
         case REGISTER_CRAWLER:
@@ -187,7 +184,7 @@ throw (DialectError)
                                    "Invalid dialog context at message #%d.",
                                    m->id());
 
-            rc = continue_dialog(static_cast<const RegisterCrawler&>(*m));
+            k = continue_dialog(static_cast<const RegisterCrawler&>(*m));
             break;
         case END_CRAWL:
            if (initiator)
@@ -209,7 +206,7 @@ throw (DialectError)
                                    "Invalid dialog context at message #%d.",
                                    m->id());
 
-            rc = continue_dialog(static_cast<const EndCrawl&>(*m));
+            k = continue_dialog(static_cast<const EndCrawl&>(*m));
             break;
         default:
             throw DialectError("SchedulerCrawler::continue_dialog",
@@ -220,10 +217,10 @@ throw (DialectError)
     
     context[Inbound] = m->id();
 
-    return rc;
+    return k;
 }
 
-bool
+SchedulerCrawler::key_t
 SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
 {
     /*
@@ -243,10 +240,10 @@ SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
               << "' with " << m.cores << " cores.\n";
 #endif
 
-    return true;
+    return 0;
 }
 
-bool
+SchedulerCrawler::key_t
 SchedulerCrawler::continue_dialog(const BeginCrawl &m)
 {
     /*
@@ -270,10 +267,10 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
 
     send(e);
 
-    return true;
+    return 0;
 }
 
-bool
+SchedulerCrawler::key_t
 SchedulerCrawler::continue_dialog(const EndCrawl &m)
 {
     /*
@@ -283,12 +280,12 @@ SchedulerCrawler::continue_dialog(const EndCrawl &m)
      */
     assert(crawler != NULL);
 
-    sched::Deferable::key_t k = reinterpret_cast<sched::Deferable::key_t>(&m);
+    key_t k = reinterpret_cast<key_t>(&m);
     const sched::Deferable update = {k, m.new_urls, m.scheduled_urls};
 
     scheduler().defer_update(update, garbage);
 
-    return false; // We delete later, upon the garbage collector receive()
+    return k; // We delete later, upon the garbage collector receive()
 }
 
 } // dialect
