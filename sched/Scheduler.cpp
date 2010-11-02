@@ -5,8 +5,6 @@
 #include "DeferredUpdate.hpp"
 #include "utility/BreadCrumbTrail.hpp"
 
-#include <time.h> // For time()
-
 // STL
 using std::string;
 using std::vector;
