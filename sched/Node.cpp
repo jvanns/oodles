@@ -58,12 +58,10 @@ Node::calculate_weight(time_t now) const
     if (!page)
         return 0.0f;
 
-    float creat_diff = now - page->epoch,
-          crawl_diff = page->last_crawl ?
-               now - page->last_crawl : 0,
-          max = crawl_diff ? crawl_diff : creat_diff,
-          min = !crawl_diff ? crawl_diff : creat_diff,
-          score = ((page->links + 1) * (max - min)) / (page->crawl_count + 1);
+    time_t min = std::min(page->epoch, page->last_crawl),
+           max = std::max(page->epoch, page->last_crawl);
+    float score = (((now - max) + min) / (page->crawl_count + 1))
+                                              * (page->links + 1);
 
     return normalise<float> (score, 0.0f, 1.0f, min, max);
 }
