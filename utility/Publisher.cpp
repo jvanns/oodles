@@ -5,10 +5,11 @@
 #include "Subscriber.hpp"
 
 // Boost.bind
+#include <boost/ref.hpp>
 #include <boost/bind.hpp>
 
 // Boost
-using boost::ref;
+using boost::cref;
 using boost::bind;
 
 // STL
@@ -31,7 +32,7 @@ Publisher::broadcast(const Event &e) const
         Subscriber *s = *i;
 
         if (proactor)
-            proactor->io_service().post(bind(&Subscriber::receive, s, ref(e)));
+            proactor->io_service().post(bind(&Subscriber::receive, s, cref(e)));
         else
             s->receive(e); // Will block
 
