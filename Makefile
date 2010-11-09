@@ -13,9 +13,9 @@ CC ?= $(CXX)
 LDLIBS += -lstdc++
 
 # Boost specific flags
-LDLIBS_BOOST += -lboost_system -lboost_serialization -lboost_thread-mt
 LDFLAGS_BOOST ?= -L/opt/local/lib
 CPPFLAGS_BOOST ?= -I/opt/local/include
+LDLIBS_BOOST ?= -lboost_system -lboost_serialization -lboost_thread
 
 # Compiler flags and optional additional Boost flags too!
 CXXFLAGS += -Wall -pedantic -ansi -Wno-long-long -MMD -MP -pthread
