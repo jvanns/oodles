@@ -25,7 +25,7 @@ struct Deferable
     typedef net::oop::EndCrawl::NewURLs NewURLs;
     typedef net::oop::EndCrawl::ScheduledURLs ScheduledURLs;
 
-    key_t key;
+    const key_t key;
     const NewURLs &new_urls;
     const ScheduledURLs &scheduled_urls;
 };
