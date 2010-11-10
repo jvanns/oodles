@@ -12,6 +12,9 @@
 #include <map>
 #include <vector>
 
+// Boost.thread
+#include <boost/thread/mutex.hpp>
+
 namespace oodles {
 
 namespace sched {
@@ -69,6 +72,7 @@ class SchedulerCrawler : public ProtocolDialect
                 void trash(Message *m, SchedulerCrawler::key_t k);
             private:
                 /* Member variables/attributes */
+                boost::mutex mutex;
                 std::map<SchedulerCrawler::key_t, Message*> garbage;
         };
         

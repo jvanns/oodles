@@ -7,6 +7,9 @@
 #include "sched/Crawler.hpp"
 #include "sched/Scheduler.hpp"
 
+// Boost.thread
+#include <boost/thread/locks.hpp>
+
 // STL
 using std::map;
 using std::list;
@@ -32,6 +35,7 @@ void
 SchedulerCrawler::GarbageCollector::receive(const event::Event &e)
 {
     const sched::Update &d = e;
+    const boost::lock_guard<boost::mutex> lock(mutex);
     map<SchedulerCrawler::key_t, Message*>::iterator i = garbage.find(d.key);
 
     assert(i != garbage.end());
@@ -43,10 +47,13 @@ SchedulerCrawler::GarbageCollector::receive(const event::Event &e)
 void
 SchedulerCrawler::GarbageCollector::trash(Message *m, key_t k)
 {
-    if (k == 0)
-        delete m;
-    else
+    if (k != 0) {
+        const boost::lock_guard<boost::mutex> lock(mutex);
         garbage[k] = m;
+        return;
+    }
+    
+    delete m;
 }
 
 // SchedulerCrawler
