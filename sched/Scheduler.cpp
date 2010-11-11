@@ -275,10 +275,10 @@ Scheduler::schedule(const string &url, bool from_seed)
 
     assert(page);
 
-    if (!from_seed) {
+    if (!from_seed)
         ++page->links; // If we're from a seed it doesn't count as a link!
-        weigh_tree_branch(*node); // Calculates branch schedule index (weight)
-    }
+    
+    weigh_tree_branch(*node); // Calculates branch schedule index (weight)
 
     return page->url.page_id();
 }
