@@ -9,6 +9,8 @@ bin/ - Output of all compiled programs
 common/ - Code common to all Oodles components
 url/ - URL parser, normaliser and class and iterator code
 sched/ - Crawler scheduler code
+prog/ - Oodles components program source code
+net/ - Networking code (split by core then protocol)
 
 --[ Building
 
@@ -17,7 +19,7 @@ development platform. For Linux and OSX 10.5 this should be pretty
 straight-forward. You must have Boost >= 1.42 installed as the .config
 may suggest...
 
-* mkdir -p bin/test
+* mkdir -p bin/{test,prog}
 * make -j2 all
 
 All test programs will be under bin/test. Test input data is under test/input.
