@@ -1,6 +1,8 @@
-# This variable is used in the Makefile
-# for setting the path to Boost headers
+# These variables are used in the Makefile
+# for setting the path to Boost headers etc.
+LDFLAGS_BOOST = -L/opt/local/lib
 CPPFLAGS_BOOST = -I/opt/local/include
+LDLIBS_BOOST = -lboost_system -lboost_serialization -lboost_thread-mt
 
 CXX = /Developer/usr/bin/g++-4.2
 CXXFLAGS = -m64 -pipe -g3 -O0 -finline
