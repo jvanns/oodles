@@ -25,8 +25,6 @@ class Event
          * Templated cast operator will automatically,
          * given the correct (related) type, cast this
          * base class object to your derived subclass.
-         *
-         * Publisher::event() will call this below...
          */
         template<typename Derived>
         operator const Derived& () const
