@@ -74,13 +74,6 @@ Node::new_node(const value_type &v) const
     return new sched::Node(v); // Fully qualify the Node type we're creating
 }
 
-bool
-RankNode::operator() (const Node::Base *lhs, const Node::Base *rhs) const
-{
-    return static_cast<const Node*>(lhs)->weight <
-           static_cast<const Node*>(rhs)->weight;
-}
-
 } // sched
 } // oodles
 

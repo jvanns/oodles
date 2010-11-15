@@ -38,11 +38,6 @@ class Node : public oodles::Node<url::value_type>
         Node* new_node(const value_type &v) const;
 };
 
-struct RankNode : public std::binary_function<Node::Base, Node::Base, bool>
-{
-    bool operator() (const Node::Base *lhs, const Node::Base *rhs) const;
-};
-
 } // sched
 } // oodles
 
