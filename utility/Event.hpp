@@ -4,6 +4,9 @@
 // STL
 #include <set>
 
+// Boost.shared_ptr
+#include <boost/shared_ptr.hpp>
+
 namespace oodles {
 namespace event {
 
@@ -13,10 +16,14 @@ class Subscriber; // Forward declaration for Event
 class Event
 {
     public:
+        /* Dependent typedefs */
+        typedef boost::shared_ptr<Event> Ref;
+        
         /* Member functions/methods */
         Event();
-        virtual ~Event() = 0;
+        virtual ~Event();
 
+        virtual Event* clone() const = 0;
         bool add_subscriber(Subscriber &s);
         bool remove_subscriber(Subscriber &s);
         void publish(const Publisher &p) const;

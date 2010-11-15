@@ -1,6 +1,9 @@
 #ifndef OODLES_EVENT_SUBSCRIBER_HPP
 #define OODLES_EVENT_SUBSCRIBER_HPP
 
+// oodles
+#include "Event.hpp"
+
 // STL
 #include <set>
 #include <map>
@@ -8,7 +11,6 @@
 namespace oodles {
 namespace event {
 
-class Event; // // Forward declaration for Subscriber
 class Publisher; // Forward declaration for Subscriber
 
 class Subscriber
@@ -21,7 +23,7 @@ class Subscriber
         /*
          * Override this method to receive events dispatched from the publisher.
          */
-        virtual void receive(const Event &e) = 0;
+        virtual void receive(const Event::Ref e) = 0;
         size_t subscribed_to() const { return events.size(); }
     private:
         /* Member functions/methods */
