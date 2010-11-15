@@ -38,6 +38,7 @@ struct Deferable
 struct Update : public Deferable, public event::Event
 {
     Update(const Deferable &d) : Deferable(d) {}
+    event::Event* clone() const { return new Update(*this); }
 };
 
 class DeferredUpdate

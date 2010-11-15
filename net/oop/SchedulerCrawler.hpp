@@ -68,7 +68,7 @@ class SchedulerCrawler : public ProtocolDialect
                  * with a pointer passed to it and it can now be deleted at
                  * the dialects leisure.
                  */
-                void receive(const event::Event &e);
+                void receive(const event::Event::Ref e);
                 void trash(Message *m, SchedulerCrawler::key_t k);
             private:
                 /* Member variables/attributes */

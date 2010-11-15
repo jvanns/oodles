@@ -32,9 +32,9 @@ const id_t SchedulerCrawler::message_subset[] = {
 
 // GarbageCollector
 void
-SchedulerCrawler::GarbageCollector::receive(const event::Event &e)
+SchedulerCrawler::GarbageCollector::receive(const event::Event::Ref e)
 {
-    const sched::Update &d = e;
+    const sched::Update &d = *e;
     const boost::lock_guard<boost::mutex> lock(mutex);
     map<SchedulerCrawler::key_t, Message*>::iterator i = garbage.find(d.key);
 
