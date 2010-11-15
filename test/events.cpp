@@ -24,13 +24,14 @@ using std::ostringstream;
 struct Integers : public oodles::event::Event
 {
     vector<int> v;
+    oodles::event::Event* clone() const { return new Integers(*this); }
 };
 
 struct Sum : public oodles::event::Subscriber
 {
-    void receive(const oodles::event::Event &e)
+    void receive(const oodles::event::Event::Ref e)
     {
-        const Integers &m = e;
+        const Integers &m = *e;
         cout << "Sum: " << calculate_sum(m) << std::endl;
     };
 
@@ -50,9 +51,9 @@ struct Sum : public oodles::event::Subscriber
 
 struct Deviation : public oodles::event::Subscriber
 {
-    void receive(const oodles::event::Event &e)
+    void receive(const oodles::event::Event::Ref e)
     {
-        const Integers &m = e;
+        const Integers &m = *e;
         cout << "Standard deviation: " << calculate_deviation(m) << std::endl;
     };
 
@@ -70,9 +71,9 @@ struct Deviation : public oodles::event::Subscriber
 
 struct Concatenate : public oodles::event::Subscriber
 {
-    void receive(const oodles::event::Event &e)
+    void receive(const oodles::event::Event::Ref e)
     {
-        const Integers &m = e;
+        const Integers &m = *e;
         cout << "Concatenation: " << concatenate_integers(m) << std::endl;
     };
 
