@@ -38,6 +38,10 @@ class Event
         {
             return *static_cast<const Derived*>(this);
         }
+    protected:
+        /* Member functions/methods */
+        Event(const Event &e);
+        Event& operator= (const Event &e);
     private:
         /* Member variables/attributes */
         std::set<Subscriber*> subscribers;

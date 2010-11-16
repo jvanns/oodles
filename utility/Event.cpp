@@ -9,6 +9,8 @@ using std::set;
 namespace oodles {
 namespace event {
 
+// Public methods
+
 Event::Event()
 {
 }
@@ -40,6 +42,31 @@ bool
 Event::remove_subscriber(Subscriber &s)
 {
     return s.unsubscribe_from(*this);
+}
+
+// Protected methods
+
+Event::Event(const Event &e)
+{
+    /*
+     * Do not copy the subscribers. Only Publisher::broadcast() should make
+     * a copy/clone of us. The source Event, 'e', remains the authority as
+     * far as subscriptions are concerned. When it ('e') goes out of scope
+     * or is deleted then the subcribers are removed as above in ~Event().
+     */
+}
+
+Event&
+Event::operator= (const Event &e)
+{
+    /*
+     * Do not copy the subscribers. Only Publisher::broadcast() should make
+     * a copy/clone of us. The source Event, 'e', remains the authority as
+     * far as subscriptions are concerned. When it ('e') goes out of scope
+     * or is deleted then the subcribers are removed as above in ~Event().
+     */
+
+    return *this;
 }
 
 } // event
