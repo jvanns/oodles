@@ -56,7 +56,7 @@ float
 Node::calculate_weight(time_t now) const
 {
     if (!page)
-        return 0.0f;
+        return weight;
 
     size_t min = std::min(page->epoch, page->last_crawl),
            max = std::max(page->epoch, page->last_crawl),
