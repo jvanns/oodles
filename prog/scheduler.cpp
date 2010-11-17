@@ -78,6 +78,7 @@ static void print_usage(const char *program)
          << ":\n"
          << "\n-h\t--help"
          << "\n-s\t--service <ip:port>"
+         << "\n-i\t--interval <seconds>"
          << "\n-f\t--seed-file <seed input file>"
          << "\n-d\t--dot-file <dot output file>\n";
 }
