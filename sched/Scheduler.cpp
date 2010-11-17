@@ -181,8 +181,7 @@ Scheduler::select_best_child(Node &parent) const
         if (c.page && !c.eligible()) // Ignore ineligible yet crawlable nodes
             continue;
 
-        if (!n || (n && c.weight > n->weight))
-            n = &c;
+        n = c.weigh_against(n);
     }
 
     if (!n) { // No child was a candidate although all were considered
@@ -203,13 +202,8 @@ Scheduler::weigh_tree_branch(Node &n, time_t now) const
     if (!n.parent)
         return;
 
-    Node *parent = parent_of(n);
-
-    parent->weight -= n.weight;
-    n.weight = n.calculate_weight(now);
-    parent->weight = parent->weight + (n.weight / (n.size() + 1));
-
-    weigh_tree_branch(*parent);
+    n.calculate_weight(now);
+    weigh_tree_branch(*parent_of(n), now);
 }
 
 Crawler::unit_t
