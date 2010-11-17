@@ -4,7 +4,7 @@
 namespace oodles {
 
 template<class T>
-float
+double
 normalise(const T &n, // Arbitrary value
           const T &to_min, // Target range
           const T &to_max,
