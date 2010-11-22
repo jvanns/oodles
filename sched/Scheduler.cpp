@@ -91,12 +91,12 @@ Scheduler::update_node(url::URL::hash_t id, time_t time)
     Node *n = page_table[id];
     PageData *p = n->page;
 
-    weigh_tree_branch(*n, time);
-    clean_tree_branch(*n);
-
     p->unassign_crawler();
-    p->last_crawl = time;
+    p->last_crawl = time; // FIXME: Needs to be from the Crawler
     p->crawl_count++;
+    
+    weigh_tree_branch(*n);
+    clean_tree_branch(*n);
 }
 
 void
@@ -162,6 +162,21 @@ Scheduler::clean_tree_branch(Node &n) const
     clean_tree_branch(*parent);
 }
 
+void
+Scheduler::weigh_tree_branch(Node &n) const
+{
+    Node *p = parent_of(n);
+
+    while (p) {
+        for (size_t i = 0 ; i < p->size() ; ++i) {
+            Node &c = p->child(i);
+            c.calculate_weight(); // Cannot be run in parallel
+        }
+        
+        p = parent_of(*p);
+    }
+}
+
 Node*
 Scheduler::select_best_child(Node &parent) const
 {
@@ -181,7 +196,7 @@ Scheduler::select_best_child(Node &parent) const
         if (c.page && !c.eligible()) // Ignore ineligible yet crawlable nodes
             continue;
 
-        n = c.weigh_against(n);
+        n = c.weigh_against(n); // Returns the chosen one ;)
     }
 
     if (!n) { // No child was a candidate although all were considered
@@ -194,16 +209,6 @@ Scheduler::select_best_child(Node &parent) const
     }
 
     return n;
-}
-
-void
-Scheduler::weigh_tree_branch(Node &n, time_t now) const
-{
-    if (!n.parent)
-        return;
-
-    n.calculate_weight(now);
-    weigh_tree_branch(*parent_of(n), now);
 }
 
 Crawler::unit_t

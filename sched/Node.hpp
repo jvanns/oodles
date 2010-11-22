@@ -25,8 +25,8 @@ class Node : public oodles::Node<url::value_type>
         void print(std::ostream &s, const io::PrinterBase &p) const;
         
         double weight() const;
+        void calculate_weight();
         Node* weigh_against(Node *&n);
-        void calculate_weight(time_t now);
 
         bool assigned() const { return page && page->crawler; }
         bool eligible() const { return page ? page->crawler == NULL : false; }
@@ -40,9 +40,8 @@ class Node : public oodles::Node<url::value_type>
         Node* new_node(const value_type &v) const;
 
         struct Measure {
-            int8_t considered;
-            double previous, current;
-            Measure() : considered(0), previous(0), current(0) {}
+            double minimum, previous, current;
+            Measure() : minimum(0), previous(0), current(0) {}
         };
 
         /* Member variables/attributes */

@@ -77,8 +77,8 @@ class Scheduler : public Linker
         /* Member functions/methods */
         Node* traverse_branch(Node &n);
         void clean_tree_branch(Node &n) const;
+        void weigh_tree_branch(Node &n) const;
         Node* select_best_child(Node &parent) const;
-        void weigh_tree_branch(Node &n, time_t now = time(NULL)) const;
         
         Crawler::unit_t fill_crawler(Crawler &c, Node *&n);
         url::URL::hash_t schedule(const std::string &url, bool from_seed);
