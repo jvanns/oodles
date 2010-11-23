@@ -154,10 +154,12 @@ Scheduler::clean_tree_branch(Node &n) const
 
     Node *parent = parent_of(n);
 
-    if (n.size() > 1)
-        n.visit_state = Node::Amber;
-    else
+    if (n.leaf())
         n.visit_state = Node::Green;
+    else
+        n.visit_state = Node::Amber;
+
+    --parent->visited; // Update the parents index of visited children
 
     clean_tree_branch(*parent);
 }
