@@ -51,10 +51,26 @@ class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
         void set_protocol(ProtocolHandler *p); // Pair protocol with endpoint
         ProtocolHandler* get_protocol() const { return protocol; }
     private:
+        struct Metric 
+        {
+            time_t last_transfer;
+            double transfer_rate;
+            size_t transferred_bytes;
+
+            Metric() :
+                last_transfer(0),
+                transfer_rate(0.0f),
+                transferred_bytes(0)
+            {}
+
+            operator bool () const { return last_transfer > 0; }
+        };
+        
         /* Member variables/attributes */
         Buffer<NBS> inbound;
         Buffer<NBS> outbound;
         ProtocolHandler *protocol;
+        Metric recv_rate, send_rate;
         boost::asio::ip::tcp::socket tcp_socket;
 
         /* Member functions/methods */

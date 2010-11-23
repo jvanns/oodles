@@ -7,6 +7,7 @@
 
 // STL
 #include <string>
+#include <iostream>
 
 namespace oodles {
 namespace net {
@@ -50,6 +51,13 @@ class ProtocolHandler : public ProtocolDialect
          */
         void receive_data();
         void transfer_data(size_t pending = 0);
+
+        /*
+         * Virtual method for printing network statistics
+         * for both the raw TCP/IP (from the Endpoint) to
+         * the protocol specific metrics.
+         */
+        virtual void print_metrics(std::ostream *s) const;
 
         /*
          * Return the protocol name/identifier such as

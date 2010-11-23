@@ -159,6 +159,8 @@ TCPFileExchange::bytes_transferred(size_t n)
         assert(sent == loaded); // Assert we sent all we should have
 
         cout << "All " << loaded << " files transferred successfully.\n";
+        cout << "Transfer metrics:\n";
+        print_metrics(&cout);
     }
 }
 
@@ -300,6 +302,8 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
              << loaded << " files received in total.\n";
 
         incoming.reset();
+        cout << "Transfer metrics:\n";
+        print_metrics(&cout);
     }
 
     return used;
