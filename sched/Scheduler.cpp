@@ -167,16 +167,8 @@ Scheduler::clean_tree_branch(Node &n) const
 void
 Scheduler::weigh_tree_branch(Node &n) const
 {
-    Node *p = parent_of(n);
-
-    while (p) {
-        for (size_t i = 0 ; i < p->size() ; ++i) {
-            Node &c = p->child(i);
-            c.calculate_weight(); // Cannot be run in parallel
-        }
-        
-        p = parent_of(*p);
-    }
+    for (Node *p = &n ; p ; p = parent_of(*p)) 
+        p->calculate_weight(); // Cannot be run in parallel
 }
 
 Node*
