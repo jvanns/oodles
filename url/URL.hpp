@@ -43,12 +43,12 @@ class URL
         /* Member functions/methods */
         URL(const std::string &url);
 
-        bool operator== (URL &rhs);
-        bool operator!= (URL &rhs);
+        bool operator== (URL &rhs) const;
+        bool operator!= (URL &rhs) const;
 
-        hash_t page_id();
-        hash_t path_id();
-        hash_t domain_id();
+        hash_t page_id() const;
+        hash_t path_id() const;
+        hash_t domain_id() const;
         std::string to_string() const;
         void print(std::ostream &stream) const;
 
@@ -81,6 +81,7 @@ class URL
                 IDGenerator(const Type &value);
                 ~IDGenerator();
 
+                hash_t id() const { return hash; }
                 hash_t id(hash_t seed) { return compute_hash(seed); }
             private:
                 /* Member functions/methods */
@@ -92,12 +93,13 @@ class URL
         };
 
         /* Member functions/methods */
-        void tokenise(const std::string &url) throw(ParseError);
+        hash_t tokenise(const std::string &url) throw(ParseError);
 
         /* Member variables/attributes */
-        Attributes attributes;
+        IDGenerator<std::vector<value_type> > domain, path;
         IDGenerator<value_type> page;
-        IDGenerator<std::vector<value_type> > path, domain;
+        Attributes attributes;
+        const hash_t url_id;
 
         /* Friend class declarations */
         friend class Iterator; // We need to give iterators access to...

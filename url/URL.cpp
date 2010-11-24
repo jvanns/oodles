@@ -4,6 +4,9 @@
 // STL
 #include <sstream>
 
+// libc
+#include <assert.h> // For assert()
+
 // STL
 using std::copy;
 using std::string;
@@ -16,30 +19,30 @@ namespace oodles {
 namespace url {
 
 URL::URL(const string &url) :
-    page(attributes.page),
+    domain(attributes.domain),
     path(attributes.path),
-    domain(attributes.domain)
+    page(attributes.page),
+    url_id(tokenise(url))
 {
-    tokenise(url);
+    assert(url_id == page_id());
 }
 
 URL::hash_t
-URL::page_id()
+URL::page_id() const
 {
-    return page.id(path_id());
-}
-
-
-URL::hash_t
-URL::path_id()
-{
-    return path.id(domain_id());
+    return page.id();
 }
 
 URL::hash_t
-URL::domain_id()
+URL::path_id() const
 {
-    return domain.id(0); // A seed of 0 indicates no seed
+    return path.id();
+}
+
+URL::hash_t
+URL::domain_id() const
+{
+    return domain.id();
 }
 
 string
@@ -83,18 +86,18 @@ URL::print(ostream &stream) const
 }
 
 bool
-URL::operator==(URL &rhs)
+URL::operator==(URL &rhs) const
 {
-    return page_id() == rhs.page_id();
+    return url_id == rhs.url_id;
 }
 
 bool
-URL::operator!=(URL &rhs)
+URL::operator!=(URL &rhs) const
 {
     return !(operator==(rhs));
 }
 
-void
+URL::hash_t
 URL::tokenise(const string &url) throw(ParseError)
 {
     Parser p;
@@ -103,6 +106,8 @@ URL::tokenise(const string &url) throw(ParseError)
     if (!p.parse(i, j, attributes))
        throw ParseError("URL::tokenise", 0, "Failed to parse input '%s'.",
                         url.c_str());
+    
+    return page.id(path.id(domain.id(0)));
 }
 
 } // url
