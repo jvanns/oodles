@@ -73,33 +73,16 @@ class URL
         }
     private:
         /* Internal structures */
-        template<class Type>
-        class IDGenerator
-        {
-            public:
-                /* Member functions/methods */
-                IDGenerator(const Type &value);
-                ~IDGenerator();
-
-                hash_t id() const { return hash; }
-                hash_t id(hash_t seed) { return compute_hash(seed); }
-            private:
-                /* Member functions/methods */
-                hash_t compute_hash(hash_t seed);
-
-                /* Member variables/attributes */
-                hash_t hash;
-                const Type &content;
+        struct ID {
+            hash_t domain, path, page;
         };
 
         /* Member functions/methods */
-        hash_t tokenise(const std::string &url) throw(ParseError);
+        ID tokenise(const std::string &url) throw(ParseError);
 
         /* Member variables/attributes */
-        IDGenerator<std::vector<value_type> > domain, path;
-        IDGenerator<value_type> page;
         Attributes attributes;
-        const hash_t url_id;
+        const ID id;
 
         /* Friend class declarations */
         friend class Iterator; // We need to give iterators access to...
@@ -117,7 +100,5 @@ operator<< (std::ostream &stream, const URL &url)
 
 } // url
 } // oodles
-
-#include "URL.ipp" // Implementation (IDGenerator only)
 
 #endif
