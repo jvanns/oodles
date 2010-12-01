@@ -42,6 +42,9 @@ class URL
 
         /* Member functions/methods */
         URL(const std::string &url);
+        
+        URL(const URL &url);
+        URL& operator= (const URL &url);
 
         bool operator== (URL &rhs) const;
         bool operator!= (URL &rhs) const;
@@ -81,7 +84,7 @@ class URL
         ID tokenise(const std::string &url) throw(ParseError);
 
         /* Member variables/attributes */
-        const ID id;
+        ID id;
         Attributes attributes;
 
         /* Friend class declarations */

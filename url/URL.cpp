@@ -89,6 +89,21 @@ URL::URL(const string &url) : id(tokenise(url))
 {
 }
 
+URL::URL(const URL &url) : id(url.id), attributes(url.attributes)
+{
+}
+
+URL&
+URL::operator= (const URL &url)
+{
+    if (this != &url) {
+        id = url.id;
+        attributes = url.attributes;
+    }
+
+    return *this;
+}
+
 URL::hash_t
 URL::page_id() const
 {
