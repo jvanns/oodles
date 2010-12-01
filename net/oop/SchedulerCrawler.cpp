@@ -57,7 +57,7 @@ SchedulerCrawler::GarbageCollector::trash(Message *m, key_t k)
 }
 
 // SchedulerCrawler
-SchedulerCrawler::SchedulerCrawler() : initiator(false), crawler(NULL)
+SchedulerCrawler::SchedulerCrawler() : initiator(false)
 {
     context[Inbound] = context[Outbound] = INVALID_ID;
 }
@@ -236,9 +236,9 @@ SchedulerCrawler::continue_dialog(const RegisterCrawler &m)
     
     assert(context != NULL);
     
-    crawler = &(context->create_crawler(m.name, m.cores));
-    crawler->set_endpoint(handler->get_endpoint());
-    scheduler().register_crawler(*crawler);
+    sched::Crawler &c = context->create_crawler(m.name, m.cores);
+    c.set_endpoint(handler->get_endpoint());
+    scheduler().register_crawler(c);
     
 #ifdef DEBUG_SCHED
     std::cerr << "Registered crawler '" << m.name
@@ -281,8 +281,6 @@ SchedulerCrawler::continue_dialog(const EndCrawl &m)
      * contained in the received message, m, as sent
      * by the Crawler. We defer the update, however.
      */
-    assert(crawler != NULL);
-
     key_t k = reinterpret_cast<key_t>(&m);
     const sched::Deferable update = {k, m.new_urls, m.scheduled_urls};
 
