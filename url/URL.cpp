@@ -89,6 +89,33 @@ URL::URL(const string &url) : id(tokenise(url))
 {
 }
 
+URL::URL(const URL &url) : attributes(url.attributes), id(url.id)
+{
+}
+
+URL&
+URL::operator= (const URL &url)
+{
+    if (this != &url) {
+        id = url.id;
+        attributes = url.attributes;
+    }
+
+    return *this;
+}
+
+bool
+URL::operator==(URL &rhs) const
+{
+    return page_id() == rhs.page_id();
+}
+
+bool
+URL::operator!=(URL &rhs) const
+{
+    return !(operator==(rhs));
+}
+
 URL::hash_t
 URL::page_id() const
 {
@@ -145,18 +172,6 @@ void
 URL::print(ostream &stream) const
 {
     stream << to_string();
-}
-
-bool
-URL::operator==(URL &rhs) const
-{
-    return page_id() == rhs.page_id();
-}
-
-bool
-URL::operator!=(URL &rhs) const
-{
-    return !(operator==(rhs));
 }
 
 URL::ID

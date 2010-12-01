@@ -42,6 +42,9 @@ class URL
 
         /* Member functions/methods */
         URL(const std::string &url);
+        
+        URL(const URL &url);
+        URL& operator= (const URL &url);
 
         bool operator== (URL &rhs) const;
         bool operator!= (URL &rhs) const;
@@ -82,7 +85,7 @@ class URL
 
         /* Member variables/attributes */
         Attributes attributes;
-        const ID id;
+        ID id;
 
         /* Friend class declarations */
         friend class Iterator; // We need to give iterators access to...
