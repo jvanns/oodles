@@ -1,7 +1,5 @@
 // oodles
-#include "utility/Proactor.hpp"
-#include "net/core/Client.hpp"
-#include "net/oop/SchedulerCrawler.hpp"
+#include "crawl/Context.hpp"
 
 // STL
 #include <string>
@@ -19,15 +17,10 @@ using std::endl;
 using std::string;
 
 // oodles
-using oodles::Proactor;
-using oodles::net::Client;
 using oodles::net::hostname;
-using oodles::net::Protocol;
-using oodles::net::oop::dialect::SchedulerCrawler;
+using oodles::crawl::Context;
 
-typedef oodles::net::oop::Protocol OOP;
-
-static Proactor *g_proactor = NULL;
+static Context *g_context = NULL;
 
 static void signal_handler(int signal)
 {
@@ -43,11 +36,11 @@ static void signal_handler(int signal)
             break;
     }
 
-    if (stop && g_proactor)
-        g_proactor->stop();
+    if (stop && g_context)
+        g_context->stop_crawling();
 }
 
-static void set_signal_handler(Proactor &p)
+static void set_signal_handler(Context &c)
 {
     sigset_t blocked;
     struct sigaction action;
@@ -69,7 +62,7 @@ static void set_signal_handler(Proactor &p)
     sigaction(SIGTERM, &action, NULL);
     sigaction(SIGQUIT, &action, NULL);
 
-    g_proactor = &p;
+    g_context = &c;
 }
 
 static void print_usage(const char *program)
@@ -120,22 +113,15 @@ int main(int argc, char *argv[])
     int rc = 0;
     
     try {
-        Proactor proactor(cores);
-
+        Context context(name, cores);
+        
         /*
          * We must allow the signal handler to stop the
          * proactor service and join all the threads.
          */
-        set_signal_handler(proactor);
+        set_signal_handler(context);
         
-        const Protocol<OOP, SchedulerCrawler> creator;
-        Client client(proactor.io_service(), creator);
-        SchedulerCrawler &dialect = client.dialect();
-
-        client.start(connect_to);
-        dialect.register_crawler(name, cores);
-
-        proactor.wait();
+        context.start_crawling(connect_to); /* Registers with scheduler */
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
         rc = 1;

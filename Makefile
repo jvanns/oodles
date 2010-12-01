@@ -31,6 +31,7 @@ LDLIBS += $(LDLIBS_BOOST)
 NET_CORE_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/core/*.cpp))
 NET_OOP_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/oop/*.cpp))
 SCHEDULER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard sched/*.cpp))
+CRAWLER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard crawl/*.cpp))
 UTILITY_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard utility/*.cpp))
 COMMON_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard common/*.cpp))
 URL_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard url/*.cpp))
@@ -124,7 +125,8 @@ prog/crawler: prog/crawler.o \
 	$(UTILITY_OBJECTS) \
 	$(NET_CORE_OBJECTS) \
 	$(NET_OOP_OBJECTS) \
-	$(SCHEDULER_OBJECTS) ;\
+	$(SCHEDULER_OBJECTS) \
+	$(CRAWLER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 # Phony targets
