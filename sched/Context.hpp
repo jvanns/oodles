@@ -2,8 +2,8 @@
 #define OODLES_SCHED_CONTEXT_HPP
 
 // oodles
-#include "sched/Crawler.hpp"
-#include "sched/Scheduler.hpp"
+#include "Crawler.hpp"
+#include "Scheduler.hpp"
 
 #include "net/core/Server.hpp"
 #include "net/oop/SchedulerCrawler.hpp"
