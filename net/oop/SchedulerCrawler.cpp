@@ -97,9 +97,7 @@ SchedulerCrawler::begin_crawl(const vector<url::URL*> &urls)
     vector<url::URL*>::const_iterator i = urls.begin(), j = urls.end();
     
     while (i != j) {
-        url::URL &u = *(*i);
-        m->urls[u.domain_id()].push_back(BeginCrawl::URL(u.page_id(),
-                                                         u.to_string()));
+        m->urls.push_back(*(*i));
         ++i;
     }
 
@@ -259,17 +257,15 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      * sent this message.
      */
     EndCrawl *e = new EndCrawl;
-    BeginCrawl::URLs::const_iterator i, j;
+    list<url::URL>::const_iterator i = m.urls.begin(), j = m.urls.end();
 
-    for (i = m.urls.begin(), j = m.urls.end() ; i != j ; ++i) {
+    while (i != j) {
+        const url::URL &u = *i;
 #ifdef DEBUG_CRAWL
-        std::cerr << "Will crawl " << i->second.size() 
-                  << " URLs from the domain ID of " << i->first << std::endl;
+        std::cerr << u << std::endl;
 #endif
-
-        list<BeginCrawl::URL>::const_iterator k, l;
-        for (k = i->second.begin(), l = i->second.end() ; k != l ; ++k)
-            e->scheduled_urls.push_back(make_pair(k->first, true));
+        e->scheduled_urls.push_back(make_pair(u.page_id(), true));
+        ++i;
     }
 
     send(e);
