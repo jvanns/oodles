@@ -85,6 +85,10 @@ class IDGenerator
 namespace oodles {
 namespace url {
 
+URL::URL()
+{
+}
+
 URL::URL(const string &url) : id(tokenise(url))
 {
 }
