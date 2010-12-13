@@ -1,4 +1,5 @@
 // oodles
+#include "Boost.hpp"
 #include "Messages.hpp"
 
 // Boost.serialization
@@ -45,11 +46,25 @@ RegisterCrawler_::serialize(Deconstructor &archive,
     archive << name;
 }
 
+BeginCrawl_::BeginCrawl_() : pointer_owner(false)
+{
+}
+
+BeginCrawl_::~BeginCrawl_()
+{
+}
+
 void
 BeginCrawl_::serialize(Reconstructor &archive,
                        unsigned int /* version */)
 {
     archive >> urls;
+
+    /*
+     * The serialisation layer 'owns' (it created) the pointer(s)
+     * when reconstructing the object on receipt of the raw data.
+     */
+    pointer_owner = true;
 }
 
 void
@@ -57,6 +72,12 @@ BeginCrawl_::serialize(Deconstructor &archive,
                        unsigned int /* version */) const
 {
     archive << urls;
+
+    /*
+     * The serialisation layer does not own (did not create) the pointer(s)
+     * when deconstructing the object to send as raw data. Therefore the
+     * attribute 'pointer_owner' remains false (initialised by the constructor).
+     */
 }
 
 void
