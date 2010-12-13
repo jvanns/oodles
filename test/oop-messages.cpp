@@ -21,7 +21,6 @@
 
 // STL
 using std::list;
-using std::find;
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -29,6 +28,26 @@ using std::string;
 using std::make_pair;
 
 namespace {
+
+/*
+ * Find a value but dereference the pointer as well as the iterator
+ */
+template<typename Iterator, typename Type> struct find
+{
+    find() {}
+
+    bool operator() (Iterator i, Iterator j, const Type &value) const
+    {
+        while (i != j) {
+            if (*(*i) == value)
+                return true;
+            
+            ++i;
+        }
+
+        return false;
+    }
+};
 
 class TestOOPDialect : public oodles::net::ProtocolDialect
 {
@@ -123,14 +142,15 @@ class TestOOPDialect : public oodles::net::ProtocolDialect
         {
             assert(b.urls.size() == 3);
             
-            static const URL a("http://www.apple.com/uk"),
-                             y("http://www.youtube.com/uk"),
-                             f("http://www.facebook.co.uk");
-            list<URL>::const_iterator begin(b.urls.begin()), end(b.urls.end());
+            static const oodles::url::URL a("http://www.apple.com/uk"),
+                                          y("http://www.youtube.com/uk"),
+                                          f("http://www.facebook.co.uk");
+            static const find<list<URL*>::const_iterator, URL> finder;
+            list<URL*>::const_iterator begin(b.urls.begin()), end(b.urls.end());
 
-            assert(find(begin, end, a) != end);
-            assert(find(begin, end, y) != end);
-            assert(find(begin, end, f) != end);
+            assert(finder(begin, end, a));
+            assert(finder(begin, end, y));
+            assert(finder(begin, end, f));
             
             using oodles::net::oop::EndCrawl;
 
@@ -154,13 +174,13 @@ class TestOOPDialect : public oodles::net::ProtocolDialect
             using oodles::net::oop::BeginCrawl;
 
             BeginCrawl *m = new BeginCrawl;
-            static const URL a("http://www.apple.com/uk"),
-                             y("http://www.youtube.com/uk"),
-                             f("http://www.facebook.co.uk");
+            static oodles::url::URL a("http://www.apple.com/uk"),
+                                    y("http://www.youtube.com/uk"),
+                                    f("http://www.facebook.co.uk");
 
-            m->urls.push_back(a);
-            m->urls.push_back(y);
-            m->urls.push_back(f);
+            m->urls.push_back(&a);
+            m->urls.push_back(&y);
+            m->urls.push_back(&f);
             
             send(m); // Non-blocking
         }
