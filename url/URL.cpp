@@ -109,13 +109,13 @@ URL::operator= (const URL &url)
 }
 
 bool
-URL::operator==(URL &rhs) const
+URL::operator==(const URL &rhs) const
 {
     return page_id() == rhs.page_id();
 }
 
 bool
-URL::operator!=(URL &rhs) const
+URL::operator!=(const URL &rhs) const
 {
     return !(operator==(rhs));
 }
