@@ -6,7 +6,6 @@
 #include "Serialiser.hpp"
 
 // STL
-#include <map>
 #include <list>
 #include <string>
 
@@ -39,19 +38,17 @@ struct RegisterCrawler_
 
 struct BeginCrawl_
 {
-    /* Dependent typedefs */
-    //................Page ID...........Page URL
-    typedef std::pair<url::URL::hash_t, std::string> URL;
-    //...............Domain ID.........URLs
-    typedef std::map<url::URL::hash_t, std::list<URL> > URLs;
-    
     /* Member functions/methods */
+    BeginCrawl_();
+    virtual ~BeginCrawl_();
+
     static id_t id() { return BEGIN_CRAWL; }
     void serialize(Reconstructor &archive, unsigned int /* version */);
     void serialize(Deconstructor &archive, unsigned int /* version */) const;
     
     /* Member variables/attributes */
-    URLs urls;
+    bool pointer_owner;
+    std::list<url::URL> urls;
 };
 
 struct EndCrawl_
