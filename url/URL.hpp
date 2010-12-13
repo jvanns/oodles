@@ -46,8 +46,8 @@ class URL
         URL(const URL &url);
         URL& operator= (const URL &url);
 
-        bool operator== (URL &rhs) const;
-        bool operator!= (URL &rhs) const;
+        bool operator== (const URL &rhs) const;
+        bool operator!= (const URL &rhs) const;
 
         hash_t page_id() const;
         hash_t path_id() const;
