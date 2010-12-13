@@ -5,6 +5,8 @@
 #include "Parser.hpp"
 #include "Iterator.hpp"
 #include "TreeIterator.hpp"
+
+#include "net/oop/Accessor.hpp"
 #include "common/Exceptions.hpp"
 
 // STL
@@ -41,6 +43,7 @@ class URL
         enum {Scheme, Username, Password, Domain, Port, Path, Page};
 
         /* Member functions/methods */
+        URL();
         URL(const std::string &url);
         
         URL(const URL &url);
@@ -88,8 +91,10 @@ class URL
         ID id;
 
         /* Friend class declarations */
-        friend class Iterator; // We need to give iterators access to...
-        friend class TreeIterator; // We need to give iterators access to...
+        friend class Iterator;
+        friend class TreeIterator;
+
+        PERMIT_SERIALISER_ACCESS  // Allows OOP serialisation
 };
 
 static
