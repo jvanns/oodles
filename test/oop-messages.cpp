@@ -1,4 +1,5 @@
 // oodles
+#include "url/URL.hpp"
 #include "common/Exceptions.hpp"
 
 // oodles core networking
@@ -19,6 +20,8 @@
 #include <getopt.h>
 
 // STL
+using std::list;
+using std::find;
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -31,6 +34,7 @@ class TestOOPDialect : public oodles::net::ProtocolDialect
 {
     public:
         /* Member functions/methods */
+        typedef oodles::url::URL URL;
         TestOOPDialect() : initiator(false) {}
         
         void register_crawler()
@@ -119,13 +123,14 @@ class TestOOPDialect : public oodles::net::ProtocolDialect
         {
             assert(b.urls.size() == 3);
             
-            oodles::url::URL a("http://www.apple.com/uk"),
+            static const URL a("http://www.apple.com/uk"),
                              y("http://www.youtube.com/uk"),
                              f("http://www.facebook.co.uk");
+            list<URL>::const_iterator begin(b.urls.begin()), end(b.urls.end());
 
-            assert(b.urls.find(a.domain_id()) != b.urls.end());
-            assert(b.urls.find(y.domain_id()) != b.urls.end());
-            assert(b.urls.find(f.domain_id()) != b.urls.end());
+            assert(find(begin, end, a) != end);
+            assert(find(begin, end, y) != end);
+            assert(find(begin, end, f) != end);
             
             using oodles::net::oop::EndCrawl;
 
@@ -149,16 +154,13 @@ class TestOOPDialect : public oodles::net::ProtocolDialect
             using oodles::net::oop::BeginCrawl;
 
             BeginCrawl *m = new BeginCrawl;
-            oodles::url::URL a("http://www.apple.com/uk"),
+            static const URL a("http://www.apple.com/uk"),
                              y("http://www.youtube.com/uk"),
                              f("http://www.facebook.co.uk");
 
-            m->urls[a.domain_id()].push_back(BeginCrawl::URL(a.page_id(),
-                                                             a.to_string()));
-            m->urls[y.domain_id()].push_back(BeginCrawl::URL(y.page_id(),
-                                                             y.to_string()));
-            m->urls[f.domain_id()].push_back(BeginCrawl::URL(f.page_id(),
-                                                             f.to_string()));
+            m->urls.push_back(a);
+            m->urls.push_back(y);
+            m->urls.push_back(f);
             
             send(m); // Non-blocking
         }
