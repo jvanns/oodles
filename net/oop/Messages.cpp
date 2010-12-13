@@ -8,6 +8,7 @@
 #include <boost/serialization/string.hpp>
 
 // STL
+using std::list;
 using std::string;
 
 namespace {
@@ -52,6 +53,14 @@ BeginCrawl_::BeginCrawl_() : pointer_owner(false)
 
 BeginCrawl_::~BeginCrawl_()
 {
+    if (pointer_owner) {
+        list<url::URL*>::const_iterator i(urls.begin()), j(urls.end());
+
+        while (i != j) {
+            delete *i;
+            ++i;
+        }
+    }
 }
 
 void
