@@ -97,7 +97,7 @@ SchedulerCrawler::begin_crawl(const vector<url::URL*> &urls)
     vector<url::URL*>::const_iterator i = urls.begin(), j = urls.end();
     
     while (i != j) {
-        m->urls.push_back(*(*i));
+        m->urls.push_back(*i);
         ++i;
     }
 
@@ -257,10 +257,10 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      * sent this message.
      */
     EndCrawl *e = new EndCrawl;
-    list<url::URL>::const_iterator i = m.urls.begin(), j = m.urls.end();
+    list<url::URL*>::const_iterator i = m.urls.begin(), j = m.urls.end();
 
     while (i != j) {
-        const url::URL &u = *i;
+        const url::URL &u = *(*i);
 #ifdef DEBUG_CRAWL
         std::cerr << u << std::endl;
 #endif
