@@ -25,7 +25,7 @@ Context::start_crawling(const string &service)
 {
     SchedulerCrawler &dialect = client.dialect();
     
-    dialect.register_crawler(crawler.id(), crawler.cores());
+    dialect.register_crawler(crawler);
     client.start(service);
     dispatcher.wait();
 }

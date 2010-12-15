@@ -82,7 +82,8 @@ test/url-scheduler: test/url-scheduler.o \
 	$(UTILITY_OBJECTS) \
 	$(NET_CORE_OBJECTS) \
 	$(NET_OOP_OBJECTS) \
-	$(SCHEDULER_OBJECTS) ;\
+	$(SCHEDULER_OBJECTS) \
+	$(CRAWLER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 test/allocator: test/allocator.o \
@@ -107,7 +108,8 @@ test/oop-messages: test/oop-messages.o \
 	$(UTILITY_OBJECTS) \
 	$(NET_CORE_OBJECTS) \
 	$(NET_OOP_OBJECTS) \
-	$(SCHEDULER_OBJECTS) ;\
+	$(SCHEDULER_OBJECTS) \
+	$(CRAWLER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 prog/scheduler: prog/scheduler.o \
@@ -116,7 +118,8 @@ prog/scheduler: prog/scheduler.o \
 	$(UTILITY_OBJECTS) \
 	$(NET_CORE_OBJECTS) \
 	$(NET_OOP_OBJECTS) \
-	$(SCHEDULER_OBJECTS) ;\
+	$(SCHEDULER_OBJECTS) \
+	$(CRAWLER_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 prog/crawler: prog/crawler.o \

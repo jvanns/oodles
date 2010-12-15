@@ -2,6 +2,9 @@
 #include "Messages.hpp"
 #include "SchedulerCrawler.hpp"
 
+// oodles crawler
+#include "crawl/Crawler.hpp"
+
 // oodles scheduler
 #include "sched/Context.hpp"
 #include "sched/Crawler.hpp"
@@ -57,7 +60,7 @@ SchedulerCrawler::GarbageCollector::trash(Message *m, key_t k)
 }
 
 // SchedulerCrawler
-SchedulerCrawler::SchedulerCrawler() : initiator(false)
+SchedulerCrawler::SchedulerCrawler() : initiator(false), crawler(NULL)
 {
     context[Inbound] = context[Outbound] = INVALID_ID;
 }
@@ -79,13 +82,14 @@ SchedulerCrawler::translate()
 }
 
 void
-SchedulerCrawler::register_crawler(const string &name, uint16_t cores)
+SchedulerCrawler::register_crawler(crawl::Crawler &c)
 {
     RegisterCrawler *m = new RegisterCrawler;
-    m->cores = cores;
-    m->name = name;
-
+    m->cores = c.cores();
+    m->name = c.id();
+    
     initiator = true;
+    crawler = &c;
     
     send(m); // Non-blocking
 }
@@ -256,19 +260,14 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      * all URLs given in m as scheduled by the Scheduler that
      * sent this message.
      */
-    EndCrawl *e = new EndCrawl;
+    assert(crawler != NULL);
+    
     list<url::URL*>::const_iterator i = m.urls.begin(), j = m.urls.end();
 
     while (i != j) {
         const url::URL &u = *(*i);
-#ifdef DEBUG_CRAWL
-        std::cerr << u << std::endl;
-#endif
-        e->scheduled_urls.push_back(make_pair(u.page_id(), true));
-        ++i;
+        crawler->fetch(u);
     }
-
-    send(e);
 
     return 0;
 }

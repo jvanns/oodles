@@ -16,10 +16,12 @@
 #include <boost/thread/mutex.hpp>
 
 namespace oodles {
+namespace crawl {
+    class Crawler; // Forward declaraton for SchedulerCrawler
+} // crawl
 
 namespace sched {
 
-class Crawler; // Forward declaraton for SchedulerCrawler
 class Scheduler; // Forward declaraton for SchedulerCrawler
    
 } // sched
@@ -45,9 +47,11 @@ class SchedulerCrawler : public ProtocolDialect
 
         /*
          * A crawler initiates the conversation by sending a RegisterCrawler
-         * message to the Scheduler. It does so using this public method.
+         * message to the Scheduler. It does so using this public method. An
+         * instance of this class, SchedulerCrawler, then keeps a pointer to
+         * the crawler it is registering.
          */
-        void register_crawler(const std::string &name, uint16_t cores);
+        void register_crawler(crawl::Crawler &c);
 
         /*
          * The scheduler will eventually respond, after a schedule run,
@@ -98,6 +102,7 @@ class SchedulerCrawler : public ProtocolDialect
         /* Member variables/attributes */
         bool initiator;
         id_t context[2];
+        crawl::Crawler *crawler;
         GarbageCollector garbage;
         static const id_t message_subset[];
 };
