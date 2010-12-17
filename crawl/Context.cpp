@@ -1,5 +1,6 @@
 // oodles
 #include "Context.hpp"
+#include "utility/Linker.hpp"
 
 // STL
 using std::string;
@@ -24,6 +25,7 @@ void
 Context::start_crawling(const string &service)
 {
     SchedulerCrawler &dialect = client.dialect();
+    const Link link(&client, &crawler);
     
     dialect.register_crawler(crawler);
     client.start(service);

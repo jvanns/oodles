@@ -3,6 +3,7 @@
 
 // oodles
 #include "Endpoint.hpp"
+#include "utility/Linker.hpp"
 
 namespace oodles {
 namespace net {
@@ -10,7 +11,7 @@ namespace net {
 class ProtocolCreator; // Forward declaration for Client
 struct ProtocolDialect; // Forward declaration for Client
 
-class Client
+class Client : public Linker
 {
     public:
         /* Member functions/methods */
