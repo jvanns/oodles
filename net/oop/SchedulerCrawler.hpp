@@ -60,6 +60,14 @@ class SchedulerCrawler : public ProtocolDialect
          * URLs it scheduled the crawler to er, crawl.
          */
         void begin_crawl(const std::vector<url::URL*> &urls);
+
+        /*
+         * The crawler will return a list of URLs to the scheduler once it
+         * has (attmpted) to crawl them. The state (success/failure) of the
+         * URL is sent along with it. Generally the list of URLs provided here
+         * will be from the same domain.
+         */
+        void end_crawl(const std::list<url::URL> &urls);
     private:
         /* Internal Data Structures */
         class GarbageCollector : public event::Subscriber

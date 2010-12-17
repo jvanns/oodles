@@ -109,6 +109,20 @@ SchedulerCrawler::begin_crawl(const vector<url::URL*> &urls)
 }
 
 void
+SchedulerCrawler::end_crawl(const list<url::URL> &urls)
+{
+    EndCrawl *m = new EndCrawl;
+    list<url::URL>::const_iterator i = urls.begin(), j = urls.end();
+    
+    while (i != j) {
+        m->scheduled_urls.push_back(make_pair(i->page_id(), true)); // FIXME
+        ++i;
+    }
+
+    send(m);
+}
+
+void
 SchedulerCrawler::send(Message *m)
 {
     context[Outbound] = m->id();
