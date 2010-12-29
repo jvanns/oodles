@@ -60,9 +60,9 @@ namespace placeholders = boost::asio::placeholders;
 
 Client::Client(io_service &s, const ProtocolCreator &c) :
     connection(Endpoint::create(s)),
+    protocol_creator(c),
     resolver(s)
 {
-    connection->set_protocol(c.create());
 }
 
 void
@@ -124,6 +124,10 @@ void
 Client::connect_callback(const error_code &e, resolver::iterator i)
 {
     if (!e) {
+        ProtocolHandler *p = protocol_creator.create();
+       
+        extend_link_to(connection.get());
+        connection->set_protocol(p);
         connection->start();
     } else {
         static const resolver::iterator end;

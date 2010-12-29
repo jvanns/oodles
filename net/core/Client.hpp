@@ -24,6 +24,7 @@ class Client : public Linker
     private:
         /* Member variables/attributes */
         Endpoint::Connection connection;
+        const ProtocolCreator &protocol_creator;
         boost::asio::ip::tcp::resolver resolver;
 
         /* Member functions/methods */
