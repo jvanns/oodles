@@ -56,8 +56,7 @@ Endpoint::start()
     tcp_socket.set_option(boost::asio::socket_base::send_buffer_size(NBS));
     tcp_socket.set_option(boost::asio::socket_base::receive_buffer_size(NBS));
 
-    protocol->transfer_data();
-    protocol->receive_data();
+    protocol->start();
 }
 
 void

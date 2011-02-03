@@ -11,13 +11,14 @@
 namespace oodles {
 namespace net {
 
+struct OnConnect; // Forward declaration for ProtocolHandler
 struct DialectCreator; // Forward declaration for ProtocolHandler
 
 class ProtocolHandler : public ProtocolDialect
 {
     public:
         /* Member functions/methods */
-        ProtocolHandler(const DialectCreator &c);
+        ProtocolHandler(const DialectCreator &d, OnConnect *c);
         virtual ~ProtocolHandler();
 
         /*
@@ -30,6 +31,11 @@ class ProtocolHandler : public ProtocolDialect
          * Return the internal dialect object
          */
         ProtocolDialect* get_dialect() const { return dialect; }
+
+        /*
+         * Start any data transfer after executing any OnConnect functor.
+         */
+        void start();
 
         /*
          * Begin a transfer. The (outbound) buffer is prepared
@@ -84,6 +90,7 @@ class ProtocolHandler : public ProtocolDialect
         void stop() { endpoint->stop(); }
     private:
         /* Member variables/attributes */
+        OnConnect *on_connect;
         Endpoint::Connection endpoint;
 
         /* Member functions/methods */

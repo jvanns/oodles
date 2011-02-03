@@ -1,4 +1,5 @@
 // oodles
+#include "OnConnect.hpp"
 #include "ProtocolHandler.hpp"
 
 // libc
@@ -11,8 +12,9 @@ namespace oodles {
 namespace net {
 
 // Public methods
-ProtocolHandler::ProtocolHandler(const DialectCreator &c) :
-    dialect(c.create(*this))
+ProtocolHandler::ProtocolHandler(const DialectCreator &d, OnConnect *c) :
+    dialect(d.create(*this)),
+    on_connect(c)
 {
     dialect->set_handler(*this);
 }
@@ -21,6 +23,8 @@ ProtocolHandler::~ProtocolHandler()
 {
     if (dialect != this)
         delete dialect;
+
+    delete on_connect;
 }
 
 void
@@ -28,6 +32,16 @@ ProtocolHandler::set_endpoint(Endpoint::Connection e)
 {
     assert(!endpoint);
     endpoint = e;
+}
+
+void
+ProtocolHandler::start()
+{
+    if (on_connect)
+        (*on_connect)(*this);
+
+    transfer_data();
+    receive_data();
 }
 
 void

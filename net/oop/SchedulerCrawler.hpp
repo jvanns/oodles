@@ -49,9 +49,9 @@ class SchedulerCrawler : public ProtocolDialect
          * A crawler initiates the conversation by sending a RegisterCrawler
          * message to the Scheduler. It does so using this public method. An
          * instance of this class, SchedulerCrawler, then keeps a pointer to
-         * the crawler it is registering.
+         * the crawler it is registering (now via the Linker system).
          */
-        void register_crawler(crawl::Crawler &c);
+        void register_crawler();
 
         /*
          * The scheduler will eventually respond, after a schedule run,
@@ -91,6 +91,7 @@ class SchedulerCrawler : public ProtocolDialect
         /* Member functions/methods */
         void send(Message *m);
         Protocol& protocol() const;
+        crawl::Crawler& crawler() const;
         sched::Scheduler& scheduler() const;
         
         /*
@@ -110,7 +111,6 @@ class SchedulerCrawler : public ProtocolDialect
         /* Member variables/attributes */
         bool initiator;
         id_t context[2];
-        crawl::Crawler *crawler;
         GarbageCollector garbage;
         static const id_t message_subset[];
 };

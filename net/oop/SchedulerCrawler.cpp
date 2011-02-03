@@ -60,7 +60,7 @@ SchedulerCrawler::GarbageCollector::trash(Message *m, key_t k)
 }
 
 // SchedulerCrawler
-SchedulerCrawler::SchedulerCrawler() : initiator(false), crawler(NULL)
+SchedulerCrawler::SchedulerCrawler() : initiator(false)
 {
     context[Inbound] = context[Outbound] = INVALID_ID;
 }
@@ -82,14 +82,13 @@ SchedulerCrawler::translate()
 }
 
 void
-SchedulerCrawler::register_crawler(crawl::Crawler &c)
+SchedulerCrawler::register_crawler()
 {
     RegisterCrawler *m = new RegisterCrawler;
-    m->cores = c.cores();
-    m->name = c.id();
+    m->cores = crawler().cores();
+    m->name = crawler().id();
     
     initiator = true;
-    crawler = &c;
     
     send(m); // Non-blocking
 }
@@ -134,6 +133,18 @@ SchedulerCrawler::protocol() const
 {
     assert(handler != NULL);
     return *handler;
+}
+
+crawl::Crawler&
+SchedulerCrawler::crawler() const
+{
+    assert(coupling != NULL);
+
+    Linker *l = coupling->complement_of(*this);
+
+    assert(l != NULL);
+    
+    return static_cast<crawl::Crawler&>(*l);
 }
 
 sched::Scheduler&
@@ -274,13 +285,11 @@ SchedulerCrawler::continue_dialog(const BeginCrawl &m)
      * all URLs given in m as scheduled by the Scheduler that
      * sent this message.
      */
-    assert(crawler != NULL);
-    
     list<url::URL*>::const_iterator i = m.urls.begin(), j = m.urls.end();
 
     while (i != j) {
         const url::URL &u = *(*i);
-        crawler->fetch(u);
+        crawler().fetch(u);
     }
 
     return 0;

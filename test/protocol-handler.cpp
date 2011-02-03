@@ -3,6 +3,7 @@
 
 #include "net/core/Client.hpp"
 #include "net/core/Server.hpp"
+#include "net/core/OnConnect.hpp"
 #include "net/core/ProtocolCreator.hpp"
 #include "net/core/ProtocolHandler.hpp"
 
@@ -47,8 +48,9 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
     private:
         struct WiredFile; // Forward declaration for public methods below
     public:
-        TCPFileExchange(const oodles::net::DialectCreator &c) :
-            ProtocolHandler(c),
+        TCPFileExchange(const oodles::net::DialectCreator &d,
+                        oodles::net::OnConnect *c) :
+            ProtocolHandler(d, c),
             loaded(0),
             sent(0) {}
 
@@ -303,6 +305,29 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
     return used;
 }
 
+struct BeginExchange : public oodles::net::OnConnect
+{
+    int argc;
+    char **argv;
+
+    OnConnect* create() const { return new BeginExchange(*this); } // Clone
+
+    void operator() (oodles::net::ProtocolHandler &p)
+    {
+        TCPFileExchange &tcpfex = *p.get_dialect();
+        
+        for (int i = 0 ; i < argc ; ++i) {
+            if (!tcpfex.load_file(argv[i]))
+                cerr << "Failed to load file '" << argv[i] << "'.\n";
+            else
+                cout << "Opened file '" << argv[i] << "'.\n";
+        }
+        
+        cout << "Attempting to send " << tcpfex.pending() << " files...\n";
+    }
+};
+
+
 static void print_usage(const char *program)
 {
     cerr << program << " [-h|-c <host:port>|-s <ip:port>] <file file...>\n\n";
@@ -348,8 +373,6 @@ int main(int argc, char *argv[])
     argc -= optind;
     argv += optind;
 
-    int rc = 0;
-    const oodles::net::Protocol<TCPFileExchange> creator; // Creator
     const bool send = (!client_only && !server_only) || client_only;
 
     if (send && argc == 0) {
@@ -357,10 +380,11 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    oodles::net::Server *server = NULL;
-    oodles::net::Client *client = NULL;
-
     try {
+        BeginExchange *oncon = send ? new BeginExchange : NULL;
+        const oodles::net::Protocol<TCPFileExchange> creator(oncon);
+        oodles::net::Server *server = NULL;
+        oodles::net::Client *client = NULL;
         boost::asio::io_service service;
 
         if (!client_only)
@@ -370,37 +394,23 @@ int main(int argc, char *argv[])
             client = new oodles::net::Client(service, creator);
 
         if (send) {
-            TCPFileExchange &tcpfex = client->dialect();
-            
-            for (int i = 0 ; i < argc ; ++i) {
-                if (!tcpfex.load_file(argv[i]))
-                    cerr << "Failed to load file '" << argv[i] << "'.\n";
-                else
-                    cout << "Opened file '" << argv[i] << "'.\n";
-            }
+            oncon->argc = argc;
+            oncon->argv = argv;
         }
 
         if (server) {
             cout << "NOTE: All received files can be found in " << tmp << ".\n";
-            
             server->start(listen_on);
         }
 
-        if (client) {
-            TCPFileExchange &tcpfex = client->dialect();
-            cout << "Attempting to send " << tcpfex.pending() << " files...\n";
-            
+        if (client)
             client->start(connect_to);
-        }
 
         service.run();
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
-        rc = 1;
+        return 1;
     }
 
-    delete client;
-    delete server;
-
-    return rc;
+    return 0;
 }

@@ -2,6 +2,7 @@
 #define OODLES_NET_PROTOCOLCREATOR_HPP
 
 // oodles
+#include "OnConnect.hpp"
 #include "utility/Linker.hpp"
 
 // STL
@@ -92,10 +93,17 @@ class Protocol : public ProtocolCreator
 {
     public:
         /* Member functions/methods */
-        Protocol() {}
-        ProtocolHandler* create() const { return new Handler(interpreter); }
+        Protocol(OnConnect *c = NULL) : on_connect(c) {}
+        
+        ProtocolHandler* create() const
+        {
+            OnConnect *c = on_connect ? on_connect->create() : NULL;
+            Handler *h = new Handler(interpreter, c);
+            return h;
+        }
     private:
         /* Member variables/attributes */
+        OnConnect *on_connect;
         const ProtocolInterpreter<Dialect> interpreter;
 };
 
