@@ -187,15 +187,15 @@ throw (DialectError)
                 context[Inbound] != BEGIN_CRAWL)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
-                                   "Invalid dialog context at message #%d.",
-                                   m->id());
+                                   "Invalid inbound context: P=#%d, C=#%d.",
+                                   context[Inbound], m->id());
             
             if (context[Outbound] != END_CRAWL &&
                 context[Outbound] != REGISTER_CRAWLER)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
-                                   "Invalid dialog context at message #%d.",
-                                   m->id());
+                                   "Invalid outbound context: P=#%d, C=#%d.",
+                                   context[Outbound], m->id());
             
             k = continue_dialog(static_cast<const BeginCrawl&>(*m));
             break;
@@ -209,14 +209,14 @@ throw (DialectError)
             if (context[Inbound] != INVALID_ID)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
-                                   "Invalid dialog context at message #%d.",
-                                   m->id());
+                                   "Invalid inbound context: P=#%d, C=#%d.",
+                                   context[Inbound], m->id());
             
             if (context[Outbound] != INVALID_ID)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
-                                   "Invalid dialog context at message #%d.",
-                                   m->id());
+                                   "Invalid outbound context: P=#%d, C=#%d.",
+                                   context[Outbound], m->id());
 
             k = continue_dialog(static_cast<const RegisterCrawler&>(*m));
             break;
@@ -230,15 +230,15 @@ throw (DialectError)
                 context[Inbound] != REGISTER_CRAWLER)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
-                                   "Invalid dialog context at message #%d.",
-                                   m->id());
+                                   "Invalid inbound context: P=#%d, C=#%d.",
+                                   context[Inbound], m->id());
             
             if (context[Outbound] != INVALID_ID &&
                 context[Outbound] != BEGIN_CRAWL)
                 throw DialectError("SchedulerCrawler::continue_dialog",
                                    0,
-                                   "Invalid dialog context at message #%d.",
-                                   m->id());
+                                   "Invalid outbound context: P=#%d, C=#%d.",
+                                   context[Outbound], m->id());
 
             k = continue_dialog(static_cast<const EndCrawl&>(*m));
             break;
