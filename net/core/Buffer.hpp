@@ -49,7 +49,7 @@ template<size_t max> class Buffer
                 size_t commit_buffer(size_t bytes)
                 {
                     buffer.commit(bytes);
-                    return buffer.size();
+                    return !bytes ? 0 : buffer.size();
                 }
             private:
                 /* Member variables/attributes */
@@ -77,7 +77,7 @@ template<size_t max> class Buffer
                 size_t consume_buffer(size_t bytes)
                 {
                     buffer.consume(bytes);
-                    return buffer.size();
+                    return !bytes ? 0 : buffer.size();
                 }
             private:
                 /* Member variables/attributes */
