@@ -23,3 +23,23 @@ may suggest...
 * make -j2 all
 
 All test programs will be under bin/test. Test input data is under test/input.
+
+--[ Testing transfer rate of core networking code
+
+On a UNIX OS such as Linux or *BSD (so a Mac too) download and install iperf.
+In fact, on your Linux system it may already be installed or available as a
+package.
+
+We can use iperf as the benchmark to compare transfer rates of the oodles
+net/core code. Using this particular set of parameters we ensure the
+same TCP stack options are used;
+
+Machine 1 (server):
+iperf -s -p 9999 -f KBytes -l 4K -N -B <IP address>
+Machine 2 (client):
+iperf -c <server host> -p 9999 -f KBytes -l 4K -N -F /tmp/yourtestfile ... ...
+
+Machine 1 (server):
+bin/test/protocol-handler -s <IP address>:9999
+Machine 2 (client):
+bin/test/protocol-handler -c <server host>:9999 /tmp/yourtestfile ... ...
