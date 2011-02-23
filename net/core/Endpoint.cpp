@@ -28,6 +28,26 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
+void
+Endpoint::Metric::update(size_t bytes)
+{
+    const time_t now = time(NULL), interval = now - last_transfer;
+    const bool update_rate = last_transfer > 0 && interval >= 1;
+
+    transferred_bytes += bytes;
+
+    if (update_rate || (bootstrap && !last_transfer))
+        last_transfer = now;
+
+    if (update_rate) { // We only update the rate every second or so
+        transfer_rate = (intermediate + bytes) / interval;
+        intermediate = 0;
+    } else {
+        intermediate += bytes;
+        bootstrap = false;
+    }
+}
+
 Endpoint::Endpoint(io_service &s) : protocol(NULL), tcp_socket(s)
 {
 }
@@ -105,26 +125,12 @@ void
 Endpoint::raw_recv_callback(const error_code& e, size_t b)
 {
     if (!e && b > 0) {
-        const time_t now = time(NULL);
         size_t n = inbound.producer().commit_buffer(b),
                u = protocol->buffer2message(inbound.consumer().data(), n);
         
         inbound.consumer().consume_buffer(u);
         protocol->receive_data();
-        
-        /*
-         * Update recv metrics
-         */
-        if (!recv_rate)
-            recv_rate.transfer_rate = recv_rate.transferred_bytes = b;
-        else {
-            recv_rate.transfer_rate = (recv_rate.transferred_bytes + b) /
-                                      ((recv_rate.last_transfer - now) + 1);
-            recv_rate.transferred_bytes += b;
-            recv_rate.transfer_rate /= 60;
-        }
-        
-        recv_rate.last_transfer = now;
+        recv_rate.update(b);
     } else {
         if (e == boost::asio::error::operation_aborted)
             return;
@@ -143,24 +149,10 @@ Endpoint::raw_send_callback(const error_code& e, size_t b)
 {
     if (!e && b > 0) {
         size_t n = outbound.consumer().consume_buffer(b);
-        const time_t now = time(NULL);
         
         protocol->bytes_transferred(b);
-        protocol->transfer_data(n);
-        
-        /*
-         * Update send metrics
-         */
-        if (!send_rate)
-            send_rate.transfer_rate = send_rate.transferred_bytes = b;
-        else {
-            send_rate.transfer_rate = (send_rate.transferred_bytes + b) /
-                                      ((send_rate.last_transfer - now) + 1);
-            send_rate.transferred_bytes += b;
-            send_rate.transfer_rate /= 60;
-        }
-        
-        send_rate.last_transfer = now;
+        protocol->transfer_data(n); 
+        send_rate.update(b);
     } else {
         if (e == boost::asio::error::operation_aborted)
             return;

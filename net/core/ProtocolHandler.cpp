@@ -95,14 +95,14 @@ ProtocolHandler::print_metrics(ostream *s) const
        << endpoint->recv_rate.transferred_bytes / 1024 << '\n'
        << "Last transfer:        "
        << endpoint->recv_rate.last_transfer << '\n'
-       << "Receive rate (KiB/s): " << endpoint->recv_rate.transfer_rate / 1024
+       << "Receive rate (KiB/s): " << endpoint->recv_rate.transfer_rate / 1024.f
        << '\n';
     
     *s << "Sent (KiB):           "
        << endpoint->send_rate.transferred_bytes / 1024 << '\n'
        << "Last transfer:        "
        << endpoint->send_rate.last_transfer << '\n'
-       << "Send rate (KiB/s):    " << endpoint->send_rate.transfer_rate / 1024 
+       << "Send rate (KiB/s):    " << endpoint->send_rate.transfer_rate / 1024.f
        << '\n';
 }
 

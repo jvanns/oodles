@@ -53,17 +53,19 @@ class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
     private:
         struct Metric 
         {
+            bool bootstrap;
             time_t last_transfer;
             double transfer_rate;
-            size_t transferred_bytes;
+            size_t transferred_bytes, intermediate;
 
             Metric() :
+                bootstrap(true),
                 last_transfer(0),
                 transfer_rate(0.0f),
                 transferred_bytes(0)
             {}
 
-            operator bool () const { return last_transfer > 0; }
+            void update(size_t bytes);
         };
         
         /* Member variables/attributes */
