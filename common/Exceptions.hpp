@@ -45,6 +45,15 @@ struct DialogError : public NonFatalException
     DialogError(const std::string &from, int error, const char *format, ...);
 };
 
+// HTTP-specific exceptions
+namespace http {
+
+struct HeaderError : public NonFatalException
+{
+    HeaderError(const std::string &from, int error, const char *format, ...);
+};
+   
+} // http
 } // net
 
 // URL-specific exceptions
