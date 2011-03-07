@@ -55,6 +55,8 @@ class URL
         hash_t page_id() const;
         hash_t path_id() const;
         hash_t domain_id() const;
+        std::string host() const;
+        std::string resource() const;
         std::string to_string() const;
         void print(std::ostream &stream) const;
 
@@ -84,6 +86,7 @@ class URL
         };
 
         /* Member functions/methods */
+        void to_stream(std::ostream &stream) const;
         ID tokenise(const std::string &url) throw(ParseError);
 
         /* Member variables/attributes */

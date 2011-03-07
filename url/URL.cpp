@@ -139,43 +139,76 @@ URL::domain_id() const
 }
 
 string
-URL::to_string() const
+URL::host() const
 {
-    ostringstream stream;
-
-    stream << attributes.scheme << "://";
-
-    if (!attributes.username.empty())
-        stream << attributes.username << ':' << attributes.password << '@';
-
+    string s;
+    
     if (!attributes.domain.empty()) {
         vector<value_type>::const_iterator i = attributes.domain.begin(),
                                            j = attributes.domain.end() - 1;
-        copy(i, j, ostream_iterator<value_type>(stream, "."));
-        stream << *j;
+
+        while (i != j) {
+            s += *i + ".";
+            ++i;
+        }
+
+        s += *j;
     }
 
-    if (!attributes.port.empty() && attributes.port != "80")
-        stream << ':' << attributes.port;
+    return s;
+}
 
+string
+URL::resource() const
+{
+    string s;
+    
     if (!attributes.path.empty()) {
         vector<value_type>::const_iterator i = attributes.path.begin(),
                                            j = attributes.path.end() - 1;
 
-        stream << '/';
-        copy(i, j, ostream_iterator<value_type>(stream, "/"));
-        stream << *j;
-    }
-    
-    stream << '/' << attributes.page;
+        while (i != j) {
+            s += *i + "/";
+            ++i;
+        }
 
+        s += *j;
+    }
+
+    s += "/" + attributes.page;
+
+    return s;
+}
+
+string
+URL::to_string() const
+{
+    ostringstream stream;
+    to_stream(stream);
+    
     return stream.str();
 }
 
 void
 URL::print(ostream &stream) const
 {
-    stream << to_string();
+    to_stream(stream);
+}
+
+void
+URL::to_stream(ostream &stream) const
+{
+    stream << attributes.scheme << "://";
+
+    if (!attributes.username.empty())
+        stream << attributes.username << ':' << attributes.password << '@';
+
+    stream << host();
+
+    if (!attributes.port.empty() && attributes.port != "80")
+        stream << ':' << attributes.port;
+
+    stream << resource();
 }
 
 URL::ID
