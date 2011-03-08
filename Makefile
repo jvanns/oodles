@@ -29,6 +29,7 @@ LDLIBS += $(LDLIBS_BOOST)
 
 # Compile oodles object files
 NET_CORE_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/core/*.cpp))
+NET_HTTP_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/http/*.cpp))
 NET_OOP_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/oop/*.cpp))
 SCHEDULER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard sched/*.cpp))
 CRAWLER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard crawl/*.cpp))
