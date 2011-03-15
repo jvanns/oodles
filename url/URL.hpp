@@ -55,8 +55,14 @@ class URL
         hash_t page_id() const;
         hash_t path_id() const;
         hash_t domain_id() const;
+        
         std::string host() const;
         std::string resource() const;
+        const std::string& port() const { return attributes.port; }
+        const std::string& scheme() const { return attributes.scheme; }
+        const std::string& username() const { return attributes.username; }
+        const std::string& password() const { return  attributes.password; }
+        
         std::string to_string() const;
         void print(std::ostream &stream) const;
 
