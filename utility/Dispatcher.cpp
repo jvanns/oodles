@@ -1,5 +1,5 @@
 // oodles
-#include "Proactor.hpp"
+#include "Dispatcher.hpp"
 
 // Boost.bind
 #include <boost/bind.hpp>
@@ -10,7 +10,7 @@ using boost::asio::io_service;
 
 namespace oodles {
 
-Proactor::Proactor(size_t threads) : running(false), work(ios)
+Dispatcher::Dispatcher(size_t threads) : running(false), work(ios)
 {
     if (!threads)
         threads = 1;
@@ -21,14 +21,14 @@ Proactor::Proactor(size_t threads) : running(false), work(ios)
     running = true;
 }
 
-Proactor::~Proactor()
+Dispatcher::~Dispatcher()
 {
     stop();
     wait();
 }
 
 void
-Proactor::stop()
+Dispatcher::stop()
 {
     if (running) {
         ios.stop();
@@ -37,7 +37,7 @@ Proactor::stop()
 }
 
 void
-Proactor::wait()
+Dispatcher::wait()
 {
     threads.join_all();
 }

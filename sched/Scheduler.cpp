@@ -29,7 +29,7 @@ Scheduler::Scheduler(Context *c) :
     tree(new Node("ROOT"))
 {
     if (c)
-        update = new DeferredUpdate(c->proactor());
+        update = new DeferredUpdate(c->dispatcher);
 }
 
 Scheduler::~Scheduler()

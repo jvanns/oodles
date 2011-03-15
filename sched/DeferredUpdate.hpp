@@ -45,7 +45,7 @@ class DeferredUpdate
 {
     public:
         /* Member functions/methods */
-        DeferredUpdate(Proactor &p);
+        DeferredUpdate(Dispatcher &d);
         
         uint32_t update(Scheduler &s);
         void defer(const Deferable &d, event::Subscriber &s);

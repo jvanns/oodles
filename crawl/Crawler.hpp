@@ -4,7 +4,7 @@
 // oodles
 #include "url/URL.hpp"
 #include "utility/Linker.hpp"
-#include "utility/Proactor.hpp"
+#include "utility/Dispatcher.hpp"
 
 // STL
 #include <map>
@@ -18,7 +18,7 @@ class Crawler : public Linker
 {
     public:
         /* Member functions/methods */
-        Crawler(Proactor &p, const std::string &name, uint16_t cores);
+        Crawler(const std::string &name, uint16_t cores, Dispatcher &d);
 
         uint16_t cores() const { return cpus; }
         const std::string& id() const { return name; }
@@ -26,9 +26,9 @@ class Crawler : public Linker
         void fetch(const url::URL &url);
     private:
         /* Member variables/attributes */
-        Proactor &dispatcher;
         const uint16_t cpus;
         const std::string name;
+        Dispatcher &dispatcher;
         std::map<url::URL::hash_t, std::list<url::URL> > urls;
 };
 

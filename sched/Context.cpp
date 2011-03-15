@@ -27,7 +27,7 @@ namespace {
  */
 
 // oodles 
-using oodles::Proactor;
+using oodles::Dispatcher;
 using oodles::io::DotMatrix;
 using oodles::BreadCrumbTrail;
 using oodles::sched::Scheduler;
@@ -39,16 +39,16 @@ using boost::posix_time::seconds;
 using boost::asio::deadline_timer;
 using boost::enable_shared_from_this;
 
-class ProactorTask : public enable_shared_from_this<ProactorTask>
+class DispatcherTask : public enable_shared_from_this<DispatcherTask>
 {
     public:
         /* Member functions/methods */
-        ProactorTask(Proactor &p, Scheduler &s, ostream *dot, int interval) :
-            proactor(p),
+        DispatcherTask(Dispatcher &d, Scheduler &s, ostream *dot, int interval):
             scheduler(s),
+            dispatcher(d),
             dot_stream(dot),
             interval(interval),
-            sleeper(p.io_service())
+            sleeper(d.io_service())
         {
             new_task();
         }
@@ -106,7 +106,7 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
             
             if ((d = time(NULL) - then) < interval) {
                 sleeper.expires_from_now(seconds(interval - d));
-                sleeper.async_wait(bind(&ProactorTask::new_task,
+                sleeper.async_wait(bind(&DispatcherTask::new_task,
                                         shared_from_this()));
             } else {
                 new_task();
@@ -115,25 +115,26 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
         
         void new_task()
         {
-            shared_ptr<ProactorTask> p(new ProactorTask(*this));
-            p->proactor.io_service().post(bind(&ProactorTask::operator(), p));
+            shared_ptr<DispatcherTask> task(new DispatcherTask(*this));
+            task->dispatcher.io_service().post(bind(&DispatcherTask::operator(),
+                                                    task));
         }
     private:
         /* Member variables/attributes */
-        Proactor &proactor;
         Scheduler &scheduler;
+        Dispatcher &dispatcher;
         
         ostream *dot_stream;
         const int interval;
         deadline_timer sleeper;
 
         /* Member functions/methods */
-        ProactorTask(const ProactorTask &t) :
-            proactor(t.proactor),
+        DispatcherTask(const DispatcherTask &t) :
             scheduler(t.scheduler),
+            dispatcher(t.dispatcher),
             dot_stream(t.dot_stream),
             interval(t.interval),
-            sleeper(t.proactor.io_service())
+            sleeper(t.dispatcher.io_service())
         {
         }
 };
@@ -143,21 +144,21 @@ class ProactorTask : public enable_shared_from_this<ProactorTask>
 namespace oodles {
 namespace sched {
 
-Context::Context() : server(proactor().io_service(), creator), scheduler(this)
+Context::Context() : server(dispatcher.io_service(), creator), scheduler(this)
 {
 }
 
 void
 Context::stop_crawling()
 {
-    proactor().stop();
+    dispatcher.stop();
 }
 
 void
 Context::start_crawling(ostream *dot_stream, int interval)
 {
-    ProactorTask t(proactor(), scheduler, dot_stream, interval);
-    proactor().wait();
+    DispatcherTask t(dispatcher, scheduler, dot_stream, interval);
+    dispatcher.wait();
 }
 
 void

@@ -3,8 +3,8 @@
 
 // oodles
 #include "Crawler.hpp"
-#include "utility/Proactor.hpp"
 #include "net/core/Client.hpp"
+#include "utility/Dispatcher.hpp"
 #include "net/oop/SchedulerCrawler.hpp"
 
 namespace oodles {
@@ -29,7 +29,7 @@ class Context
         /*
          * Asynchronous task dispatcher
          */
-        Proactor dispatcher;
+        Dispatcher dispatcher;
         
         /*
          * Crawler layer

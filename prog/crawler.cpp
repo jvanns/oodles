@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
         
         /*
          * We must allow the signal handler to stop the
-         * proactor service and join all the threads.
+         * dispatcher service and join all the threads.
          */
         set_signal_handler(context);
         

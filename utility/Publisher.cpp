@@ -1,7 +1,7 @@
 // oodles
 #include "Event.hpp"
-#include "Proactor.hpp"
 #include "Publisher.hpp"
+#include "Dispatcher.hpp"
 #include "Subscriber.hpp"
 
 // Boost.bind
@@ -16,7 +16,7 @@ using std::set;
 namespace oodles {
 namespace event {
 
-Publisher::Publisher(Proactor *p) : proactor(p)
+Publisher::Publisher(Dispatcher *d) : dispatcher(d)
 {
 }
 
@@ -30,8 +30,8 @@ Publisher::broadcast(const Event &e) const
     while (i != j) {
         Subscriber *s = *i;
 
-        if (proactor)
-            proactor->io_service().post(bind(&Subscriber::receive, s, ref));
+        if (dispatcher)
+            dispatcher->io_service().post(bind(&Subscriber::receive, s, ref));
         else
             s->receive(ref); // Will block
 

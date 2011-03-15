@@ -1,6 +1,6 @@
 // oodles
 #include "utility/Event.hpp"
-#include "utility/Proactor.hpp"
+#include "utility/Dispatcher.hpp"
 #include "utility/Publisher.hpp"
 #include "utility/Subscriber.hpp"
 
@@ -95,7 +95,7 @@ struct Concatenate : public oodles::event::Subscriber
 int main(int argc, char *argv[])
 {
     Integers e; // Event object
-    oodles::Proactor t; // Task dispatcher
+    oodles::Dispatcher t; // Task dispatcher
     oodles::event::Publisher p(&t); // Publisher
 
     Sum s; // Subscriber

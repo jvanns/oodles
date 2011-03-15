@@ -9,7 +9,7 @@ using std::list;
 namespace oodles {
 namespace sched {
 
-DeferredUpdate::DeferredUpdate(Proactor &p) : publisher(&p)
+DeferredUpdate::DeferredUpdate(Dispatcher &d) : publisher(&d)
 {
 }
 

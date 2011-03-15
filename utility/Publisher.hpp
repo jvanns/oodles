@@ -6,7 +6,7 @@
 
 namespace oodles {
 
-class Proactor; // Forward declaration for Publisher
+class Dispatcher; // Forward declaration for Publisher
 
 namespace event {
 
@@ -16,11 +16,11 @@ class Publisher
 {
     public:
         /* Member functions/methods */
-        Publisher(Proactor *p = NULL);
+        Publisher(Dispatcher *d = NULL);
         void broadcast(const Event &e) const;
     private:
         /* Member variables/attributes */
-        Proactor *proactor;
+        Dispatcher *dispatcher;
 };
 
 } // event

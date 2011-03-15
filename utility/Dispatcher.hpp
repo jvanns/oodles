@@ -1,5 +1,5 @@
-#ifndef OODLES_PROACTOR_HPP
-#define OODLES_PROACTOR_HPP
+#ifndef OODLES_DISPATCHER_HPP
+#define OODLES_DISPATCHER_HPP
 
 // Boost.asio
 #include <boost/asio/io_service.hpp>
@@ -9,12 +9,12 @@
 
 namespace oodles {
 
-class Proactor
+class Dispatcher
 {
     public:
         /* Member variables/attributes */
-        Proactor(size_t threads = boost::thread::hardware_concurrency());
-        ~Proactor();
+        Dispatcher(size_t threads = boost::thread::hardware_concurrency());
+        ~Dispatcher();
 
         void stop();
         void wait();

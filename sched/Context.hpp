@@ -8,7 +8,7 @@
 #include "net/core/Server.hpp"
 #include "net/oop/SchedulerCrawler.hpp"
 
-#include "utility/Proactor.hpp"
+#include "utility/Dispatcher.hpp"
 #include "utility/BreadCrumbTrail.hpp"
 
 // STL
@@ -30,8 +30,6 @@ class Context
 
         void stop_crawling();
         void start_crawling(std::ostream *dot_stream = NULL, int interval = 1);
-
-        Proactor& proactor() { return dispatcher; }
     private:
         /* Dependent typedefs */
         typedef net::Server Server;
@@ -43,7 +41,7 @@ class Context
         /*
          * Asynchronous task dispatcher
          */
-        Proactor dispatcher;
+        Dispatcher dispatcher;
 
         /*
          * Network layers
@@ -57,6 +55,9 @@ class Context
         Scheduler scheduler;
         BreadCrumbTrail trail;
         std::map<std::string, Crawler> crawlers;
+
+        /* Friend class declarations */
+        friend class Scheduler; // Scheduler wants to access dispatcher
 };
 
 } // sched
