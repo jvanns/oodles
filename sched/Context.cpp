@@ -144,7 +144,7 @@ class DispatcherTask : public enable_shared_from_this<DispatcherTask>
 namespace oodles {
 namespace sched {
 
-Context::Context() : server(dispatcher.io_service(), creator), scheduler(this)
+Context::Context() : server(dispatcher, creator), scheduler(this)
 {
 }
 

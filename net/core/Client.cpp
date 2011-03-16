@@ -3,6 +3,7 @@
 #include "ProtocolCreator.hpp"
 #include "ProtocolHandler.hpp"
 #include "common/Exceptions.hpp"
+#include "utility/Dispatcher.hpp"
 
 // Boost.bind (TR1 is incompatible)
 #include <boost/bind.hpp>
@@ -20,7 +21,6 @@ using boost::bind;
 using boost::system::error_code;
 
 // Boost.asio
-using boost::asio::io_service;
 using boost::asio::ip::address;
 typedef boost::asio::ip::tcp::endpoint endpoint;
 typedef boost::asio::ip::tcp::resolver resolver;
@@ -58,10 +58,10 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Client::Client(io_service &s, const ProtocolCreator &c) :
-    connection(Endpoint::create(s)),
+Client::Client(Dispatcher &d, const ProtocolCreator &c) :
+    connection(Endpoint::create(d)),
     protocol_creator(c),
-    resolver(s)
+    resolver(d.io_service())
 {
 }
 

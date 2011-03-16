@@ -1,6 +1,7 @@
 // oodles
 #include "url/URL.hpp"
 #include "common/Exceptions.hpp"
+#include "utility/Dispatcher.hpp"
 
 // oodles core networking
 #include "net/core/Client.hpp"
@@ -252,13 +253,13 @@ int main(int argc, char *argv[])
     const oodles::net::Protocol<OOP, TestOOPDialect> creator;
 
     try {
-        boost::asio::io_service service;
-
+        oodles::Dispatcher dispatcher;
+        
         if (!client_only)
-            server = new oodles::net::Server(service, creator);
+            server = new oodles::net::Server(dispatcher, creator);
 
         if (!server_only)
-            client = new oodles::net::Client(service, creator);
+            client = new oodles::net::Client(dispatcher, creator);
 
         if (send) {
             TestOOPDialect &d = client->dialect();
@@ -271,7 +272,7 @@ int main(int argc, char *argv[])
         if (client)
             client->start(connect_to);
         
-        service.run();
+        dispatcher.wait();
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
         rc = 1;

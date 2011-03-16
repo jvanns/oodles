@@ -33,7 +33,7 @@ Context::Context(const string &name, uint16_t cores) :
     dispatcher(cores),
     crawler(name, cores, dispatcher),
     creator(&BeginDialog::instance()),
-    client(dispatcher.io_service(), creator)
+    client(dispatcher, creator)
 {
 }
 

@@ -2,6 +2,7 @@
 #include "Endpoint.hpp"
 #include "ProtocolHandler.hpp"
 #include "common/Exceptions.hpp"
+#include "utility/Dispatcher.hpp"
 
 // Boost.bind
 #include <boost/bind.hpp>
@@ -20,7 +21,6 @@ using boost::system::error_code;
 
 // Boost.asio
 using boost::asio::buffer;
-using boost::asio::io_service;
 
 namespace oodles {
 namespace net {
@@ -48,7 +48,7 @@ Endpoint::Metric::update(size_t bytes)
     }
 }
 
-Endpoint::Endpoint(io_service &s) : protocol(NULL), tcp_socket(s)
+Endpoint::Endpoint(Dispatcher &d) : protocol(NULL), tcp_socket(d.io_service())
 {
 }
 

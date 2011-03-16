@@ -18,6 +18,9 @@
 #include <stdint.h> // For uint16_t
 
 namespace oodles {
+
+class Dispatcher; // Forward declaration for Endpoint
+
 namespace net {
 
 static const uint16_t NBS = OODLES_PAGE_SIZE; // Network buffer size
@@ -38,9 +41,9 @@ class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
 
         static
         Endpoint*
-        create(boost::asio::io_service &s)
+        create(Dispatcher &d)
         {
-            return new Endpoint(s);
+            return new Endpoint(d);
         }
 
         bool online() const { return tcp_socket.is_open(); }
@@ -76,7 +79,7 @@ class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
         boost::asio::ip::tcp::socket tcp_socket;
 
         /* Member functions/methods */
-        Endpoint(boost::asio::io_service &s);
+        Endpoint(Dispatcher &d);
 
         Endpoint();
         Endpoint(const Endpoint &e);

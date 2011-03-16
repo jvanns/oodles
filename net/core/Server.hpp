@@ -7,6 +7,9 @@
 #include "common/Exceptions.hpp"
 
 namespace oodles {
+
+class Dispatcher; // Forward declaration for Server
+
 namespace net {
 
 class ProtocolCreator; // Forward declaration for Server
@@ -15,13 +18,14 @@ class Server : public Linker
 {
     public:
         /* Member functions/methods */
-        Server(boost::asio::io_service &s, const ProtocolCreator &c);
+        Server(Dispatcher &d, const ProtocolCreator &c);
 
         void start(const std::string &service) throw (InvalidService);
         void stop();
     private:
         /* Member variables/attributes */
         bool reverse_lookup;
+        Dispatcher &dispatcher;
         const ProtocolCreator &protocol_creator;
         boost::asio::ip::tcp::acceptor acceptor;
         boost::asio::ip::tcp::resolver resolver;

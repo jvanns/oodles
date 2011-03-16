@@ -1,6 +1,7 @@
 // oodles
 #include "Server.hpp"
 #include "ProtocolCreator.hpp"
+#include "utility/Dispatcher.hpp"
 
 // Boost.bind (TR1 is incompatible)
 #include <boost/bind.hpp>
@@ -22,7 +23,6 @@ using boost::bind;
 using boost::system::error_code;
 
 // Boost.asio
-using boost::asio::io_service;
 using boost::asio::ip::address;
 typedef boost::asio::ip::tcp::endpoint endpoint;
 typedef boost::asio::ip::tcp::acceptor acceptor;
@@ -61,11 +61,12 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Server::Server(io_service &s, const ProtocolCreator &c) :
+Server::Server(Dispatcher &d, const ProtocolCreator &c) :
     reverse_lookup(false),
+    dispatcher(d),
     protocol_creator(c),
-    acceptor(s),
-    resolver(s)
+    acceptor(d.io_service()),
+    resolver(d.io_service())
 {
 }
 
@@ -104,7 +105,7 @@ Server::stop()
 void
 Server::async_accept()
 {
-    Endpoint::Connection c(Endpoint::create(acceptor.get_io_service()));
+    Endpoint::Connection c(Endpoint::create(dispatcher));
 
     acceptor.async_accept(c->socket(), bind(&Server::acceptor_callback,
                                             this,

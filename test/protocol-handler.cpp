@@ -1,5 +1,6 @@
 // oodles
 #include "common/Exceptions.hpp"
+#include "utility/Dispatcher.hpp"
 
 #include "net/core/Client.hpp"
 #include "net/core/Server.hpp"
@@ -389,13 +390,13 @@ int main(int argc, char *argv[])
         const oodles::net::Protocol<TCPFileExchange> creator(oncon);
         oodles::net::Server *server = NULL;
         oodles::net::Client *client = NULL;
-        boost::asio::io_service service;
+        oodles::Dispatcher dispatcher;
 
         if (!client_only)
-            server = new oodles::net::Server(service, creator);
+            server = new oodles::net::Server(dispatcher, creator);
 
         if (!server_only)
-            client = new oodles::net::Client(service, creator);
+            client = new oodles::net::Client(dispatcher, creator);
 
         if (send) {
             oncon->argc = argc;
@@ -410,7 +411,7 @@ int main(int argc, char *argv[])
         if (client)
             client->start(connect_to);
 
-        service.run();
+        dispatcher.wait();
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
         return 1;

@@ -6,6 +6,9 @@
 #include "utility/Linker.hpp"
 
 namespace oodles {
+
+class Dispatcher; // Forward declaration for Client
+
 namespace net {
 
 class ProtocolCreator; // Forward declaration for Client
@@ -15,7 +18,7 @@ class Client : public Linker
 {
     public:
         /* Member functions/methods */
-        Client(boost::asio::io_service &s, const ProtocolCreator &c);
+        Client(Dispatcher &d, const ProtocolCreator &c);
 
         void start(const std::string &service);
         void stop();
