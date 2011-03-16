@@ -23,7 +23,7 @@ class Client : public Linker
         void stop();
     private:
         /* Member variables/attributes */
-        Endpoint::Connection connection;
+        Dispatcher &dispatcher;
         const ProtocolCreator &protocol_creator;
         boost::asio::ip::tcp::resolver resolver;
 
@@ -53,7 +53,8 @@ class Client : public Linker
          * c is the connected endpoint upon success
          */
         void connect_callback(const boost::system::error_code &e,
-                              boost::asio::ip::tcp::resolver::iterator i);
+                              boost::asio::ip::tcp::resolver::iterator i,
+                              Endpoint::Connection c);
 };
 
 } // net

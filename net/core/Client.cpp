@@ -59,7 +59,7 @@ namespace net {
 namespace placeholders = boost::asio::placeholders;
 
 Client::Client(Dispatcher &d, const ProtocolCreator &c) :
-    connection(Endpoint::create(d)),
+    dispatcher(d),
     protocol_creator(c),
     resolver(d.io_service())
 {
@@ -91,12 +91,13 @@ Client::async_resolve(const string &service)
 void
 Client::async_connect(resolver::iterator &i)
 {
-    const endpoint &e = *i;
+    Endpoint::Connection c(Endpoint::create(dispatcher));
 
-    connection->socket().async_connect(e, bind(&Client::connect_callback,
-                                               this,
-                                               placeholders::error,
-                                               ++i));
+    c->socket().async_connect(*i, bind(&Client::connect_callback,
+                                       this,
+                                       placeholders::error,
+                                       i++,
+                                       c));
 }
 
 void
@@ -112,14 +113,16 @@ Client::resolver_callback(const error_code &e, resolver::iterator i)
 }
 
 void
-Client::connect_callback(const error_code &e, resolver::iterator i)
+Client::connect_callback(const error_code &e,
+                         resolver::iterator i,
+                         Endpoint::Connection c)
 {
     if (!e) {
         ProtocolHandler *p = protocol_creator.create();
        
-        extend_link_to(connection.get());
-        connection->set_protocol(p);
-        connection->start();
+        extend_link_to(c.get());
+        c->set_protocol(p);
+        c->start();
     } else {
         static const resolver::iterator end;
 
@@ -128,8 +131,8 @@ Client::connect_callback(const error_code &e, resolver::iterator i)
                              0,
                              "Failed to connect to (resolved) service.");
 
-        connection->stop();
         async_connect(i);
+        c->stop();
     }
 }
 
