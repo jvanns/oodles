@@ -77,15 +77,6 @@ Client::stop()
     resolver.cancel();
 }
 
-ProtocolDialect&
-Client::dialect() const
-{
-    ProtocolDialect *d = connection->get_protocol()->get_dialect();
-    assert(d);
-
-    return *d;
-}
-
 void
 Client::async_resolve(const string &service)
 {

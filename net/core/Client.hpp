@@ -12,7 +12,6 @@ class Dispatcher; // Forward declaration for Client
 namespace net {
 
 class ProtocolCreator; // Forward declaration for Client
-struct ProtocolDialect; // Forward declaration for Client
 
 class Client : public Linker
 {
@@ -22,8 +21,6 @@ class Client : public Linker
 
         void start(const std::string &service);
         void stop();
-        
-        ProtocolDialect& dialect() const;
     private:
         /* Member variables/attributes */
         Endpoint::Connection connection;
