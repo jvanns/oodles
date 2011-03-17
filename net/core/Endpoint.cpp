@@ -1,5 +1,6 @@
 // oodles
 #include "Endpoint.hpp"
+#include "SessionHandler.hpp"
 #include "ProtocolHandler.hpp"
 #include "common/Exceptions.hpp"
 #include "utility/Dispatcher.hpp"
@@ -48,12 +49,16 @@ Endpoint::Metric::update(size_t bytes)
     }
 }
 
-Endpoint::Endpoint(Dispatcher &d) : protocol(NULL), tcp_socket(d.io_service())
+Endpoint::Endpoint(Dispatcher &d) :
+    session(NULL),
+    protocol(NULL),
+    tcp_socket(d.io_service())
 {
 }
 
 Endpoint::~Endpoint()
 {
+    delete session;
     delete protocol;
 }
 
@@ -66,7 +71,7 @@ Endpoint::stop()
 void
 Endpoint::start()
 {
-    assert(protocol); // Can't do anything without a protocol
+    assert(protocol && session); // Can't do anything without either!
     assert(tcp_socket.is_open()); // Can't do anything with a closed socket!
     /*
      * Disable Nagles algorithm (no_delay) when setting our own buffer sizes
@@ -80,12 +85,20 @@ Endpoint::start()
 }
 
 void
+Endpoint::set_session(SessionHandler *s)
+{
+    assert(!session); // Must be set only once
+
+    s->set_endpoint(shared_from_this());
+
+    session = s;
+}
+
+void
 Endpoint::set_protocol(ProtocolHandler *p)
 {
     assert(!protocol); // Must be set only once
 
-    extend_link_to(p);
-    p->extend_link_to(p->get_dialect());
     p->set_endpoint(shared_from_this());
     
     protocol = p; // Ownership is transferred

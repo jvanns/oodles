@@ -4,7 +4,6 @@
 // oodles
 #include "Buffer.hpp"
 #include "common/page.hpp"
-#include "utility/Linker.hpp"
 
 // Boost.shared
 #include <boost/shared_ptr.hpp>
@@ -28,9 +27,10 @@ static const uint16_t NBS = OODLES_PAGE_SIZE; // Network buffer size
 /* Free function for returning the local hostname of this endpoint */
 inline std::string hostname() { return boost::asio::ip::host_name(); }
 
+class SessionHandler; // Forward declaration for Endpoint
 class ProtocolHandler; // Forward declaration for Endpoint
 
-class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
+class Endpoint : public boost::enable_shared_from_this<Endpoint>
 {
     public:
         /* Dependent typedefs */
@@ -51,6 +51,9 @@ class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
 
         void stop(); // Close socket cancelling pending handlers
         void start(); // Must be called to register reads/writes
+
+        void set_session(SessionHandler *s); // Pair session with endpoint
+        SessionHandler* get_session() const { return session; }
         void set_protocol(ProtocolHandler *p); // Pair protocol with endpoint
         ProtocolHandler* get_protocol() const { return protocol; }
     private:
@@ -74,8 +77,10 @@ class Endpoint : public Linker, public boost::enable_shared_from_this<Endpoint>
         /* Member variables/attributes */
         Buffer<NBS> inbound;
         Buffer<NBS> outbound;
-        ProtocolHandler *protocol;
         Metric recv_rate, send_rate;
+        
+        SessionHandler *session;
+        ProtocolHandler *protocol;
         boost::asio::ip::tcp::socket tcp_socket;
 
         /* Member functions/methods */
