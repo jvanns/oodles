@@ -14,13 +14,13 @@ class Dispatcher; // Forward declaration for Client
 namespace net {
 
 class SessionHandler; // Forward declaration for Client
-class ProtocolCreator; // Forward declaration for Client
+class HandlerCreator; // Forward declaration for Client
 
 class Client
 {
     public:
         /* Member functions/methods */
-        Client(Dispatcher &d, const ProtocolCreator &c);
+        Client(Dispatcher &d, const HandlerCreator &c);
 
         void start(const std::string &service, SessionHandler &s);
         void stop();
@@ -30,7 +30,7 @@ class Client
         
         /* Member variables/attributes */
         Dispatcher &dispatcher;
-        const ProtocolCreator &protocol_creator;
+        const HandlerCreator &handler_creator;
         boost::asio::ip::tcp::resolver resolver;
 
         /* Member functions/methods */

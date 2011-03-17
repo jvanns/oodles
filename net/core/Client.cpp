@@ -1,8 +1,8 @@
 // oodles
 #include "Client.hpp"
+#include "HandlerCreator.hpp"
 #include "SessionHandler.hpp"
 #include "ProtocolHandler.hpp"
-#include "ProtocolCreator.hpp"
 #include "common/Exceptions.hpp"
 #include "utility/Dispatcher.hpp"
 
@@ -59,9 +59,9 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Client::Client(Dispatcher &d, const ProtocolCreator &c) :
+Client::Client(Dispatcher &d, const HandlerCreator &c) :
     dispatcher(d),
-    protocol_creator(c),
+    handler_creator(c),
     resolver(d.io_service())
 {
 }
@@ -106,7 +106,7 @@ Client::async_connect(PendingSession ps,  resolver::iterator &i)
 void
 Client::detach_client(Endpoint::Connection c) const
 {
-    ProtocolHandler *p = protocol_creator.create();
+    ProtocolHandler *p = handler_creator.create_protocol();
    
     c->set_protocol(p);
     c->start();
