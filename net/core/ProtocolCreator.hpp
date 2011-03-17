@@ -4,19 +4,33 @@
 namespace oodles {
 namespace net {
 
-class ProtocolCreator
+class ProtocolHandler; // Forward declaration for ProtocolCreator
+
+} // net
+} // oodles
+
+namespace private_protocol {
+
+class CreatorBase
 {
     public:
         /* Member functions/methods */
-        virtual ~ProtocolCreator() {}
-        virtual ProtocolHandler* create() const = 0;
+        CreatorBase() {}
+        virtual ~CreatorBase() {}
+        virtual oodles::net::ProtocolHandler* create() const = 0;
     private:
         /* Member functions/methods */
-        ProtocolCreator(const ProtocolCreator &p);
-        ProtocolCreator& operator= (const ProtocolCreator &p);
+        CreatorBase(const CreatorBase &p);
+        CreatorBase& operator= (const CreatorBase &p);
 };
 
-template<typename Handler> struct Protocol : public ProtocolCreator
+} // private_protocol
+
+namespace oodles {
+namespace net {
+
+template<typename Handler>
+struct ProtocolCreator : public private_protocol::CreatorBase
 {
     ProtocolHandler* create() const { return new Handler; }
 };
