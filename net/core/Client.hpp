@@ -3,7 +3,9 @@
 
 // oodles
 #include "Endpoint.hpp"
-#include "utility/Linker.hpp"
+
+// STL
+#include <utility> // For std::pair
 
 namespace oodles {
 
@@ -11,17 +13,21 @@ class Dispatcher; // Forward declaration for Client
 
 namespace net {
 
+class SessionHandler; // Forward declaration for Client
 class ProtocolCreator; // Forward declaration for Client
 
-class Client : public Linker
+class Client
 {
     public:
         /* Member functions/methods */
         Client(Dispatcher &d, const ProtocolCreator &c);
 
-        void start(const std::string &service);
+        void start(const std::string &service, SessionHandler &s);
         void stop();
     private:
+        /* Dependent typedefs */
+        typedef std::pair<const std::string&, SessionHandler&> PendingSession;
+        
         /* Member variables/attributes */
         Dispatcher &dispatcher;
         const ProtocolCreator &protocol_creator;
@@ -36,8 +42,16 @@ class Client : public Linker
          * the io_service which are executed (the handlers) when a connect or
          * resolution has been completed on our behalf by the OS.
          */
-        void async_resolve(const std::string &service);
-        void async_connect(boost::asio::ip::tcp::resolver::iterator &i);
+        void async_resolve(PendingSession ps);
+        void async_connect(PendingSession ps,
+                           boost::asio::ip::tcp::resolver::iterator &i);
+        
+        /*
+         * Upon establishing a successful connection to the resolved
+         * service, we can detach this client so it becomes independently
+         * managed.
+         */
+        void detach_client(Endpoint::Connection c) const;
 
         /*
          * Handler executed by io_service when accept operation is performed.
@@ -45,7 +59,8 @@ class Client : public Linker
          * i is the first of n entries the resolver returned upon success
          */
         void resolver_callback(const boost::system::error_code &e,
-                               boost::asio::ip::tcp::resolver::iterator i);
+                               boost::asio::ip::tcp::resolver::iterator &i,
+                               PendingSession ps);
 
         /*
          * Handler executed by io_service when connect operation is performed.
@@ -54,7 +69,7 @@ class Client : public Linker
          */
         void connect_callback(const boost::system::error_code &e,
                               boost::asio::ip::tcp::resolver::iterator i,
-                              Endpoint::Connection c);
+                              PendingSession ps);
 };
 
 } // net
