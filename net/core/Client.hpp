@@ -14,7 +14,6 @@ class Dispatcher; // Forward declaration for Client
 
 namespace net {
 
-class SessionHandler; // Forward declaration for Client
 class HandlerCreator; // Forward declaration for Client
 
 class Client
@@ -23,13 +22,9 @@ class Client
         /* Member functions/methods */
         Client(Dispatcher &d, const HandlerCreator &c);
 
-        void start(const std::string &service,
-                   SessionHandler &s) throw (InvalidService);
+        void start(const std::string &service) throw (InvalidService);
         void stop();
     private:
-        /* Dependent typedefs */
-        typedef std::pair<const std::string&, SessionHandler&> PendingSession;
-        
         /* Member variables/attributes */
         Dispatcher &dispatcher;
         const HandlerCreator &handler_creator;
@@ -44,9 +39,8 @@ class Client
          * the io_service which are executed (the handlers) when a connect or
          * resolution has been completed on our behalf by the OS.
          */
-        void async_resolve(PendingSession ps);
-        void async_connect(PendingSession ps,
-                           boost::asio::ip::tcp::resolver::iterator &i);
+        void async_resolve(const std::string &service);
+        void async_connect(boost::asio::ip::tcp::resolver::iterator &i);
         
         /*
          * Upon establishing a successful connection to the resolved
@@ -61,8 +55,7 @@ class Client
          * i is the first of n entries the resolver returned upon success
          */
         void resolver_callback(const boost::system::error_code &e,
-                               boost::asio::ip::tcp::resolver::iterator &i,
-                               PendingSession ps);
+                               boost::asio::ip::tcp::resolver::iterator i);
 
         /*
          * Handler executed by io_service when connect operation is performed.
@@ -71,7 +64,7 @@ class Client
          */
         void connect_callback(const boost::system::error_code &e,
                               boost::asio::ip::tcp::resolver::iterator i,
-                              PendingSession ps);
+                              Endpoint::Connection c);
 };
 
 } // net

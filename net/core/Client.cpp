@@ -1,8 +1,6 @@
 // oodles
 #include "Client.hpp"
 #include "HandlerCreator.hpp"
-#include "SessionHandler.hpp"
-#include "ProtocolHandler.hpp"
 #include "utility/Dispatcher.hpp"
 
 // Boost.bind (TR1 is incompatible)
@@ -66,9 +64,10 @@ Client::Client(Dispatcher &d, const HandlerCreator &c) :
 }
 
 void
-Client::start(const string &service, SessionHandler &s)
+Client::start(const string &service)
+throw(InvalidService)
 {
-    async_resolve(PendingSession(service, s));
+    async_resolve(service);
 }
 
 void
@@ -78,60 +77,61 @@ Client::stop()
 }
 
 void
-Client::async_resolve(PendingSession ps)
+Client::async_resolve(const string &service)
 {
-    const resolver::query q(query_from_service(ps.first));
+    const resolver::query q(query_from_service(service));
 
     resolver.async_resolve(q, bind(&Client::resolver_callback,
                                    this,
                                    placeholders::error,
-                                   placeholders::iterator,
-                                   ps));
+                                   placeholders::iterator));
 }
 
 void
-Client::async_connect(PendingSession ps,  resolver::iterator &i)
+Client::async_connect(resolver::iterator &i)
 {
+    const endpoint &e = *i;
     Endpoint::Connection c(Endpoint::create(dispatcher));
 
-    c->set_session(&ps.second);
-    c->socket().async_connect(*i, bind(&Client::connect_callback,
+    c->socket().async_connect(e, bind(&Client::connect_callback,
                                        this,
                                        placeholders::error,
-                                       i++,
-                                       ps));
+                                       ++i,
+                                       c));
 }
 
 void
 Client::detach_client(Endpoint::Connection c) const
 {
     ProtocolHandler *p = handler_creator.create_protocol();
-   
+    SessionHandler *s = handler_creator.create_session();
+    
     c->set_protocol(p);
+    c->set_session(s);
     c->start();
+
+    handler_creator.caller_context().connect_event(s);
 }
 
 void
-Client::resolver_callback(const error_code &e,
-                          resolver::iterator &i,
-                          PendingSession ps)
+Client::resolver_callback(const error_code &e, resolver::iterator i)
 {
     if (!e) {
-        async_connect(ps, i);
+        async_connect(i);
     } else {
        throw DNSFailure("Client::resolver_callback",
                         e.value(),
-                        "Failed to resolve '%s'.", ps.first.c_str());
+                        "Failed to resolve service address.");
     }
 }
 
 void
 Client::connect_callback(const error_code &e,
                          resolver::iterator i,
-                         PendingSession ps)
+                         Endpoint::Connection c)
 {
     if (!e) {
-        detach_client(ps.second.get_endpoint());
+        detach_client(c);
     } else {
         static const resolver::iterator end;
 
@@ -140,8 +140,8 @@ Client::connect_callback(const error_code &e,
                              0,
                              "Failed to connect to (resolved) service.");
 
-        ps.second.get_endpoint()->stop();
-        async_connect(ps, i);
+        async_connect(i);
+        c->stop();
     }
 }
 
