@@ -3,7 +3,6 @@
 #include "HandlerCreator.hpp"
 #include "SessionHandler.hpp"
 #include "ProtocolHandler.hpp"
-#include "common/Exceptions.hpp"
 #include "utility/Dispatcher.hpp"
 
 // Boost.bind (TR1 is incompatible)

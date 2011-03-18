@@ -3,6 +3,7 @@
 
 // oodles
 #include "Endpoint.hpp"
+#include "common/Exceptions.hpp"
 
 // STL
 #include <utility> // For std::pair
@@ -22,7 +23,8 @@ class Client
         /* Member functions/methods */
         Client(Dispatcher &d, const HandlerCreator &c);
 
-        void start(const std::string &service, SessionHandler &s);
+        void start(const std::string &service,
+                   SessionHandler &s) throw (InvalidService);
         void stop();
     private:
         /* Dependent typedefs */
