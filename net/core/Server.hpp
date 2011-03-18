@@ -3,7 +3,6 @@
 
 // oodles
 #include "Endpoint.hpp"
-#include "utility/Linker.hpp"
 #include "common/Exceptions.hpp"
 
 namespace oodles {
@@ -12,13 +11,13 @@ class Dispatcher; // Forward declaration for Server
 
 namespace net {
 
-class ProtocolCreator; // Forward declaration for Server
+class HandlerCreator; // Forward declaration for Server
 
-class Server : public Linker
+class Server
 {
     public:
         /* Member functions/methods */
-        Server(Dispatcher &d, const ProtocolCreator &c);
+        Server(Dispatcher &d, const HandlerCreator &c);
 
         void start(const std::string &service) throw (InvalidService);
         void stop();
@@ -26,7 +25,7 @@ class Server : public Linker
         /* Member variables/attributes */
         bool reverse_lookup;
         Dispatcher &dispatcher;
-        const ProtocolCreator &protocol_creator;
+        const HandlerCreator &handler_creator;
         boost::asio::ip::tcp::acceptor acceptor;
         boost::asio::ip::tcp::resolver resolver;
 
@@ -41,7 +40,7 @@ class Server : public Linker
          */
         void async_accept();
         void async_resolve(Endpoint::Connection c);
-        void detatch_client(Endpoint::Connection c);
+        void detatch_client(Endpoint::Connection c) const;
 
         /*
          * Handler executed by io_service when accept operation is performed.

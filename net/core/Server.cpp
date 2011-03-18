@@ -1,6 +1,6 @@
 // oodles
 #include "Server.hpp"
-#include "ProtocolCreator.hpp"
+#include "HandlerCreator.hpp"
 #include "utility/Dispatcher.hpp"
 
 // Boost.bind (TR1 is incompatible)
@@ -61,10 +61,10 @@ namespace net {
 // Save my fingers!
 namespace placeholders = boost::asio::placeholders;
 
-Server::Server(Dispatcher &d, const ProtocolCreator &c) :
+Server::Server(Dispatcher &d, const HandlerCreator &c) :
     reverse_lookup(false),
     dispatcher(d),
-    protocol_creator(c),
+    handler_creator(c),
     acceptor(d.io_service()),
     resolver(d.io_service())
 {
@@ -125,13 +125,16 @@ Server::async_resolve(Endpoint::Connection c)
 }
 
 void
-Server::detatch_client(Endpoint::Connection c)
+Server::detatch_client(Endpoint::Connection c) const
 {
-    ProtocolHandler *p = protocol_creator.create();
+    ProtocolHandler *p = handler_creator.create_protocol();
+    SessionHandler *s = handler_creator.create_session();
     
-    extend_link_to(c.get());
     c->set_protocol(p);
+    c->set_session(s);
     c->start();
+
+    handler_creator.caller_context().connect_event(s);
 }
 
 void
