@@ -2,6 +2,7 @@
 #define OODLES_NET_HANDLERCREATOR_HPP
 
 // oodles
+#include "CallerContext.hpp"
 #include "SessionCreator.hpp"
 #include "ProtocolCreator.hpp"
 
@@ -11,20 +12,26 @@ namespace net {
 class HandlerCreator
 {
     public:
-        HandlerCreator() {}
+        HandlerCreator(CallerContext &c) : context(c) {}
         virtual ~HandlerCreator() {}
 
         virtual SessionHandler* create_session() const = 0;
         virtual ProtocolHandler* create_protocol() const = 0;
+
+        inline CallerContext& caller_context() const { return context; }
     private:
+        /* Member variables/attributes */
+        CallerContext &context;
+        
+        /* Member functions/methods */
         HandlerCreator(const HandlerCreator &c);
         HandlerCreator& operator= (const HandlerCreator &c);
 };
 
-template<typename SH, PH> struct Creator : public HandlerCreator
+template<typename PH, typename SH> struct Creator : public HandlerCreator
 {
-    typedef SH Session;
-    typedef PH Protocol;
+
+    Creator(CallerContext &c) : HandlerCreator(c) {}
     
     SessionHandler* create_session() const
     {
