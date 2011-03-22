@@ -129,12 +129,12 @@ Server::detatch_client(Endpoint::Connection c) const
 {
     ProtocolHandler *p = handler_creator.create_protocol();
     SessionHandler *s = handler_creator.create_session();
+    CallerContext &cc = handler_creator.caller_context();
     
     c->set_protocol(p);
     c->set_session(s);
-    c->start();
-
-    handler_creator.caller_context().connect_event(s);
+    
+    c->start(cc);
 }
 
 void

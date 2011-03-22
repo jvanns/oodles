@@ -27,6 +27,7 @@ static const uint16_t NBS = OODLES_PAGE_SIZE; // Network buffer size
 /* Free function for returning the local hostname of this endpoint */
 inline std::string hostname() { return boost::asio::ip::host_name(); }
 
+class CallerContext; // Forward declaration for Endpoint
 class SessionHandler; // Forward declaration for Endpoint
 class ProtocolHandler; // Forward declaration for Endpoint
 
@@ -50,7 +51,7 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         boost::asio::ip::tcp::socket& socket() { return tcp_socket; }
 
         void stop(); // Close socket cancelling pending handlers
-        void start(); // Must be called to register reads/writes
+        void start(CallerContext &c); // Must be called to register reads/writes
 
         void set_session(SessionHandler *s); // Pair session with endpoint
         SessionHandler* get_session() const { return session; }

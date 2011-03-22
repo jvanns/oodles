@@ -1,7 +1,9 @@
 // oodles
 #include "Endpoint.hpp"
+#include "CallerContext.hpp"
 #include "SessionHandler.hpp"
 #include "ProtocolHandler.hpp"
+
 #include "common/Exceptions.hpp"
 #include "utility/Dispatcher.hpp"
 
@@ -69,7 +71,7 @@ Endpoint::stop()
 }
 
 void
-Endpoint::start()
+Endpoint::start(CallerContext &c)
 {
     assert(protocol && session); // Can't do anything without either!
     assert(tcp_socket.is_open()); // Can't do anything with a closed socket!
@@ -81,6 +83,7 @@ Endpoint::start()
     tcp_socket.set_option(boost::asio::socket_base::send_buffer_size(NBS));
     tcp_socket.set_option(boost::asio::socket_base::receive_buffer_size(NBS));
 
+    session->start(c); // Call first to prepare session/context before transfers
     protocol->start();
 }
 

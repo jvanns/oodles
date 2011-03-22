@@ -9,7 +9,7 @@ class SessionHandler; // Forward declaration for CallerContext
 struct CallerContext
 {
     virtual ~CallerContext() {}
-    virtual void connect_event(SessionHandler *s) = 0;
+    virtual void start(SessionHandler &s) = 0;
 };
 
 } // net
