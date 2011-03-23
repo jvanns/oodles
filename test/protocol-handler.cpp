@@ -4,8 +4,8 @@
 
 #include "net/core/Client.hpp"
 #include "net/core/Server.hpp"
-#include "net/core/OnConnect.hpp"
-#include "net/core/ProtocolCreator.hpp"
+#include "net/core/HandlerCreator.hpp"
+#include "net/core/SessionHandler.hpp"
 #include "net/core/ProtocolHandler.hpp"
 
 // Boost
@@ -28,10 +28,55 @@ using std::endl;
 using std::queue;
 using std::string;
 
-/* 
- * Gah! A global variable :p
+namespace {
+
+/*
+ * Constants
  */
 static const string tmp("/tmp/TCPFEX/");
+static const uint16_t name_size = sizeof(uint16_t);
+static const uint16_t file_size = sizeof(uint32_t);
+
+/*
+ * Structure used to hold state of an in-transit file transferred by TCPFEX
+ */
+struct WiredFile
+{
+    int fd;
+    string name;
+    size_t size, buffered, transferred;
+    /*
+     * size is the size of a complete message, not just the file
+     */
+
+    WiredFile() : fd(-1), size(0), buffered(0), transferred(0) {}
+    void close() { if (fd != -1) { ::close(fd); fd = -1; } }
+    void reset() { close(); *this = WiredFile(); }
+};
+
+class TCPFileExchange; // Forward declaration for Session
+
+/*
+ * Session provides the interface between the protocol and the connected
+ * endpoint responsible for actually shifting data. It holds all outgoing
+ * files (instances of WiredFile) and any incoming file before it is written
+ * to disk.
+ */
+class Session : public oodles::net::SessionHandler
+{
+    public:
+        Session() : loaded(0), sent(0) {}
+        
+        size_t pending() const { return outbound.size(); }
+        bool read_file(const char *file_name);
+        void write_file(WiredFile &f, const char *buffer, size_t bytes);
+    private:
+        WiredFile incoming;
+        size_t loaded, sent;
+        queue<WiredFile> outbound;
+
+        friend class TCPFileExchange; // Will access private attributes above
+};
 
 /*
  * Test protocol handler abstraction; This protocol, set
@@ -46,19 +91,13 @@ static const string tmp("/tmp/TCPFEX/");
  */
 class TCPFileExchange : public oodles::net::ProtocolHandler
 {
-    private:
-        struct WiredFile; // Forward declaration for public methods below
     public:
-        TCPFileExchange(const oodles::net::DialectCreator &d,
-                        oodles::net::OnConnect *c) :
-            ProtocolHandler(d, c),
-            loaded(0),
-            sent(0) {}
-
-        bool load_file(const char *file_name);
-        size_t pending() const { return outbound.size(); }
-        void write_file(WiredFile &f, const char *buffer, size_t bytes);
-
+        /* Provide access to our session */
+        Session& session()
+        {
+            return static_cast<Session&>(*(get_endpoint()->get_session()));
+        }
+        
         /* Override the pure virtual methods from ProtocolHandler */
         string name() const { return "TCPFEX"; }
 
@@ -68,67 +107,50 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
 
         /* Reads */
         size_t buffer2message(const char *buffer, size_t max);
-    private:
-        struct WiredFile
-        {
-            int fd;
-            string name;
-            size_t size, buffered, transferred;
-            /*
-             * size is the size of a complete message, not just the file
-             */
-
-            WiredFile() : fd(-1), size(0), buffered(0), transferred(0) {}
-            void close() { if (fd != -1) { ::close(fd); fd = -1; } }
-            void reset() { close(); *this = WiredFile(); }
-        };
-        
+    private: 
         WiredFile incoming;
-        size_t loaded, sent;
-        queue<WiredFile> outbound;
-        static const uint16_t name_size, file_size;
 };
 
-const uint16_t
-TCPFileExchange::name_size = sizeof(uint16_t);
-
-const uint16_t
-TCPFileExchange::file_size = sizeof(uint32_t);
-
-bool
-TCPFileExchange::load_file(const char *file_name)
+struct ClientContext : public oodles::net::CallerContext
 {
-    int fd = -1;
-    struct stat info;
+    int argc;
+    char **argv;
 
-    if ((fd = open(file_name, O_RDONLY)) == -1)
-        return false;
+    inline void start(oodles::net::SessionHandler &s)
+    {
+        start(static_cast<Session&>(s));
+    }
+    
+    void start(Session &s)
+    {
+        for (int i = 0 ; i < argc ; ++i) {
+            if (!s.read_file(argv[i]))
+                cerr << "Failed to load file '" << argv[i] << "'.\n";
+            else
+                cout << "Opened file '" << argv[i] << "'.\n";
+        }
+        
+        cout << "Attempting to send " << s.pending() << " files...\n";
+    }
+};
 
-    if (fstat(fd, &info) != 0)
-        return false;
-
-    if (info.st_size == 0)
-        return false; // Do not, for this trivial example, load empty files
-
-    WiredFile f;
-
-    f.fd = fd;
-    f.name = file_name;
-    f.size = name_size + f.name.size() + file_size + info.st_size;
-
-    ++loaded;
-    outbound.push(f);
-
-    return true;
-}
+struct ServerContext : public oodles::net::CallerContext
+{
+    void start(oodles::net::SessionHandler &s)
+    {
+        cout << "New client connection established.\n";
+    }
+};
 
 void
 TCPFileExchange::bytes_transferred(size_t n)
 {
-    assert(pending());
-
+    Session &s = session();
+    
+    assert(s.pending());
+    
     size_t excess = 0;
-    WiredFile &f = outbound.front();
+    WiredFile &f = s.outbound.front();
 
     if (f.transferred + n > f.size)
         excess = n - (f.size - f.transferred);
@@ -144,9 +166,9 @@ TCPFileExchange::bytes_transferred(size_t n)
 
         cout << "Transfer of '" << f.name << "' complete.\n";
 
-        ++sent;
+        ++s.sent;
         f.close();
-        outbound.pop();
+        s.outbound.pop();
 
         if (excess)
             bytes_transferred(excess);
@@ -155,11 +177,11 @@ TCPFileExchange::bytes_transferred(size_t n)
     /*
      * No need to call transfer_data() from here - the Endpoint does it for us
      */
-    if (!pending()) {
+    if (!s.pending()) {
         stop(); // Will close the connection
-        assert(sent == loaded); // Assert we sent all we should have
+        assert(s.sent == s.loaded);
 
-        cout << "All " << loaded << " files transferred successfully.\n";
+        cout << "All " << s.loaded << " files transferred successfully.\n";
         cout << "Transfer metrics:\n";
         print_metrics(&cout);
     }
@@ -168,11 +190,13 @@ TCPFileExchange::bytes_transferred(size_t n)
 size_t
 TCPFileExchange::message2buffer(char *buffer, size_t max)
 {
-    if (!pending())
-        return 0;
+    Session &s = session();
 
+    if (!s.pending())
+        return 0;
+    
     size_t offset = 0;
-    WiredFile &f = outbound.front();
+    WiredFile &f = s.outbound.front();
 
     if (f.buffered == 0) { // Send the header?
         const size_t header_size = name_size + file_size + f.name.size();
@@ -211,41 +235,12 @@ TCPFileExchange::message2buffer(char *buffer, size_t max)
     return n + offset; // Return the number of bytes in buffer we used
 }
 
-void
-TCPFileExchange::write_file(WiredFile &f, const char *buffer, size_t bytes)
-{
-    assert(f.size > 0);
-    assert(!f.name.empty());
-
-    if (f.fd == -1) {
-        static const size_t e = string::npos; // end
-        const size_t s = f.name.find_last_of('/'); // slash
-        const string file_name(tmp + f.name.substr(s == e ? 0 : s + 1));
-
-        f.fd = open(file_name.c_str(), O_WRONLY | O_CREAT, 0644);
-
-        if (f.fd == -1)
-            throw oodles::OpenError("TCPFileExchange::write_file",
-                                    errno,
-                                    "Failed to open %s for writing.",
-                                    file_name.c_str());
-    }
-
-    const int n = write(f.fd, buffer, bytes);
-
-    if (n == -1)
-        throw oodles::WriteError("TCPFileExchange::write_file",
-                                 errno,
-                                 "Failed to write to %s from socket buffer.",
-                                 f.name.c_str());
-
-    f.buffered += n;
-}
-
 size_t
 TCPFileExchange::buffer2message(const char *buffer, size_t max)
 {
+    Session &s = session();
     size_t offset = 0, used = 0;
+    WiredFile &incoming = s.incoming;
 
     /*
      * If no name is set we must retrieve it from the buffer
@@ -293,14 +288,14 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
     if (written + (max - used) > incoming.size - header_size)
         end = (incoming.size - header_size) - written;
 
-    write_file(incoming, buffer + offset, end > 0 ? end : max - used);
+    s.write_file(incoming, buffer + offset, end > 0 ? end : max - used);
     used += incoming.buffered - written;
 
     if (incoming.buffered == incoming.size - header_size) {
-        ++loaded;
+       ++s.loaded;
         
         cout << "Download of '" << incoming.name << "' complete, "
-             << loaded << " files received in total.\n";
+             << s.loaded << " files received in total.\n";
 
         incoming.reset();
         cout << "Transfer metrics:\n";
@@ -310,28 +305,65 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
     return used;
 }
 
-struct BeginExchange : public oodles::net::OnConnect
+bool
+Session::read_file(const char *file_name)
 {
-    int argc;
-    char **argv;
+    int fd = -1;
+    struct stat info;
 
-    OnConnect* create() const { return new BeginExchange(*this); } // Clone
+    if ((fd = open(file_name, O_RDONLY)) == -1)
+        return false;
 
-    void operator() (oodles::net::ProtocolHandler &p)
-    {
-        TCPFileExchange &tcpfex = *p.get_dialect();
-        
-        for (int i = 0 ; i < argc ; ++i) {
-            if (!tcpfex.load_file(argv[i]))
-                cerr << "Failed to load file '" << argv[i] << "'.\n";
-            else
-                cout << "Opened file '" << argv[i] << "'.\n";
-        }
-        
-        cout << "Attempting to send " << tcpfex.pending() << " files...\n";
+    if (fstat(fd, &info) != 0)
+        return false;
+
+    if (info.st_size == 0)
+        return false; // Do not, for this trivial example, load empty files
+
+    WiredFile f;
+
+    f.fd = fd;
+    f.name = file_name;
+    f.size = name_size + f.name.size() + file_size + info.st_size;
+
+    ++loaded;
+    outbound.push(f);
+
+    return true;
+}
+
+void
+Session::write_file(WiredFile &f, const char *buffer, size_t bytes)
+{
+    assert(f.size > 0);
+    assert(!f.name.empty());
+
+    if (f.fd == -1) {
+        static const size_t e = string::npos; // end
+        const size_t s = f.name.find_last_of('/'); // slash
+        const string file_name(tmp + f.name.substr(s == e ? 0 : s + 1));
+
+        f.fd = open(file_name.c_str(), O_WRONLY | O_CREAT, 0644);
+
+        if (f.fd == -1)
+            throw oodles::OpenError("TCPFileExchange::write_file",
+                                    errno,
+                                    "Failed to open %s for writing.",
+                                    file_name.c_str());
     }
-};
 
+    const int n = write(f.fd, buffer, bytes);
+
+    if (n == -1)
+        throw oodles::WriteError("TCPFileExchange::write_file",
+                                 errno,
+                                 "Failed to write to %s from socket buffer.",
+                                 f.name.c_str());
+
+    f.buffered += n;
+}
+
+} // anonymous
 
 static void print_usage(const char *program)
 {
@@ -386,32 +418,34 @@ int main(int argc, char *argv[])
     }
 
     try {
-        BeginExchange *oncon = send ? new BeginExchange : NULL;
-        const oodles::net::Protocol<TCPFileExchange> creator(oncon);
+        typedef oodles::net::Creator<TCPFileExchange, Session> Creator;
         oodles::net::Server *server = NULL;
         oodles::net::Client *client = NULL;
         oodles::Dispatcher dispatcher;
 
-        if (!client_only)
-            server = new oodles::net::Server(dispatcher, creator);
-
-        if (!server_only)
-            client = new oodles::net::Client(dispatcher, creator);
-
-        if (send) {
-            oncon->argc = argc;
-            oncon->argv = argv;
-        }
-
-        if (server) {
+        if (!client_only) {
+            static ServerContext context;
+            static const Creator creator(context);
+            
             cout << "NOTE: All received files can be found in " << tmp << ".\n";
+            server = new oodles::net::Server(dispatcher, creator);
             server->start(listen_on);
         }
 
-        if (client)
+        if (!server_only) {
+            static ClientContext context;
+            static const Creator creator(context);
+            
+            client = new oodles::net::Client(dispatcher, creator);
             client->start(connect_to);
+            
+            context.argc = argc;
+            context.argv = argv;
+        }
 
         dispatcher.wait();
+        delete client;
+        delete server;
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
         return 1;
