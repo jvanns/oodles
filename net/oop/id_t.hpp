@@ -14,7 +14,7 @@ enum {
     INVALID_ID = 0,
 
     /*
-     * Message IDs for OOP dialect between Crawler and Scheduler
+     * Message IDs for OOP dialog between Crawler and Scheduler
      */
     REGISTER_CRAWLER = 10, // Crawler registers itself for work with Scheduler
     BEGIN_CRAWL, // Scheduler assigns URLs to crawler mandating a crawl
