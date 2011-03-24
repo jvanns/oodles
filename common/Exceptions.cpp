@@ -43,10 +43,7 @@ DNSFailure::DNSFailure(const string &from, int error, const char *format, ...)
     init(from, error, format); // va_end happens in here
 }
 
-DialectError::DialectError(const string &from,
-                           int error,
-                           const char *format,
-                           ...)
+DialogError::DialogError(const string &from, int error, const char *format, ...)
 {
     va_start(list, format);
     init(from, error, format); // va_end happens in here

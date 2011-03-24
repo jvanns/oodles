@@ -35,9 +35,9 @@ struct DNSFailure : public NonFatalException
     DNSFailure(const std::string &from, int error, const char *format, ...);
 };
 
-struct DialectError : public NonFatalException
+struct DialogError : public NonFatalException
 {
-    DialectError(const std::string &from, int error, const char *format, ...);
+    DialogError(const std::string &from, int error, const char *format, ...);
 };
 
 } // net
