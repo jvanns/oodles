@@ -9,10 +9,7 @@ namespace oodles {
 namespace net {
 namespace oop {
 
-Protocol::Protocol(const DialectCreator &d, OnConnect *c) :
-    ProtocolHandler(d, c),
-    incoming(NULL),
-    transferred(0)
+Protocol::Protocol() : incoming(NULL), transferred(0)
 {
 }
 
@@ -146,9 +143,6 @@ Protocol::buffer2message(const char *buffer, size_t max)
             incoming = NULL;
         }
     }
-    
-    if (!inbound_messages.empty() && dialect != this)
-        dialect->translate();
 
     return used;
 }
