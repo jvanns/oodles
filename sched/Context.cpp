@@ -1,7 +1,6 @@
 // oodles
 #include "Context.hpp"
 #include "utility/NodeIO.hpp"
-#include "utility/Linker.hpp"
 
 // Boost
 #include <boost/bind.hpp>
@@ -144,7 +143,21 @@ class DispatcherTask : public enable_shared_from_this<DispatcherTask>
 namespace oodles {
 namespace sched {
 
-Context::Context() : server(dispatcher, creator), scheduler(this)
+// NetContext
+Context::NetContext::NetContext(Context *c) : context(c) {}
+
+void
+Context::NetContext::start(net::SessionHandler &s)
+{
+    const Link l(context, static_cast<oop::Session*>(&s));
+}
+
+// Context
+Context::Context() :
+    scheduler(&dispatcher),
+    net_context(this),
+    creator(net_context),
+    server(dispatcher, creator)
 {
 }
 
@@ -164,7 +177,6 @@ Context::start_crawling(ostream *dot_stream, int interval)
 void
 Context::start_server(const string &service)
 {
-    const Link link(&server, &scheduler);
     server.start(service);
 }
 

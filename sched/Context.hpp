@@ -2,12 +2,15 @@
 #define OODLES_SCHED_CONTEXT_HPP
 
 // oodles
+#include "Session.hpp"
 #include "Crawler.hpp"
 #include "Scheduler.hpp"
 
 #include "net/core/Server.hpp"
-#include "net/oop/SchedulerCrawler.hpp"
+#include "net/oop/Protocol.hpp"
+#include "net/core/HandlerCreator.hpp"
 
+#include "utility/Linker.hpp"
 #include "utility/Dispatcher.hpp"
 #include "utility/BreadCrumbTrail.hpp"
 
@@ -18,11 +21,13 @@
 namespace oodles {
 namespace sched {
 
-class Context
+class Context : public Linker
 {
     public:
         /* Member functions/methods */
         Context();
+        
+        Scheduler& get_scheduler() { return scheduler; }
         
         void seed_scheduler(const std::string &url);
         void start_server(const std::string &service);
@@ -31,10 +36,15 @@ class Context
         void stop_crawling();
         void start_crawling(std::ostream *dot_stream = NULL, int interval = 1);
     private:
-        /* Dependent typedefs */
-        typedef net::Server Server;
-        typedef net::oop::Protocol OOP;
-        typedef net::oop::dialect::SchedulerCrawler SchedulerCrawler;
+        /* Internal Data Structures */
+        class NetContext : public net::CallerContext
+        {
+            public:
+                NetContext(Context *c);
+                void start(net::SessionHandler &s);
+            private:
+                Context *context;
+        };
         
         /* Member variables/attributes */
 
@@ -42,13 +52,7 @@ class Context
          * Asynchronous task dispatcher
          */
         Dispatcher dispatcher;
-
-        /*
-         * Network layers
-         */
-        Server server;
-        const net::Protocol<OOP, SchedulerCrawler> creator;
-
+        
         /*
          * Scheduler layer
          */
@@ -56,8 +60,13 @@ class Context
         BreadCrumbTrail trail;
         std::map<std::string, Crawler> crawlers;
 
-        /* Friend class declarations */
-        friend class Scheduler; // Scheduler wants to access dispatcher
+        /*
+         * Network layer
+         */ 
+        typedef net::Creator<net::oop::Protocol, oop::Session> Creator;
+        NetContext net_context;
+        const Creator creator;
+        net::Server server;
 };
 
 } // sched

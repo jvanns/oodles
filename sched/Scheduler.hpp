@@ -5,7 +5,6 @@
 #include "Node.hpp"
 #include "Crawler.hpp"
 #include "utility/Tree.hpp"
-#include "utility/Linker.hpp"
 
 // STL
 #include <queue>
@@ -17,6 +16,7 @@
 
 namespace oodles {
 
+class Dispatcher; // Forward declaration for Scheduler
 class BreadCrumbTrail; // Forward declaration for Scheduler
 
 namespace event {
@@ -27,18 +27,16 @@ class Subscriber; // Forward declaration for Scheduler
 
 namespace sched {
 
-class Context; // Forward declaration for Scheduler
 class Deferable; // Forward declaration for Scheduler
 class DeferredUpdate; // Forward declaration for Scheduler
 
-class Scheduler : public Linker
+class Scheduler 
 {
     public:
         /* Member functions/methods */
-        Scheduler(Context *c = NULL);
+        Scheduler(Dispatcher *d = NULL);
         ~Scheduler();
 
-        Context* context() { return ctxt; }
         const TreeBase& url_tree() const { return tree; }
         void register_crawler(Crawler &c) { crawlers.push(&c); }
 
@@ -52,7 +50,6 @@ class Scheduler : public Linker
         void defer_update(const Deferable &d, event::Subscriber &s);
     private:
         /* Member variables/attributes */
-        Context *ctxt;
         size_t leaves;
         BreadCrumbTrail *trail;
         DeferredUpdate *update;

@@ -1,5 +1,4 @@
 // oodles
-#include "Context.hpp"
 #include "PageData.hpp"
 #include "Scheduler.hpp"
 #include "DeferredUpdate.hpp"
@@ -21,15 +20,14 @@ parent_of(oodles::sched::Node::Base &node)
 namespace oodles {
 namespace sched {
 
-Scheduler::Scheduler(Context *c) :
-    ctxt(c),
+Scheduler::Scheduler(Dispatcher *d) :
     leaves(0),
     trail(NULL),
     update(NULL),
     tree(new Node("ROOT"))
 {
-    if (c)
-        update = new DeferredUpdate(c->dispatcher);
+    if (d)
+        update = new DeferredUpdate(*d);
 }
 
 Scheduler::~Scheduler()
