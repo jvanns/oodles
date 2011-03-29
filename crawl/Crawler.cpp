@@ -7,10 +7,9 @@ using std::string;
 namespace oodles {
 namespace crawl {
 
-Crawler::Crawler(const string &name, uint16_t cores, Dispatcher &d) :
+Crawler::Crawler(const string &name, uint16_t cores) :
     cpus(cores), /* We use cpus/cores interchangeably */
-    name(name),
-    dispatcher(d)
+    name(name)
 {
 }
 
