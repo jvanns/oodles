@@ -6,6 +6,13 @@ namespace oodles {
 namespace net {
 namespace oop {
 
+bool
+Session::online() const
+{
+    Endpoint::Connection e = get_endpoint();
+    return e && e->online();
+}
+
 void
 Session::handle_messages()
 {

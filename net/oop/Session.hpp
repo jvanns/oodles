@@ -14,6 +14,7 @@ class Message; // Forward declaration for Session
 class Session : public Linker, public SessionHandler
 {
     public:
+        bool online() const;
         void handle_messages();
         
         void push_message(Message *m); // Ownership transferred
