@@ -2,7 +2,7 @@
 #define OODLES_SCHED_CRAWLER_HPP
 
 // oodles
-#include "net/core/Endpoint.hpp"
+#include "Session.hpp"
 
 // STL
 #include <vector>
@@ -31,7 +31,7 @@ class Crawler
         void begin_crawl();
         unit_t add_url(url::URL &url);
         unit_t remove_url(url::URL &url);
-        void set_endpoint(net::Endpoint::Connection e);
+        void set_session(oop::Session *s);
 
         bool online() const { return !offline(); }
         const std::string& id() const { return name; }
@@ -41,13 +41,14 @@ class Crawler
         bool full() const { return assigned() == max_unit_size(); }
     private:
         /* Member functions/methods */
-        bool offline() const { return !endpoint || !endpoint->online(); }
+        bool offline() const { return !session || !session->online(); }
 
         /* Member variables/attributes */
+        oop::Session *session; // Network session for this Crawler
+        
         const uint16_t cores;
         const std::string name; // Identifier for this Crawler (i.e. hostname)
         std::vector<url::URL*> work_unit; // Units of work (URLs to crawl)
-        net::Endpoint::Connection endpoint; // Network session for this Crawler
 };
 
 struct RankCrawler : std::binary_function<Crawler, Crawler, bool>
