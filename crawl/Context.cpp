@@ -5,34 +5,26 @@
 // STL
 using std::string;
 
-namespace {
-
-struct BeginDialog : public oodles::net::OnConnect
-{
-    oodles::net::OnConnect* create() const { return new BeginDialog(*this); }
-
-    void operator() (oodles::net::ProtocolHandler &p)
-    {
-        oodles::net::oop::dialect::SchedulerCrawler &d = *p.get_dialect();
-        d.register_crawler();
-    }
-
-    static BeginDialog& instance()
-    {
-        static BeginDialog x;
-        return x;
-    }
-};
- 
-} // anonymous
-
 namespace oodles {
 namespace crawl {
 
+// NetContext
+Context::NetContext::NetContext(Context *c) : context(c) {}
+
+void
+Context::NetContext::start(net::SessionHandler &s)
+{
+    oop::Session *session = static_cast<oop::Session*>(&s);
+    const Link l(context, session);
+
+    session->register_crawler();
+}
+
+// Context
 Context::Context(const string &name, uint16_t cores) :
-    dispatcher(cores),
-    crawler(name, cores, dispatcher),
-    creator(&BeginDialog::instance()),
+    crawler(name, cores),
+    net_context(this),
+    creator(net_context),
     client(dispatcher, creator)
 {
 }
@@ -46,8 +38,6 @@ Context::stop_crawling()
 void
 Context::start_crawling(const string &service)
 {
-    const Link link(&client, &crawler);
-    
     client.start(service);
     dispatcher.wait();
 }

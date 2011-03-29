@@ -3,7 +3,6 @@
 
 // oodles
 #include "url/URL.hpp"
-#include "utility/Linker.hpp"
 
 // STL
 #include <map>
@@ -13,7 +12,7 @@
 namespace oodles {
 namespace crawl {
 
-class Crawler : public Linker
+class Crawler
 {
     public:
         /* Member functions/methods */

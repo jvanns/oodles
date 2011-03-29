@@ -2,27 +2,39 @@
 #define OODLES_CRAWL_CONTEXT_HPP
 
 // oodles
+#include "Session.hpp"
 #include "Crawler.hpp"
+
 #include "net/core/Client.hpp"
+#include "net/oop/Protocol.hpp"
+#include "net/core/HandlerCreator.hpp"
+
+#include "utility/Linker.hpp"
 #include "utility/Dispatcher.hpp"
-#include "net/oop/SchedulerCrawler.hpp"
 
 namespace oodles {
 namespace crawl {
 
-class Context
+class Context : public Linker
 {
     public:
         /* Member functions/methods */
         Context(const std::string &name, uint16_t cores);
 
+        Crawler& get_crawler() { return crawler; }
+
         void stop_crawling();
         void start_crawling(const std::string &service);
     private:
-        /* Dependent typedefs */
-        typedef net::Client Client;
-        typedef net::oop::Protocol OOP;
-        typedef net::oop::dialect::SchedulerCrawler SchedulerCrawler;
+        /* Internal Data Structures */
+        class NetContext : public net::CallerContext
+        {
+            public:
+                NetContext(Context *c);
+                void start(net::SessionHandler &s);
+            private:
+                Context *context;
+        };
         
         /* Member variables/attributes */
 
@@ -39,8 +51,10 @@ class Context
         /*
          * Network layers
          */
-        const net::Protocol<OOP, SchedulerCrawler> creator;
-        Client client;
+        typedef net::Creator<net::oop::Protocol, oop::Session> Creator;
+        NetContext net_context;
+        const Creator creator;
+        net::Client client;
 };
 
 } // crawl
