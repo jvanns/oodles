@@ -3,15 +3,13 @@
 #include "common/Exceptions.hpp"
 #include "utility/Dispatcher.hpp"
 
-// oodles core networking
+#include "net/oop/Session.hpp"
+#include "net/oop/Protocol.hpp"
+#include "net/oop/Messages.hpp"
+
 #include "net/core/Client.hpp"
 #include "net/core/Server.hpp"
-#include "net/core/ProtocolCreator.hpp"
-
-// oodles protocol (OOP)
-#include "net/oop/Factory.hpp"
-#include "net/oop/Messages.hpp"
-#include "net/oop/Protocol.hpp"
+#include "net/core/HandlerCreator.hpp"
 
 // STL
 #include <string>
@@ -42,7 +40,7 @@ template<typename Iterator, typename Type> struct find
         while (i != j) {
             if (*(*i) == value)
                 return true;
-            
+
             ++i;
         }
 
@@ -50,155 +48,99 @@ template<typename Iterator, typename Type> struct find
     }
 };
 
-class TestOOPDialect : public oodles::net::ProtocolDialect
+class Session : public oodles::net::oop::Session
 {
     public:
-        /* Member functions/methods */
-        typedef oodles::url::URL URL;
-        TestOOPDialect() : initiator(false) {}
-        
-        void register_crawler()
-        {
-            using oodles::net::oop::RegisterCrawler;
-            
-            RegisterCrawler *m = new RegisterCrawler;
-            m->name = "tarantula";
-            m->cores = 8;
+        void handle_message(oodles::net::oop::Message *m);
+};
 
-            initiator = true;
-            
-            send(m); // Non-blocking
-        }
-        
-        void translate()
-        {
-            oodles::net::oop::Message *m = protocol().pop_message();
+struct ClientContext : public oodles::net::CallerContext
+{
+    inline void start(oodles::net::SessionHandler &s)
+    {
+        start(static_cast<Session&>(s));
+    }
+    
+    void start(Session &s)
+    {
+        using oodles::net::oop::RegisterCrawler;
+        RegisterCrawler *m = new RegisterCrawler;
 
-            while (m) {
-                continue_dialog(m);
-                m = protocol().pop_message();
-            }
-        }
-    private:
-        /* Internal Data Structures */
-        struct Context
-        {
-            oodles::net::oop::id_t inbound, outbound;
-            Context() : inbound(oodles::net::oop::INVALID_ID),
-                        outbound(oodles::net::oop::INVALID_ID) {}
-        };
-        
-        /* Member variables/attributes */
-        bool initiator;
-        Context context;
-        
-        /* Member functions/methods */
-        void continue_dialog(oodles::net::oop::Message *m)
-        {
-            using namespace oodles::net::oop;
-            cout << "Received OOP message ID #" << m->id() << endl;
-            
-            /*
-             * Check the dialog context (based on received messages)
-             */
-            switch (m->id()) {
-                case REGISTER_CRAWLER: // Scheduler receives from Crawler
-                    assert(!initiator);
-                    assert(context.inbound == INVALID_ID);
-                    assert(context.outbound == INVALID_ID);
-                    
-                    continue_dialog(static_cast<RegisterCrawler&>(*m)); 
-                    break;
-                case BEGIN_CRAWL: // Crawler receives from Scheduler
-                    assert(initiator);
-                    assert(context.inbound == INVALID_ID // New crawler
-                           || context.inbound == BEGIN_CRAWL); // Last crawl
-                    assert(context.outbound == REGISTER_CRAWLER // New crawler
-                           || context.outbound == END_CRAWL); // Last crawl
-                    
-                    continue_dialog(static_cast<BeginCrawl&>(*m)); 
-                    break;
-                case END_CRAWL: // Scheduler receives from Crawler
-                    assert(!initiator);
-                    assert(context.inbound == REGISTER_CRAWLER // 1st Crawl
-                           || context.inbound == END_CRAWL); // Subsequent crawl
-                    assert(context.outbound == BEGIN_CRAWL); // Only ever begin
-                    
-                    continue_dialog(static_cast<EndCrawl&>(*m)); 
-                    break;
-            }
+        m->name = "tarantula";
+        m->cores = 8;
 
-            context.inbound = m->id();
-            delete m;
-        }
-        
-        void continue_dialog(const oodles::net::oop::RegisterCrawler &r)
-        {
+        s.push_message(m);
+    }
+};
+
+struct ServerContext : public oodles::net::CallerContext
+{
+    void start(oodles::net::SessionHandler &s)
+    {
+        cout << "New client connection established.\n";
+    }
+};
+
+void
+Session::handle_message(oodles::net::oop::Message *m)
+{
+    using oodles::url::URL;
+    using namespace oodles::net::oop;
+
+    static const URL a("http://www.apple.com/uk"),
+                     y("http://www.youtube.com/uk"),
+                     f("http://www.facebook.co.uk");
+
+    switch (m->id()) {
+        case REGISTER_CRAWLER:
+            {
+            BeginCrawl *s = new BeginCrawl; // send
+            RegisterCrawler &r = static_cast<RegisterCrawler&>(*m); // recv
+
             assert(r.name == "tarantula");
             assert(r.cores == 8);
-            new_crawl();
-        }
-        
-        void continue_dialog(const oodles::net::oop::BeginCrawl &b)
-        {
-            assert(b.urls.size() == 3);
             
-            static const oodles::url::URL a("http://www.apple.com/uk"),
-                                          y("http://www.youtube.com/uk"),
-                                          f("http://www.facebook.co.uk");
-            static const find<list<URL*>::const_iterator, URL> finder;
-            list<URL*>::const_iterator begin(b.urls.begin()), end(b.urls.end());
+            s->urls.push_back(&a);
+            s->urls.push_back(&y);
+            s->urls.push_back(&f);
+            
+            push_message(s);
+            }
+            break;
+        case BEGIN_CRAWL:
+            {
+            EndCrawl *s = new EndCrawl; // send
+            BeginCrawl &r = static_cast<BeginCrawl&>(*m); // recv
+            list<const URL*>::const_iterator begin(r.urls.begin()),
+                                                 end(r.urls.end());
+            static const find<list<const URL*>::const_iterator, URL> finder;
 
+            assert(r.urls.size() == 3);
             assert(finder(begin, end, a));
             assert(finder(begin, end, y));
             assert(finder(begin, end, f));
             
-            using oodles::net::oop::EndCrawl;
+            s->scheduled_urls.push_back(make_pair(a.page_id(), true));
+            s->scheduled_urls.push_back(make_pair(y.page_id(), true));
+            s->scheduled_urls.push_back(make_pair(f.page_id(), true));
 
-            EndCrawl *m = new EndCrawl;
-            m->scheduled_urls.push_back(make_pair(a.page_id(), true));
-            m->scheduled_urls.push_back(make_pair(y.page_id(), true));
-            m->scheduled_urls.push_back(make_pair(f.page_id(), true));
+            push_message(s);
+            }
+            break;
+        case END_CRAWL:
+            {
+            EndCrawl &r = static_cast<EndCrawl&>(*m); // recv
 
-            send(m); // Non-blocking
-        }
-        
-        void continue_dialog(const oodles::net::oop::EndCrawl &e)
-        {
-            assert(e.scheduled_urls.size() == 3);
-            assert(e.new_urls.empty());
-            new_crawl();
-        }
-
-        void new_crawl()
-        {
-            using oodles::net::oop::BeginCrawl;
-
-            BeginCrawl *m = new BeginCrawl;
-            static oodles::url::URL a("http://www.apple.com/uk"),
-                                    y("http://www.youtube.com/uk"),
-                                    f("http://www.facebook.co.uk");
-
-            m->urls.push_back(&a);
-            m->urls.push_back(&y);
-            m->urls.push_back(&f);
-            
-            send(m); // Non-blocking
-        }
-        
-        void send(oodles::net::oop::Message *m)
-        {
-            context.outbound = m->id();
-            protocol().push_message(m);
-            cout << "Sending OOP message ID #" << context.outbound << endl;
-        }
-
-        oodles::net::oop::Protocol& protocol() const
-        {
-            assert(handler != NULL);
-            return *handler;
-        }
-};
+            assert(r.scheduled_urls.size() == 3);
+            assert(r.new_urls.empty());
+            }
+            break;
+        default:
+            break;
+    }
+    
+    delete m;
+}
 
 } // anonymous
 
@@ -244,42 +186,40 @@ int main(int argc, char *argv[])
         }
     }
 
-    int rc = 0;
-    const bool send = (!client_only && !server_only) || client_only;
-    
-    oodles::net::Server *server = NULL;
-    oodles::net::Client *client = NULL;
-    typedef oodles::net::oop::Protocol OOP;
-    const oodles::net::Protocol<OOP, TestOOPDialect> creator;
+    argc -= optind;
+    argv += optind;
 
     try {
-        oodles::Dispatcher dispatcher;
+        typedef oodles::net::oop::Protocol OOP;
+        typedef oodles::net::Creator<OOP, Session> Creator;
         
-        if (!client_only)
+        oodles::net::Server *server = NULL;
+        oodles::net::Client *client = NULL;
+        oodles::Dispatcher dispatcher;
+
+        if (!client_only) {
+            static ServerContext context;
+            static const Creator creator(context);
+            
             server = new oodles::net::Server(dispatcher, creator);
-
-        if (!server_only)
-            client = new oodles::net::Client(dispatcher, creator);
-
-        if (send) {
-            TestOOPDialect &d = client->dialect();
-            d.register_crawler();
+            server->start(listen_on);
         }
 
-        if (server)
-            server->start(listen_on);
-
-        if (client)
+        if (!server_only) {
+            static ClientContext context;
+            static const Creator creator(context);
+            
+            client = new oodles::net::Client(dispatcher, creator);
             client->start(connect_to);
-        
+        }
+
         dispatcher.wait();
+        delete client;
+        delete server;
     } catch (const std::exception &e) {
         cerr << e.what() << endl;
-        rc = 1;
+        return 1;
     }
 
-    delete client;
-    delete server;
-
-    return rc;
+    return 0;
 }
