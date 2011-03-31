@@ -10,7 +10,7 @@ class Linker
     public:
         /* Member functions/methods */
         Linker();
-        ~Linker();
+        virtual ~Linker();
         
         bool extend_link_to(Linker *l);
     protected:
