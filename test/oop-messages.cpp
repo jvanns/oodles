@@ -1,5 +1,6 @@
 // oodles
 #include "url/URL.hpp"
+#include "utility/Linker.hpp"
 #include "common/Exceptions.hpp"
 #include "utility/Dispatcher.hpp"
 
@@ -51,11 +52,17 @@ template<typename Iterator, typename Type> struct find
 class Session : public oodles::net::oop::Session
 {
     public:
+        Session() : counter(0) {}
         void handle_message(oodles::net::oop::Message *m);
+    private:
+        size_t counter;
 };
 
-struct ClientContext : public oodles::net::CallerContext
+struct ClientContext : public oodles::net::CallerContext, public oodles::Linker
 {
+    size_t limit;
+    ClientContext() : limit(0) {}
+    
     inline void start(oodles::net::SessionHandler &s)
     {
         start(static_cast<Session&>(s));
@@ -63,6 +70,7 @@ struct ClientContext : public oodles::net::CallerContext
     
     void start(Session &s)
     {
+        const oodles::Link l(this, &s);
         using oodles::net::oop::RegisterCrawler;
         RegisterCrawler *m = new RegisterCrawler;
 
@@ -73,13 +81,37 @@ struct ClientContext : public oodles::net::CallerContext
     }
 };
 
-struct ServerContext : public oodles::net::CallerContext
+struct ServerContext : public oodles::net::CallerContext, public oodles::Linker
 {
-    void start(oodles::net::SessionHandler &s)
+    size_t limit;
+    ServerContext() : limit(0) {}
+    
+    inline void start(oodles::net::SessionHandler &s)
     {
+        start(static_cast<Session&>(s));
+    }
+    
+    void start(Session &s)
+    {
+        const oodles::Link l(this, &s);
         cout << "New client connection established.\n";
     }
 };
+
+bool limit_reached(oodles::Linker *link, size_t counter)
+{
+    ClientContext *c = dynamic_cast<ClientContext*>(link);
+    
+    if (c && counter >= c->limit)
+        return true;
+
+    ServerContext *s = dynamic_cast<ServerContext*>(link);
+    
+    if (s && counter >= s->limit)
+        return true;
+
+    return false;
+}
 
 void
 Session::handle_message(oodles::net::oop::Message *m)
@@ -125,18 +157,32 @@ Session::handle_message(oodles::net::oop::Message *m)
             s->scheduled_urls.push_back(make_pair(f.page_id(), true));
 
             push_message(s);
+            ++counter;
             }
             break;
         case END_CRAWL:
             {
+            BeginCrawl *s = new BeginCrawl; // send
             EndCrawl &r = static_cast<EndCrawl&>(*m); // recv
 
             assert(r.scheduled_urls.size() == 3);
             assert(r.new_urls.empty());
+            
+            s->urls.push_back(&a);
+            s->urls.push_back(&y);
+            s->urls.push_back(&f);
+            
+            push_message(s);
+            ++counter;
             }
             break;
         default:
             break;
+    }
+
+    if (limit_reached(coupling->complement_of(*this), counter)) {
+        cout << "Message send/recv limit reached. Stopping.\n";
+        get_endpoint()->stop();
     }
     
     delete m;
@@ -146,7 +192,7 @@ Session::handle_message(oodles::net::oop::Message *m)
 
 static void print_usage(const char *program)
 {
-    cerr << program << " [-h|-c <host:port>|-s <ip:port>]\n\n";
+    cerr << program << " [-h|-c <host:port>|-s <ip:port>] [-l <limit>]\n\n";
 
     cerr << "Provide -c (or --client) and a host:port pair to run a client.\n";
     cerr << "Provide -s (or --server) and an ip:port pair to run a server.\n";
@@ -155,15 +201,17 @@ static void print_usage(const char *program)
 int main(int argc, char *argv[])
 {
     int ch = -1;
+    size_t limit = 512;
     bool client_only = false,
          server_only = false;
     string listen_on("127.0.0.1:8888"),
            connect_to("localhost:8888");
-    const char *short_options = "hc:s:";
-    const struct option long_options[4] = {
+    const char *short_options = "hl:c:s:";
+    const struct option long_options[5] = {
         {"help", no_argument, NULL, short_options[0]},
-        {"client", required_argument, NULL, short_options[1]},
-        {"server", required_argument, NULL, short_options[3]},
+        {"limit", required_argument, NULL, short_options[1]},
+        {"client", required_argument, NULL, short_options[3]},
+        {"server", required_argument, NULL, short_options[5]},
         {NULL, 0, NULL, 0}
     };
 
@@ -172,6 +220,9 @@ int main(int argc, char *argv[])
                              long_options, NULL)) != -1)
     {
         switch (ch) {
+            case 'l':
+                limit = atol(optarg);
+                break;
             case 'c':
                 connect_to = optarg;
                 client_only = true;
@@ -200,6 +251,8 @@ int main(int argc, char *argv[])
         if (!client_only) {
             static ServerContext context;
             static const Creator creator(context);
+
+            context.limit = limit;
             
             server = new oodles::net::Server(dispatcher, creator);
             server->start(listen_on);
@@ -208,6 +261,8 @@ int main(int argc, char *argv[])
         if (!server_only) {
             static ClientContext context;
             static const Creator creator(context);
+            
+            context.limit = limit;
             
             client = new oodles::net::Client(dispatcher, creator);
             client->start(connect_to);
