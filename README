@@ -16,8 +16,16 @@ net/ - Networking code (split by core then protocol)
 
 First, copy .config-example to .config and modify it according to your
 development platform. For Linux and OSX 10.5 this should be pretty
-straight-forward. You must have Boost >= 1.42 installed as the .config
-may suggest...
+straight-forward. You may wish to modify the values of these flags for
+CPPFLAGS
+
+-DOODLES_NET_BUFFER_SIZE=16384 (default is 4096 or whatever you set below)
+-DOODLES_PAGE_SIZE (default is 4096)
+
+The latter is only used if you play with the Oodles Allocator, which I don't
+recommend presently.
+
+You must have Boost >= 1.42 installed as the .config may suggest...
 
 * mkdir -p bin/{test,prog}
 * make -j2 all
@@ -32,14 +40,24 @@ package.
 
 We can use iperf as the benchmark to compare transfer rates of the oodles
 net/core code. Using this particular set of parameters we ensure the
-same TCP stack options are used;
+same TCP stack (change 4K to OODLES_NET_BUFFER_SIZE) options are used;
 
 Machine 1 (server):
-iperf -s -p 9999 -f KBytes -l 4K -N -B <IP address>
+iperf -s -p 9999 -f KBytes -l 4K -w 4K -N -B <IP>
 Machine 2 (client):
-iperf -c <server host> -p 9999 -f KBytes -l 4K -N -F /tmp/yourtestfile ... ...
+iperf -c <server> -p 9999 -f KBytes -l 4K -w 4K -P1 -N -F /tmp/yourtestfile ...
 
 Machine 1 (server):
 bin/test/protocol-handler -s <IP address>:9999
 Machine 2 (client):
 bin/test/protocol-handler -c <server host>:9999 /tmp/yourtestfile ... ...
+
+On a crude, single-file transfer test of 1GiB the oodles network core comes
+out on top. Always. On Linux anyway! The important thing to note is that the
+results are within the same region, which they are. With protocol-handler run
+in client mode only you can send the file to the iperf server instance too.
+Transfer speed is still quicker (despite the protocol overhead). You cannot
+use iperf in client mode to send the file to the protocol-handler server
+instance due to the bespoke TCPFEX protocol the server expects (it will
+abort() due to a failed assert() if you do!).
+

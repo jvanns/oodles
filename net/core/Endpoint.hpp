@@ -16,13 +16,17 @@
 // libc
 #include <stdint.h> // For uint16_t
 
+#ifndef OODLES_NET_BUFFER_SIZE
+#define OODLES_NET_BUFFER_SIZE OODLES_PAGE_SIZE
+#endif
+
 namespace oodles {
 
 class Dispatcher; // Forward declaration for Endpoint
 
 namespace net {
 
-static const uint16_t NBS = OODLES_PAGE_SIZE; // Network buffer size
+static const uint16_t NBS = OODLES_NET_BUFFER_SIZE; // Network buffer size
 
 /* Free function for returning the local hostname of this endpoint */
 inline std::string hostname() { return boost::asio::ip::host_name(); }
