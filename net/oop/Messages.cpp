@@ -54,7 +54,7 @@ BeginCrawl_::BeginCrawl_() : pointer_owner(false)
 BeginCrawl_::~BeginCrawl_()
 {
     if (pointer_owner) {
-        list<const url::URL*>::const_iterator i(urls.begin()), j(urls.end());
+        list<url::URL*>::const_iterator i(urls.begin()), j(urls.end());
 
         while (i != j) {
             delete *i;

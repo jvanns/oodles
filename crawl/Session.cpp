@@ -135,7 +135,7 @@ Session::continue_dialog(const BeginCrawl &m)
      * all URLs given in m as scheduled by the Scheduler that
      * sent this message.
      */
-    list<const url::URL*>::const_iterator i = m.urls.begin(), j = m.urls.end();
+    list<url::URL*>::const_iterator i = m.urls.begin(), j = m.urls.end();
 
     while (i != j) {
         const url::URL &u = *(*i);

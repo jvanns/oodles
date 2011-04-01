@@ -48,7 +48,7 @@ struct BeginCrawl_
     
     /* Member variables/attributes */
     bool pointer_owner;
-    std::list<const url::URL*> urls;
+    std::list<url::URL*> urls;
 };
 
 struct EndCrawl_

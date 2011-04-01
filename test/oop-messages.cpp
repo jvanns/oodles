@@ -119,9 +119,9 @@ Session::handle_message(oodles::net::oop::Message *m)
     using oodles::url::URL;
     using namespace oodles::net::oop;
 
-    static const URL a("http://www.apple.com/uk"),
-                     y("http://www.youtube.com/uk"),
-                     f("http://www.facebook.co.uk");
+    static URL a("http://www.apple.com/uk"),
+               y("http://www.youtube.com/uk"),
+               f("http://www.facebook.co.uk");
 
     switch (m->id()) {
         case REGISTER_CRAWLER:
@@ -143,9 +143,9 @@ Session::handle_message(oodles::net::oop::Message *m)
             {
             EndCrawl *s = new EndCrawl; // send
             BeginCrawl &r = static_cast<BeginCrawl&>(*m); // recv
-            list<const URL*>::const_iterator begin(r.urls.begin()),
-                                                 end(r.urls.end());
-            static const find<list<const URL*>::const_iterator, URL> finder;
+            list<URL*>::const_iterator begin(r.urls.begin()),
+                                           end(r.urls.end());
+            static const find<list<URL*>::const_iterator, URL> finder;
 
             assert(r.urls.size() == 3);
             assert(finder(begin, end, a));
