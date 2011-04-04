@@ -56,6 +56,7 @@ Endpoint::Endpoint(Dispatcher &d) :
     protocol(NULL),
     tcp_socket(d.io_service())
 {
+    local.hostname = hostname();
 }
 
 Endpoint::~Endpoint()
@@ -83,8 +84,20 @@ Endpoint::start(CallerContext &c)
     tcp_socket.set_option(boost::asio::socket_base::send_buffer_size(NBS));
     tcp_socket.set_option(boost::asio::socket_base::receive_buffer_size(NBS));
 
+    local.port = tcp_socket.local_endpoint().port();
+    local.ip = tcp_socket.local_endpoint().address().to_string();
+    
+    remote.port = tcp_socket.remote_endpoint().port();
+    remote.ip = tcp_socket.remote_endpoint().address().to_string();
+
     session->start(c); // Call first to prepare session/context before transfers
     protocol->start();
+}
+
+void
+Endpoint::set_remote_fqdn(const std::string &fqdn)
+{
+    remote.hostname = fqdn;
 }
 
 void

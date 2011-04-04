@@ -57,6 +57,8 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         void stop(); // Close socket cancelling pending handlers
         void start(CallerContext &c); // Must be called to register reads/writes
 
+        void set_remote_fqdn(const std::string &fqdn); // Resolved, remote FQDN
+
         void set_session(SessionHandler *s); // Pair session with endpoint
         SessionHandler* get_session() const { return session; }
         void set_protocol(ProtocolHandler *p); // Pair protocol with endpoint
@@ -78,8 +80,17 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
 
             void update(size_t bytes);
         };
+
+        struct Info
+        {
+            uint16_t port;
+            std::string ip, hostname;
+
+            Info() : port(0) {}
+        };
         
         /* Member variables/attributes */
+        Info local, remote;
         Buffer<NBS> inbound;
         Buffer<NBS> outbound;
         Metric recv_rate, send_rate;

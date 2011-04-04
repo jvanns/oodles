@@ -93,6 +93,7 @@ Client::async_connect(resolver::iterator &i)
     const endpoint &e = *i;
     Endpoint::Connection c(Endpoint::create(dispatcher));
 
+    c->set_remote_fqdn(i->host_name());
     c->socket().async_connect(e, bind(&Client::connect_callback,
                                        this,
                                        placeholders::error,
