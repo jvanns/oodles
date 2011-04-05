@@ -123,7 +123,7 @@ Endpoint::set_session(SessionHandler *s)
 
     s->set_endpoint(shared_from_this());
 
-    session = s;
+    session = s; // Ownership is transferred
 }
 
 void
