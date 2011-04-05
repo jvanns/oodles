@@ -12,6 +12,7 @@ class SessionHandler
 {
     public:
         virtual ~SessionHandler() {}
+        virtual void handle_messages() {}
 
         void set_endpoint(Endpoint::Connection e);
         void print_metrics(std::ostream *s) const;

@@ -179,7 +179,12 @@ Endpoint::raw_recv_callback(const error_code& e, size_t b)
         size_t n = inbound.producer().commit_buffer(b),
                u = protocol->buffer2message(inbound.consumer().data(), n);
         
-        inbound.consumer().consume_buffer(u);
+        n = inbound.consumer().consume_buffer(u);
+        session->handle_messages();
+        
+        /*
+         * Re-register any further reads and update running statistics
+         */
         protocol->receive_data();
         recv_rate.update(b);
     } else {
@@ -199,9 +204,14 @@ void
 Endpoint::raw_send_callback(const error_code& e, size_t b)
 {
     if (!e && b > 0) {
-        size_t n = outbound.consumer().consume_buffer(b);
-        
+        size_t n = 0;
+       
+        n = outbound.consumer().consume_buffer(b);
         protocol->bytes_transferred(b);
+        
+        /*
+         * Re-register any further writes and update running statistics
+         */
         protocol->transfer_data(n); 
         send_rate.update(b);
     } else {
