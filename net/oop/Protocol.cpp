@@ -1,5 +1,4 @@
 // oodles
-#include "Session.hpp"
 #include "Factory.hpp"
 #include "Protocol.hpp"
 
@@ -143,11 +142,6 @@ Protocol::buffer2message(const char *buffer, size_t max)
             inbound_messages.push(incoming);
             incoming = NULL;
         }
-    }
-
-    if (!inbound_messages.empty()) {
-        Session &s = *static_cast<Session*>(get_endpoint()->get_session());
-        s.handle_messages();
     }
 
     return used;
