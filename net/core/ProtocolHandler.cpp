@@ -12,10 +12,6 @@ namespace oodles {
 namespace net {
 
 // Public methods
-ProtocolHandler::~ProtocolHandler()
-{
-}
-
 void
 ProtocolHandler::set_endpoint(Endpoint::Connection e)
 {
@@ -70,25 +66,6 @@ ProtocolHandler::transfer_data(size_t pending)
 void
 ProtocolHandler::print_metrics(ostream *s) const
 {
-    assert(endpoint);
-
-    if (!s)
-        return;
-
-    *s << "TCP:\n"
-       << "Received (KiB):       "
-       << endpoint->recv_rate.transferred_bytes / 1024 << '\n'
-       << "Last transfer:        "
-       << endpoint->recv_rate.last_transfer << '\n'
-       << "Receive rate (KiB/s): " << endpoint->recv_rate.transfer_rate / 1024.f
-       << '\n';
-    
-    *s << "Sent (KiB):           "
-       << endpoint->send_rate.transferred_bytes / 1024 << '\n'
-       << "Last transfer:        "
-       << endpoint->send_rate.last_transfer << '\n'
-       << "Send rate (KiB/s):    " << endpoint->send_rate.transfer_rate / 1024.f
-       << '\n';
 }
 
 string

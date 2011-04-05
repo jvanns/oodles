@@ -93,6 +93,28 @@ Endpoint::start(CallerContext &c)
     session->start(c); // Call first to prepare session/context before transfers
     protocol->start();
 }
+    
+void
+Endpoint::print_metrics(std::ostream *s) const
+{
+    if (!s)
+        return;
+
+    *s << "TCP:\n"
+       << "Received (KiB):       "
+       << recv_rate.transferred_bytes / 1024 << '\n'
+       << "Last transfer:        "
+       << recv_rate.last_transfer << '\n'
+       << "Receive rate (KiB/s): " << recv_rate.transfer_rate / 1024.f
+       << '\n';
+
+    *s << "Sent (KiB):           "
+       << send_rate.transferred_bytes / 1024 << '\n'
+       << "Last transfer:        "
+       << send_rate.last_transfer << '\n'
+       << "Send rate (KiB/s):    " << send_rate.transfer_rate / 1024.f
+       << '\n';
+}
 
 void
 Endpoint::set_remote_fqdn(const std::string &fqdn)

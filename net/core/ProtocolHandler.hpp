@@ -16,7 +16,7 @@ class ProtocolHandler
     public:
         /* Member functions/methods */
         ProtocolHandler() {}
-        virtual ~ProtocolHandler();
+        virtual ~ProtocolHandler() {}
 
         /*
          * Pair endpoint with protocol handler
@@ -44,9 +44,9 @@ class ProtocolHandler
         void transfer_data(size_t pending = 0);
 
         /*
-         * Virtual method for printing network statistics
-         * for both the raw TCP/IP (from the Endpoint) to
-         * the protocol specific metrics.
+         * Virtual method for printing protocol specific
+         * statistics/metrics such as messages inbound,
+         * maximum message size, message throughput etc.
          */
         virtual void print_metrics(std::ostream *s) const;
 

@@ -27,6 +27,7 @@ using std::cerr;
 using std::endl;
 using std::queue;
 using std::string;
+using std::ostream;
 
 namespace {
 
@@ -97,8 +98,14 @@ class TCPFileExchange : public oodles::net::ProtocolHandler
         {
             return static_cast<Session&>(*(get_endpoint()->get_session()));
         }
+
+        const Session& session() const
+        {
+            return static_cast<Session&>(*(get_endpoint()->get_session()));
+        }
         
         /* Override the pure virtual methods from ProtocolHandler */
+        void print_metrics(ostream *s) const;
         string name() const { return "TCPFEX"; }
 
         /* Writes */
@@ -142,6 +149,15 @@ struct ServerContext : public oodles::net::CallerContext
     }
 };
 
+void TCPFileExchange::print_metrics(ostream *s) const
+{
+    if (!s)
+        return;
+    
+    *s << "Files sent:     " << session().sent << endl;
+    *s << "Files received: " << session().loaded << endl;
+}
+
 void
 TCPFileExchange::bytes_transferred(size_t n)
 {
@@ -181,9 +197,8 @@ TCPFileExchange::bytes_transferred(size_t n)
         stop(); // Will close the connection
         assert(s.sent == s.loaded);
 
-        cout << "All " << s.loaded << " files transferred successfully.\n";
         cout << "Transfer metrics:\n";
-        print_metrics(&cout);
+        s.print_metrics(&cout);
     }
 }
 
@@ -292,14 +307,13 @@ TCPFileExchange::buffer2message(const char *buffer, size_t max)
     used += incoming.buffered - written;
 
     if (incoming.buffered == incoming.size - header_size) {
-       ++s.loaded;
-        
-        cout << "Download of '" << incoming.name << "' complete, "
-             << s.loaded << " files received in total.\n";
+        cout << "Download of '" << incoming.name << "' complete.\n";
 
+        ++s.loaded;
         incoming.reset();
+        
         cout << "Transfer metrics:\n";
-        print_metrics(&cout);
+        s.print_metrics(&cout);
     }
 
     return used;

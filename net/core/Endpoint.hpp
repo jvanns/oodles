@@ -13,6 +13,9 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ip/host_name.hpp>
 
+// STL
+#include <iostream>
+
 // libc
 #include <stdint.h> // For uint16_t
 
@@ -56,6 +59,7 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
 
         void stop(); // Close socket cancelling pending handlers
         void start(CallerContext &c); // Must be called to register reads/writes
+        void print_metrics(std::ostream *s) const; // Print raw TCP I/O  metrics
 
         void set_remote_fqdn(const std::string &fqdn); // Resolved, remote FQDN
 

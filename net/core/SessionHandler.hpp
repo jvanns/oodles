@@ -14,6 +14,7 @@ class SessionHandler
         virtual ~SessionHandler() {}
 
         void set_endpoint(Endpoint::Connection e);
+        void print_metrics(std::ostream *s) const;
         
         inline void start(CallerContext &c) { c.start(*this); }
         Endpoint::Connection get_endpoint() const { return endpoint; }
