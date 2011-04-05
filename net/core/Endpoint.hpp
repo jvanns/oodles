@@ -87,6 +87,7 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         Buffer<NBS> outbound;
         Metric recv_rate, send_rate;
         
+        Dispatcher &dispatcher;
         SessionHandler *session;
         ProtocolHandler *protocol;
         boost::asio::ip::tcp::socket sock;

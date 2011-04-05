@@ -52,6 +52,7 @@ Endpoint::Metric::update(size_t bytes)
 }
 
 Endpoint::Endpoint(Dispatcher &d) :
+    dispatcher(d),
     session(NULL),
     protocol(NULL),
     sock(d.io_service())
