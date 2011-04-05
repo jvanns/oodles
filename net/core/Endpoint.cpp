@@ -54,7 +54,7 @@ Endpoint::Metric::update(size_t bytes)
 Endpoint::Endpoint(Dispatcher &d) :
     session(NULL),
     protocol(NULL),
-    tcp_socket(d.io_service())
+    sock(d.io_service())
 {
     local.hostname = hostname();
 }
@@ -68,27 +68,27 @@ Endpoint::~Endpoint()
 void
 Endpoint::stop()
 {
-    tcp_socket.close();
+    socket().close();
 }
 
 void
 Endpoint::start(CallerContext &c)
 {
     assert(protocol && session); // Can't do anything without either!
-    assert(tcp_socket.is_open()); // Can't do anything with a closed socket!
+    assert(socket().is_open()); // Can't do anything with a closed socket!
     /*
      * Disable Nagles algorithm (no_delay) when setting our own buffer sizes
      */
-    tcp_socket.set_option(boost::asio::ip::tcp::no_delay(true));
-    tcp_socket.set_option(boost::asio::socket_base::keep_alive(true));
-    tcp_socket.set_option(boost::asio::socket_base::send_buffer_size(NBS));
-    tcp_socket.set_option(boost::asio::socket_base::receive_buffer_size(NBS));
+    socket().set_option(boost::asio::ip::tcp::no_delay(true));
+    socket().set_option(boost::asio::socket_base::keep_alive(true));
+    socket().set_option(boost::asio::socket_base::send_buffer_size(NBS));
+    socket().set_option(boost::asio::socket_base::receive_buffer_size(NBS));
 
-    local.port = tcp_socket.local_endpoint().port();
-    local.ip = tcp_socket.local_endpoint().address().to_string();
+    local.port = socket().local_endpoint().port();
+    local.ip = socket().local_endpoint().address().to_string();
     
-    remote.port = tcp_socket.remote_endpoint().port();
-    remote.ip = tcp_socket.remote_endpoint().address().to_string();
+    remote.port = socket().remote_endpoint().port();
+    remote.ip = socket().remote_endpoint().address().to_string();
 
     session->start(c); // Call first to prepare session/context before transfers
     protocol->start();
@@ -117,12 +117,6 @@ Endpoint::print_metrics(std::ostream *s) const
 }
 
 void
-Endpoint::set_remote_fqdn(const std::string &fqdn)
-{
-    remote.hostname = fqdn;
-}
-
-void
 Endpoint::set_session(SessionHandler *s)
 {
     assert(!session); // Must be set only once
@@ -143,6 +137,12 @@ Endpoint::set_protocol(ProtocolHandler *p)
 }
 
 void
+Endpoint::set_remote_fqdn(const std::string &fqdn)
+{
+    remote.hostname = fqdn;
+}
+
+void
 Endpoint::async_recv(char *ptr, size_t max)
 {
     assert(protocol);
@@ -150,11 +150,11 @@ Endpoint::async_recv(char *ptr, size_t max)
     if (!(ptr && max > 0))
         return;
 
-    tcp_socket.async_read_some(buffer(ptr, max),
-                               bind(&Endpoint::raw_recv_callback,
-                               shared_from_this(),
-                               placeholders::error,
-                               placeholders::bytes_transferred));
+    socket().async_read_some(buffer(ptr, max),
+                             bind(&Endpoint::raw_recv_callback,
+                             shared_from_this(),
+                             placeholders::error,
+                             placeholders::bytes_transferred));
 }
 
 void
@@ -165,11 +165,11 @@ Endpoint::async_send(const char *ptr, size_t max)
     if (!(ptr && max > 0))
         return;
 
-    tcp_socket.async_write_some(buffer(ptr, max),
-                                bind(&Endpoint::raw_send_callback,
-                                shared_from_this(),
-                                placeholders::error,
-                                placeholders::bytes_transferred));
+    socket().async_write_some(buffer(ptr, max),
+                              bind(&Endpoint::raw_send_callback,
+                              shared_from_this(),
+                              placeholders::error,
+                              placeholders::bytes_transferred));
 }
 
 void

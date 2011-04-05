@@ -47,26 +47,14 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         /* Member functions/methods */
         ~Endpoint();
 
-        static
-        Endpoint*
-        create(Dispatcher &d)
-        {
-            return new Endpoint(d);
-        }
-
-        bool online() const { return tcp_socket.is_open(); }
-        boost::asio::ip::tcp::socket& socket() { return tcp_socket; }
-
-        void stop(); // Close socket cancelling pending handlers
-        void start(CallerContext &c); // Must be called to register reads/writes
-        void print_metrics(std::ostream *s) const; // Print raw TCP I/O  metrics
-
-        void set_remote_fqdn(const std::string &fqdn); // Resolved, remote FQDN
-
-        void set_session(SessionHandler *s); // Pair session with endpoint
+        bool online() const { return socket().is_open(); }
         SessionHandler* get_session() const { return session; }
-        void set_protocol(ProtocolHandler *p); // Pair protocol with endpoint
         ProtocolHandler* get_protocol() const { return protocol; }
+        static Endpoint* create(Dispatcher &d) { return new Endpoint(d); }
+        
+        void stop(); // Close socket cancelling pending handlers
+        void start(CallerContext &c); // Must be called to prepare reads/writes
+        void print_metrics(std::ostream *s) const; // Print raw TCP I/O  metrics
     private:
         struct Metric 
         {
@@ -101,7 +89,7 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         
         SessionHandler *session;
         ProtocolHandler *protocol;
-        boost::asio::ip::tcp::socket tcp_socket;
+        boost::asio::ip::tcp::socket sock;
 
         /* Member functions/methods */
         Endpoint(Dispatcher &d);
@@ -109,6 +97,13 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         Endpoint();
         Endpoint(const Endpoint &e);
         Endpoint& operator= (const Endpoint &e);
+        
+        boost::asio::ip::tcp::socket& socket() { return sock; }
+        const boost::asio::ip::tcp::socket& socket() const { return sock; }
+
+        void set_session(SessionHandler *s); // Pair session with endpoint
+        void set_protocol(ProtocolHandler *p); // Pair protocol with endpoint
+        void set_remote_fqdn(const std::string &fqdn); // Resolved, remote FQDN
 
         /*
          * Asynchronous operations - registers the handlers/callbacks with
@@ -135,6 +130,8 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         raw_send_callback(const boost::system::error_code& e, size_t b);
 
         /* Friend class declarations */
+        friend class Client; // Only Client and Server should be...
+        friend class Server; // ... the callers executing the set_* methods
         friend class ProtocolHandler; // Needs access to inbound and outbound
 };
 
