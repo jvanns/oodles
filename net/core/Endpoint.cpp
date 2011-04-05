@@ -74,8 +74,9 @@ Endpoint::stop()
 void
 Endpoint::start(CallerContext &c)
 {
+    assert(online()); // Can't do anything with a closed socket!
     assert(protocol && session); // Can't do anything without either!
-    assert(socket().is_open()); // Can't do anything with a closed socket!
+    
     /*
      * Disable Nagles algorithm (no_delay) when setting our own buffer sizes
      */
@@ -145,7 +146,7 @@ Endpoint::set_remote_fqdn(const std::string &fqdn)
 void
 Endpoint::async_recv(char *ptr, size_t max)
 {
-    assert(protocol);
+    assert(protocol && session); // Can't do anything without either!
 
     if (!(ptr && max > 0))
         return;
@@ -160,7 +161,7 @@ Endpoint::async_recv(char *ptr, size_t max)
 void
 Endpoint::async_send(const char *ptr, size_t max)
 {
-    assert(protocol);
+    assert(protocol && session); // Can't do anything without either!
 
     if (!(ptr && max > 0))
         return;
