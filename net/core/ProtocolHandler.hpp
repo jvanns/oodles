@@ -42,7 +42,16 @@ class ProtocolHandler
          */
         void receive_data();
         void transfer_data(size_t pending = 0);
-
+        
+        /*
+         * Called by Endpoint, this registers, with the Dispatcher,
+         * a callback (handle_messages in a derived SessionHandler)
+         * to be executed to handle any messages now ready for processing
+         * after buffer2message has been exhuasted by the async_recv()
+         * callback.
+         */
+        void handle_messages(Dispatcher &d) const;
+        
         /*
          * Virtual method for printing protocol specific
          * statistics/metrics such as messages inbound,

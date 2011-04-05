@@ -182,7 +182,7 @@ Endpoint::raw_recv_callback(const error_code& e, size_t b)
                u = protocol->buffer2message(inbound.consumer().data(), n);
         
         n = inbound.consumer().consume_buffer(u);
-        session->handle_messages();
+        protocol->handle_messages(dispatcher);
         
         /*
          * Re-register any further reads and update running statistics

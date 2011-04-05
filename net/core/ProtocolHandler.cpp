@@ -1,5 +1,10 @@
 // oodles
+#include "SessionHandler.hpp"
 #include "ProtocolHandler.hpp"
+#include "utility/Dispatcher.hpp"
+
+// Boost.bind
+#include <boost/bind.hpp>
 
 // libc
 #include <assert.h> // For assert()
@@ -7,6 +12,9 @@
 // STL
 using std::string;
 using std::ostream;
+
+// Boost
+using boost::bind;
 
 namespace oodles {
 namespace net {
@@ -61,6 +69,13 @@ ProtocolHandler::transfer_data(size_t pending)
     }
 
     endpoint->async_send(endpoint->outbound.consumer().data(), pending);
+}
+
+void
+ProtocolHandler::handle_messages(Dispatcher &d) const
+{
+    SessionHandler *s = endpoint->get_session();
+    d.io_service().post(bind(&SessionHandler::handle_messages, s));
 }
 
 void
