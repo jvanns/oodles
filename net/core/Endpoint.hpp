@@ -94,8 +94,6 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
 
         /* Member functions/methods */
         Endpoint(Dispatcher &d);
-
-        Endpoint();
         Endpoint(const Endpoint &e);
         Endpoint& operator= (const Endpoint &e);
         
