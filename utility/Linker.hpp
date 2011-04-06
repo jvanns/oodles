@@ -22,7 +22,7 @@ class Linker
         void link(Link *l);
 
         /* Friend class declarations */
-        friend class Link; /// Link wants link() only
+        friend struct Link; // Link wants link() only
 };
 
 struct Link
