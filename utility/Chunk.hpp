@@ -48,7 +48,7 @@ struct Chunk
     }
 
     bool full() const { return available_blocks == 0; }
-    bool empty() const { return !mem || available_blocks == allocated_blocks; };
+    bool empty() const { return !mem || available_blocks == allocated_blocks; }
 
     /* Member variables/attributes */
     byte_t *mem, next_free_block, available_blocks, allocated_blocks;
