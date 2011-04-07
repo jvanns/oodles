@@ -51,6 +51,14 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         SessionHandler* get_session() const { return session; }
         ProtocolHandler* get_protocol() const { return protocol; }
         static Endpoint* create(Dispatcher &d) { return new Endpoint(d); }
+
+        const uint16_t local_port() const { return local.port; }
+        const std::string& local_ip() const { return local.ip; }
+        const std::string& local_hostname() const { return local.hostname; }
+
+        const uint16_t remote_port() const { return remote.port; }
+        const std::string& remote_ip() const { return remote.ip; }
+        const std::string& remote_hostname() const { return remote.hostname; }
         
         void stop(); // Close socket cancelling pending handlers
         void start(CallerContext &c); // Must be called to prepare reads/writes
