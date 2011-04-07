@@ -56,6 +56,7 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
         void start(CallerContext &c); // Must be called to prepare reads/writes
         void print_metrics(std::ostream *s) const; // Print raw TCP I/O  metrics
     private:
+        /* Internal Data Structures */
         struct Metric 
         {
             bool bootstrap;
