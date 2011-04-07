@@ -98,7 +98,7 @@ Protocol::message2buffer(char *buffer, size_t max)
         max -= buffered;
         done = max == 0;
         
-        if (outgoing->complete(Message::Request)) {
+        if (outgoing->complete()) {
             done = max > 0 && !outbound_messages.empty();
             buffered_messages.push(outgoing);
             outbound_messages.pop();
@@ -130,7 +130,7 @@ Protocol::buffer2message(const char *buffer, size_t max)
         max -= buffered;
         done = max == 0;
 
-        if (incoming->complete(Message::Response)) {
+        if (incoming->complete()) {
             inbound_messages.push(incoming);
             incoming = NULL;
         }

@@ -43,12 +43,9 @@ class Message
         bool add_header(const std::string &key, const std::string &value);
         
         /* Protocol handler interface */
-        bool complete(int mode) const;
+        bool complete() const;
         size_t to_buffer(char *buffer, size_t max);
-        size_t from_buffer(const char *buffer, size_t max);
-        
-        /* Internal structures */
-        enum { Request = 1, Response = 2 };
+        size_t from_buffer(const char *buffer, size_t max); 
     private: 
         /* Forward declarations */
         struct Header;
@@ -69,6 +66,8 @@ class Message
         size_t write_request_line(char *buffer, size_t max); 
         
         /* Internal structures */
+        enum { Request = 1, Response = 2 };
+        
         class Trigram
         {
             public:
@@ -99,6 +98,7 @@ class Message
 
         /* Member variables/attributes */
         int fd;
+        int mode;
         float version;
         Trigram start_line;
         std::vector<Header> headers;
