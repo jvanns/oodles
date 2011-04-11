@@ -15,8 +15,9 @@ class Session : public Linker, public SessionHandler
 {
     public:
         void handle_messages();
+        void send_request(const std::string &resource, int response_fd);
+        void send_response(uint16_t code, int data_fd, size_t data_size);
         
-        void push_message(Message *m); // Ownership transferred
         virtual void handle_message(Message *m) = 0; // Ownership transferred
 };
    
