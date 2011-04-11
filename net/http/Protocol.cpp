@@ -9,7 +9,7 @@ namespace oodles {
 namespace net {
 namespace http {
 
-Protocol::Protocol() : incoming(NULL), transferred(0), data_store(0)
+Protocol::Protocol() : incoming(NULL), transferred(0)
 {
 }
 
@@ -26,12 +26,13 @@ Protocol::pop_message()
 }
 
 void
-Protocol::push_message(Message *m)
+Protocol::push_message(Message *m, int fd)
 {
     if (!m)
         return;
 
     outbound_messages.push(m);
+    response_fds.push(fd);
     
     if (buffered_messages.empty())
         transfer_data();
@@ -123,7 +124,7 @@ Protocol::buffer2message(const char *buffer, size_t max)
      */
     while (!done) {
         if (!incoming)
-           incoming = new Message(data_store, 0);
+           incoming = new Message(response_fd(), 0);
 
         buffered = incoming->from_buffer(buffer + used, max);
         used += buffered;
@@ -137,6 +138,19 @@ Protocol::buffer2message(const char *buffer, size_t max)
     }
 
     return used;
+}
+
+inline
+int
+Protocol::response_fd()
+{
+    if (response_fds.empty())
+        return -1;
+
+    int fd = response_fds.front();
+    response_fds.pop();
+
+    return fd;
 }
 
 } // http

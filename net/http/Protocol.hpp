@@ -20,7 +20,7 @@ class Protocol : public ProtocolHandler
         Protocol();
         
         Message* pop_message();
-        void push_message(Message *m);
+        void push_message(Message *m, int response_fd = -1);
         
         /*
          * These methods override the pure virtual interface
@@ -31,9 +31,13 @@ class Protocol : public ProtocolHandler
         size_t message2buffer(char *buffer, size_t max);
         size_t buffer2message(const char *buffer, size_t max);
     private:
+        /* Member functions/methods */
+        int response_fd();
+        
         /* Member variables/attributes */
         Message *incoming;
-        size_t transferred, data_store;
+        size_t transferred;
+        std::queue<int> response_fds;
         std::queue<Message*> inbound_messages,
                              outbound_messages,
                              buffered_messages;
