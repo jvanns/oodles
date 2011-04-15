@@ -22,6 +22,11 @@ struct WriteError : public NonFatalException
     WriteError(const std::string &from, int error, const char *format, ...);
 };
 
+struct TypeError : public NonFatalException
+{
+    TypeError(const std::string &from, int error, const char *format, ...);
+};
+
 // Net-specific exceptions
 namespace net {
 
