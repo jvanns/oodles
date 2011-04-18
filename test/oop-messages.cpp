@@ -183,6 +183,7 @@ Session::handle_message(oodles::net::oop::Message *m)
     if (limit_reached(coupling->complement_of(*this), counter)) {
         cout << "Message send/recv limit reached. Stopping.\n";
         get_endpoint()->stop();
+        print_metrics(&cout);
     }
     
     delete m;
