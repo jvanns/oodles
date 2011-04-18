@@ -66,7 +66,7 @@ class Message
         size_t write_request_line(char *buffer, size_t max); 
         
         /* Internal structures */
-        enum { Request = 1, Response = 2 };
+        enum { Inbound = 1, Outbound = 2 };
         
         class Trigram
         {

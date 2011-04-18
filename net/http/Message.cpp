@@ -67,12 +67,14 @@ const string Message::protocol("HTTP");
 
 Message::Message(int fd, size_t size) :
     fd(fd),
-    mode(-1),
+    mode(Inbound),
     version(0),
     buffered(0),
     body_offset(0),
     body_size(size)
 {
+    if (size > 0)
+        add_header("content-length", to_string<size_t>(size));
 }
 
 uint16_t
@@ -96,7 +98,7 @@ Message::response_phrase() const
 void
 Message::request(const string &method, const string &URI)
 {
-    mode = Request;
+    mode = Outbound;
     version = 1.1f; // Always use 1.1 in Oodles
     
     start_line[0] = method;
@@ -127,7 +129,7 @@ Message::request_method() const
 void
 Message::respond(uint16_t code, const string &phrase)
 {
-    mode = Response;
+    mode = Outbound;
     version = 1.1f; // Always use 1.1 in Oodles
     
     start_line[0] = protocol + to_string<float>(version);
@@ -174,7 +176,7 @@ Message::add_header(const string &key, const string &value)
 bool
 Message::complete() const
 {
-    if (mode == Request)
+    if (mode == Outbound)
         return headers_sent() && pending() == 0;
     
     return headers_received() && pending() == 0;
