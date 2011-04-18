@@ -197,14 +197,21 @@ URL::print(ostream &stream) const
 void
 URL::to_stream(ostream &stream) const
 {
-    stream << attributes.scheme << "://";
+    if (!attributes.scheme.empty())
+        stream << attributes.scheme << "://";
 
-    if (!attributes.username.empty())
-        stream << attributes.username << ':' << attributes.password << '@';
+    if (!attributes.username.empty()) {
+        stream << attributes.username;
+        
+        if (!attributes.password.empty())
+            stream << ':' << attributes.password;
+        
+        stream << '@';
+    }
 
     stream << host();
 
-    if (!attributes.port.empty() && attributes.port != "80")
+    if (!attributes.port.empty())
         stream << ':' << attributes.port;
 
     stream << resource();
