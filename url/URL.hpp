@@ -12,6 +12,9 @@
 // STL
 #include <iostream>
 
+// libc
+#include <stdint.h> // For uint64_t
+
 // Test for 64-bit capability
 #ifdef __GNUG__
 #ifdef __LP64__
@@ -40,7 +43,7 @@ class URL
         typedef Iterator iterator;
         typedef TreeIterator tree_iterator;
 
-        enum {Scheme, Username, Password, Domain, Port, Path, Page};
+        enum {Scheme, Username, Password, Domain, Port, Path, Page, Query};
 
         /* Member functions/methods */
         URL();

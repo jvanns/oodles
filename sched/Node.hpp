@@ -10,11 +10,11 @@ namespace sched {
 
 class PageData; // Forward declration for Node
 
-class Node : public oodles::Node<url::value_type>
+class Node : public oodles::Node<std::string>
 {
     public:
         /* Dependent typedefs */
-        typedef url::value_type value_type;
+        typedef std::string value_type;
         typedef oodles::Node<value_type> Base;
 
         /* Member functions/methods */

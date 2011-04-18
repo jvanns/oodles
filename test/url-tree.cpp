@@ -7,6 +7,9 @@
 // STL
 #include <iostream>
 
+// libc
+#include <string.h> // For strncmp()
+
 // IO streams
 using std::cout;
 using std::cerr;
@@ -18,7 +21,7 @@ using std::string;
 // STL exception
 using std::exception;
 
-static oodles::Tree<oodles::url::value_type> tree;
+static oodles::Tree<std::string> tree;
 
 static
 bool

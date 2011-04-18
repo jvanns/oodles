@@ -25,7 +25,6 @@ using std::ostream_iterator;
 namespace {
 
 typedef oodles::url::URL::hash_t hash_t;
-typedef oodles::url::value_type value_type;
 
 // Define a local-only template function, hasher
 template<class Container>
@@ -36,7 +35,7 @@ hasher(const Container &input, hash_t seed);
 template<>
 inline
 hash_t
-hasher<value_type>(const value_type &input, hash_t seed)
+hasher<string>(const string &input, hash_t seed)
 {
 #ifdef HAS_64_BITS
     return oodles::fnv64(input.data(), input.size(), seed);
@@ -48,9 +47,9 @@ hasher<value_type>(const value_type &input, hash_t seed)
 template<>
 inline
 hash_t
-hasher<vector<value_type> >(const vector<value_type> &input, hash_t seed)
+hasher<vector<string> >(const vector<string> &input, hash_t seed)
 {
-    vector<value_type>::const_iterator i = input.begin();
+    vector<string>::const_iterator i = input.begin();
 
     for ( ; i != input.end() ; ++i)
         seed = hasher(*i, seed);
@@ -144,8 +143,8 @@ URL::host() const
     string s;
     
     if (!attributes.domain.empty()) {
-        vector<value_type>::const_iterator i = attributes.domain.begin(),
-                                           j = attributes.domain.end() - 1;
+        vector<string>::const_iterator i = attributes.domain.begin(),
+                                       j = attributes.domain.end() - 1;
 
         while (i != j) {
             s += *i + ".";
@@ -161,21 +160,21 @@ URL::host() const
 string
 URL::resource() const
 {
-    string s;
+    string s("/");
     
     if (!attributes.path.empty()) {
-        vector<value_type>::const_iterator i = attributes.path.begin(),
-                                           j = attributes.path.end() - 1;
+        vector<string>::const_iterator i = attributes.path.begin(),
+                                       j = attributes.path.end() - 1;
 
         while (i != j) {
             s += *i + "/";
             ++i;
         }
 
-        s += *j;
+        s += *j + "/";
     }
 
-    s += "/" + attributes.page;
+    s += attributes.page;
 
     return s;
 }
@@ -198,14 +197,21 @@ URL::print(ostream &stream) const
 void
 URL::to_stream(ostream &stream) const
 {
-    stream << attributes.scheme << "://";
+    if (!attributes.scheme.empty())
+        stream << attributes.scheme << "://";
 
-    if (!attributes.username.empty())
-        stream << attributes.username << ':' << attributes.password << '@';
+    if (!attributes.username.empty()) {
+        stream << attributes.username;
+        
+        if (!attributes.password.empty())
+            stream << ':' << attributes.password;
+        
+        stream << '@';
+    }
 
     stream << host();
 
-    if (!attributes.port.empty() && attributes.port != "80")
+    if (!attributes.port.empty())
         stream << ':' << attributes.port;
 
     stream << resource();
@@ -215,12 +221,11 @@ URL::ID
 URL::tokenise(const string &url) throw(ParseError)
 {
     Parser p;
-    IDGenerator<value_type> page(attributes.page);
-    IDGenerator<vector<value_type> > path(attributes.path),
-                                     domain(attributes.domain);
-    value_type::const_iterator i = url.begin(),  j = url.end();
+    IDGenerator<string> page(attributes.page);
+    IDGenerator<vector<string> > path(attributes.path),
+                                 domain(attributes.domain);
 
-    if (!p.parse(i, j, attributes))
+    if (!p.parse(url, attributes))
        throw ParseError("URL::tokenise", 0, "Failed to parse input '%s'.",
                         url.c_str());
 

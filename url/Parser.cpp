@@ -1,196 +1,317 @@
 // oodles
+#include "URL.hpp"
 #include "Parser.hpp"
 
-// Boost.spirit
-#include <boost/spirit/include/phoenix_stl.hpp>
-#include <boost/spirit/include/phoenix_core.hpp>
-#include <boost/spirit/include/phoenix_object.hpp>
-#include <boost/spirit/include/phoenix_fusion.hpp>
-#include <boost/spirit/include/phoenix_operator.hpp>
+// STL
+#include <set>
+#include <limits>
 
-// Boost.fusion
-#include <boost/fusion/include/adapt_struct.hpp>
+// libc
+#include <stdlib.h> // For strtol()
+#include <assert.h> // For assert()
 
 // STL
+using std::set;
+using std::pair;
+using std::string;
 using std::vector;
+using std::exception;
+using std::numeric_limits;
 
-BOOST_FUSION_ADAPT_STRUCT(
-    oodles::url::Attributes,
-    (oodles::url::value_type, port)
-    (oodles::url::value_type, page)
-    (oodles::url::value_type, scheme)
-    (oodles::url::value_type, username)
-    (oodles::url::value_type, password)
-    (std::vector<oodles::url::value_type>, path)
-    (std::vector<oodles::url::value_type>, domain)
-)
+static const string::size_type NONE = string::npos;
 
-/*
- * Functor for use with spirit:qi and phoenix::function
- * checks input of a path fragment first before appending
- * it to the container. 
- *
- * We wish to remove '.' and '..' components in an absolute
- * path.
- */
-struct normalise_path_fragment_impl
+static
+inline
+int
+str2int(const string &s)
 {
-    template<typename Container, typename Type>
-    struct result
-    {
-        typedef void type;
-    };
+    char *end;
+    long result = 0;
+    const char *str = s.c_str();
+    static const long min = numeric_limits<long>::min(),
+                      max = numeric_limits<long>::max();
 
-    template<typename Container, typename Type>
-    void operator() (Container &c, const Type &v) const
-    {
-        static const Type cd("."), // Current Directory
-                          pd(".."); // Previous Directory
+    result = strtol(str, &end, 10);
 
-        if (v != cd && v != pd)
-            c.push_back(v);
-        else if (v == pd && !c.empty())
-            c.erase(c.end() - 1);
+    if (result == min && errno == ERANGE)
+        throw oodles::TypeError("str2int",
+                                errno,
+                                "Integer underflow converting '%s'.", str);
+
+    if (result == max && errno == ERANGE)
+        throw oodles::TypeError("str2int",
+                                errno,
+                                "Integer overflow converting '%s'.", str);
+
+    if (end == str || (end && *end != '\0'))
+        throw oodles::TypeError("str2int",
+                                errno,
+                                "Cannot convert '%s' to integer.", str);
+
+    return static_cast<int> (result);
+}
+
+static
+inline
+size_t
+count_chars(const string &s, size_t start, size_t end, const char c = '.')
+{
+    size_t n = 0;
+
+    while (start <= end)
+        if (s[start++] == c)
+            ++n;
+
+    return n;
+}
+
+static
+inline
+int
+tokenise_scheme(const string &url, string::size_type &index, string &scheme)
+{
+    int state = oodles::url::URL::Scheme;
+
+    if (url[index] == ':') { // Predict next state
+        index += 2; // Skip over '//'
+
+        if (url.find_last_of('@', url.find_first_of('/', index + 1)) != NONE)
+            state = oodles::url::URL::Username;
+        else
+            state = oodles::url::URL::Domain;
+    } else {
+        scheme += tolower(url[index]); // Normalise as we go :)
     }
-};
 
-boost::phoenix::function<normalise_path_fragment_impl> normalise_path_fragment;
+    return state;
+}
+
+static
+inline
+int
+tokenise_domain(const string &url,
+                string::size_type &index,
+                oodles::url::Attributes &attributes)
+{
+    uint16_t octets = 0;
+    int state = oodles::url::URL::Domain;
+    vector<string> &domain = attributes.domain;
+    string::size_type i = 0, j = 0, max = url.size();
+
+    if ((j = url.find_first_of('/', index)) == NONE)
+        j = max; // No path or page given, just a domain
+
+    if ((i = url.find_last_of(':', j)) != NONE && i > index)
+        j = i; // We have a port to parse to
+
+    i = 0; // Reset to use as index to domain
+
+    /*
+     * Reserve (pre-allocate) the correct no. of entries for our domain. The
+     * no. domain components will be 1 more than the no. of dots delimiting it.
+     */
+    domain.resize(count_chars(url, index, j, '.') + 1);
+
+    for (string *s = &domain[i] ; index < j ; ++index) {
+        if (url[index] == '.') {
+            try {
+                str2int(*s);
+                octets++;
+            } catch (const exception &e) {
+            }
+            
+            s = &domain[++i]; // Reference next domain component
+        } else
+            *s += tolower(url[index]); // Normalise as we go :)
+    }
+
+    try {
+        str2int(domain[i]);
+        attributes.ip = octets == 3 ? true : false;
+    } catch (const exception &e) {
+    }
+
+    if (url[index] == ':')
+        state = oodles::url::URL::Port;
+    else if (url[index] == '/')
+        state = oodles::url::URL::Path;
+    else
+        state = oodles::url::URL::Page;
+
+    return state;
+}
+
+static
+inline
+int
+tokenise_path(const string &url,
+              string::size_type &index,
+              vector<string> &path)
+{
+    int state = oodles::url::URL::Page;
+    string::size_type i = 0, j = url.find_last_of('/');
+
+    if (j == NONE || j == index - 1) {
+        index--; // Will re-skip the single '/' that got us here
+        return state; // Seems there are no further path fragments
+    }
+
+    /*
+     * Reserve (pre-allocate) the correct no. of entries for our path. The
+     * no. path components will be equal to the no. of slashes delimiting it.
+     */
+    path.resize(count_chars(url, index, j, '/')); // Reserve capacity
+
+    for (string *s = &path[i] ; index < j ; ++index) {
+        if (url[index] == '/')
+            s = &path[++i]; // Reference next path component
+        else
+            *s += url[index];
+    }
+
+    return state; // Next (potential) state already set above
+}
+
+static
+inline
+int
+tokenise_query(const string &url,
+               string::size_type &index,
+               set<pair<string, string> > *&query_string)
+{
+    int state = oodles::url::URL::Query;
+    string::size_type i = 0, j = 0, max = url.size();
+
+    if ((i = url.find_first_of('#', index)) != NONE) // Skip any anchor
+        max = i - 1;
+
+    assert(!query_string);
+    query_string = new set<pair<string, string> >();
+    
+    while (index < max) {
+        i = url.find_first_of('=', index);
+        if ((j = url.find_first_of('&', i)) == NONE)
+            j = max + 1;
+
+        const pair<string, string> p(url.substr(index, i - index),
+                                     url.substr(i + 1, (j - 1) - i));
+
+        query_string->insert(p);
+        index = j + 1;
+    }
+
+    return state;
+}
+
+static
+inline
+void
+normalise(string &page,
+          vector<string> &path,
+          set<pair<string, string> > *&query_string)
+{
+    if (!path.empty()) {
+        vector<string>::iterator i(path.begin()), j(path.end()), k;
+
+        while (i != j) {
+            k = i;
+            
+            if (*i == "..") {
+                k -= 2;
+                path.erase(i);
+                path.erase(k + 1);
+            } else if (*i == ".") {
+                if (k != path.begin())
+                    --k;
+
+                path.erase(i);
+            }
+
+            i = k;
+            ++i;
+        }
+    }
+
+    if (query_string) {
+        set<pair<string, string> >::iterator i(query_string->begin()),
+                                             j(query_string->end());
+        page += "?";
+
+        while (i != j) {
+            page += i->first + "=" + i->second + "&";
+            ++i;
+        }
+
+        page.erase(page.end() - 1); // Remove trailing '&'
+    }
+}
 
 namespace oodles {
 namespace url {
 
 /*
- * Use Spirit here - 'tis a simple syntax and we could scan it
- * sequentially efficiently enough but we'll compare results to
- * be sure...
+ * No need for Spirit here - 'tis a simple syntax and we can scan it
+ * sequentially efficiently enough. Follow the rule:
  *
- * Format:
  * scheme://username:password@domain.com:port/path/page?query_string#anchor
  */
-Parser::Parser() : Parser::base_type(url, "url"), ip(false)
-{
-    using boost::phoenix::ref;
-    using boost::phoenix::at_c;
-
-    using boost::spirit::qi::_1;
-    using boost::spirit::qi::_val;
-
-    /* Directives */
-    using boost::spirit::qi::eoi; // End Of Input
-    using boost::spirit::qi::lit; // Literal
-    using boost::spirit::qi::omit;
-    using boost::spirit::qi::repeat;
-    using boost::spirit::qi::no_case; // Ignore case
-
-    /* Parsers */
-    using boost::spirit::byte_;
-    using boost::spirit::ascii::char_;
-    using boost::spirit::ascii::digit;
-
-    /*
-     * Scheme: All characters up to but not including the terminator '://'
-     */
-    scheme %= +(char_ - lit("://")) >> omit[lit("://")];
-
-    /*
-     * Username: All characters up to but not including the terminator ':'
-     */
-    username %= +(~char_(":.@")) >> omit[':'];
-
-    /*
-     * Password: All characters up to but not including the terminator '@'
-     */
-    password %= +(char_ - '@') >> omit['@'];
-
-    /*
-     * Domain: A period delimited sequence of strings up to a path or port
-     */
-    domain %=
-        (   // FIXME: There has to be a better expression that this!
-            repeat(3)[+digit >> '.'] >>
-            repeat(1)[+digit][ref(ip) = true] // Try and distinguish IP octets
-        |
-            +(no_case[~char_(".:/")]) % '.'  // From domain components
-        )
-        >> -omit[char_(':') | '/']
-    ;
-
-    /*
-     * Port: Er, a port number (up to and certainly not including '/' ;)
-     */
-    port %= +(digit - '/') >> -omit['/'];
-
-    /*
-     * Path: A forward-slash delimited sequence of strings up to the page
-     */
-    dir %= +(byte_ - '/'); // Identifies a single path fragment
-    path = *(dir >> '/')[normalise_path_fragment(_val, _1)] >> -omit['/'];
-
-    /*
-     * Page: Leaf node of the path - the last of the URL (drop the #fragment)
-     */
-    page %= *(byte_ - '#') >> -omit[lit('#') >> *(byte_ -  eoi)] || eoi;
-
-    url =
-        -scheme[at_c<2>(_val) = _1] /* Scheme is not always present in links */
-        >> -(username[at_c<3>(_val) = _1] >  /* Most domains have no username */
-             password[at_c<4>(_val) = _1]) /* But those that do have password */
-        >> -domain[at_c<6>(_val) = _1] /* Absolute URLs have a domain */
-        >> -port[at_c<0>(_val) = _1] /* And maybe a port number too */
-        >> -path[at_c<5>(_val) = _1] /* And of course perhaps a file path */
-        >> -page[at_c<1>(_val) = _1] /* Any further characters are the page */
-    ;
-
-    /* Give the rules an appropriate name */
-    url.name("URL");
-    port.name("Port number");
-    page.name("Page/document");
-    scheme.name("Scheme/protocol");
-    username.name("Domain username");
-    password.name("Domain password");
-    domain.name("Site domain components");
-    path.name("Path/directory hierarchy");
-
-    /* Install an error handler */
-    using std::cerr;
-    using std::endl;
-
-    using qi::_2;
-    using qi::_3;
-    using qi::_4;
-
-    using qi::fail;
-    using qi::on_error;
-
-    using boost::phoenix::val;
-    using boost::phoenix::construct;
-
-    on_error<fail>
-    (
-        url,
-        cerr << val("Error! Expecting ")
-             << _4
-             << val(" here: \"")
-             << construct<value_type>(_3, _2)
-             << val("\"")
-             << endl
-    );
-}
-
 bool
-Parser::parse(value_type::const_iterator &begin,
-              value_type::const_iterator &end,
-              Attributes &url)
+Parser::parse(const string &url, Attributes &attributes)
 {
-    if (qi::parse(begin, end, *this, url)) {
-        url.ip = ip; // Update the attribute copy of the flag, ip
+    int s = URL::Scheme; // Normally a URL begins with a scheme such as http...
+    string::size_type i = 0, max = url.size();
+    set<pair<string, string> > *query_string = NULL;
 
-        if (begin == end)
-            return true; // Parse was both successful and completed in full
+    if (url.find_first_of("://") > url.find_first_of('.'))
+        s = URL::Domain; // ...however, some links begin with only a domain
+
+    for ( ; i < max ; ++i) {
+        switch (s) {
+            case URL::Scheme:
+                s = tokenise_scheme(url, i, attributes.scheme);
+                break;
+            case URL::Username:
+                if (url[i] == ':')
+                    s = URL::Password;
+                else
+                    attributes.username += url[i];
+                break;
+            case URL::Password:
+                if (url[i] == '@')
+                    s = URL::Domain;
+                else
+                    attributes.password += url[i];
+                break;
+            case URL::Domain:
+                s = tokenise_domain(url, i, attributes);
+                break;
+            case URL::Port:
+                if (url[i] == '/')
+                    s = URL::Path;
+                else
+                    attributes.port += url[i];
+                break;
+            case URL::Path:
+                s = tokenise_path(url, i, attributes.path);
+                break;
+            case URL::Page:
+                if (url[i] == '?')
+                    s = URL::Query;
+                else
+                    attributes.page += url[i]; // May be a leaf of the path?
+                break;
+            case URL::Query:
+                s = tokenise_query(url, i, query_string);
+                break;
+        }
     }
 
-    return false;
+    normalise(attributes.page, attributes.path, query_string);
+    delete query_string;
+
+    return true;
 }
 
 } // url
 } // oodles
+
