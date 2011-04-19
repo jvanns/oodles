@@ -63,7 +63,7 @@ class Message
         /* Message deconstruction to network buffer (send) */
         size_t write_body(char *buffer, size_t max);
         size_t write_headers(char *buffer,size_t max);
-        size_t write_request_line(char *buffer, size_t max); 
+        size_t write_start_line(char *buffer, size_t max); 
         
         /* Internal structures */
         enum { Inbound = 1, Outbound = 2 };

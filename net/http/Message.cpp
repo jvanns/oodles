@@ -346,7 +346,7 @@ Message::write_headers(char *buffer, size_t max)
     vector<Header>::iterator i(headers.begin()), j(headers.end()), k;
     
     if (start_line.size() > 0)
-        if ((used = write_request_line(buffer, max)) == 0)
+        if ((used = write_start_line(buffer, max)) == 0)
             return 0; // Not enough buffer space even for the request line
 
     for (x = used ; i != j ; ) {
@@ -388,7 +388,7 @@ Message::write_headers(char *buffer, size_t max)
 }
 
 size_t
-Message::write_request_line(char *buffer, size_t max)
+Message::write_start_line(char *buffer, size_t max)
 {
     static const char DL = ' ';
     size_t n = start_line.size() + 4, x = 0; // 4 = 2xDL + CR + LF
