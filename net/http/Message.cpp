@@ -103,7 +103,7 @@ Message::request(const string &method, const string &URI)
     
     start_line[0] = method;
     start_line[1] = URI.empty() ? "*" : URI;
-    start_line[2] = protocol + to_string<float>(version);
+    start_line[2] = protocol + "/" + to_string<float>(version);
 
     body_offset = start_line.size() + 4; // 4 = 2x DL + CR + LF
 }
@@ -132,7 +132,7 @@ Message::respond(uint16_t code, const string &phrase)
     mode = Outbound;
     version = 1.1f; // Always use 1.1 in Oodles
     
-    start_line[0] = protocol + to_string<float>(version);
+    start_line[0] = protocol + "/" + to_string<float>(version);
     start_line[1] = to_string<uint16_t>(code);
     start_line[2] = phrase;
 
@@ -340,7 +340,7 @@ Message::write_headers(char *buffer, size_t max)
 
         if (n > max)
             break; // We can't fit any more full-line headers
-        
+
         memcpy(buffer + x, i->key.c_str(), i->key.size());
         x += i->key.size();
         memcpy(buffer + x, &DL, 1);
