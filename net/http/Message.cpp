@@ -330,7 +330,7 @@ Message::write_headers(char *buffer, size_t max)
     static const char DL = ':';
     size_t used = 0, n = 0, x = 0;
     vector<Header>::iterator i(headers.begin()), j(headers.end()), k;
-
+    
     if (start_line.size() > 0)
         if ((used = write_request_line(buffer, max)) == 0)
             return 0; // Not enough buffer space even for the request line
@@ -338,7 +338,7 @@ Message::write_headers(char *buffer, size_t max)
     for (x = used ; i != j ; ) {
         n = i->key.size() + i->value.size() + 3; // 3 = DL + CR + LF
 
-        if (n < max)
+        if (n > max)
             break; // We can't fit any more full-line headers
         
         memcpy(buffer + x, i->key.c_str(), i->key.size());
