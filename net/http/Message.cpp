@@ -205,12 +205,12 @@ Message::from_buffer(const char *buffer, size_t max)
     
     if (!headers_received())
         used = read_headers(buffer, max);
-
+    
     if (used < max)
         used += read_body(buffer + used, max - used);
-
+    
     buffered += used;
-
+    
     return used;
 }
 
@@ -288,8 +288,8 @@ Message::read_headers(const char *buffer, size_t max) throw (HeaderError)
         if (buffer[i - 3] ==  CR && buffer[i - 2] == LF && buffer[i - 1] == CR)
             body_offset = i + 1; // Header/body split located
         else if (buffer[i - 1] != CR)
-          throw HeaderError("Message::identify_header", 0,
-                            "Expected CRLF terminator but none found.");
+            throw HeaderError("Message::identify_header", 0,
+                              "Expected CRLF terminator but none found.");
         
         if (j == 0) { // The Response start-line.
             read_response_line(buffer, i - 2);
@@ -336,7 +336,12 @@ Message::write_headers(char *buffer, size_t max)
             return 0; // Not enough buffer space even for the request line
 
     for (x = used ; i != j ; ) {
-        n = i->key.size() + i->value.size() + 3; // 3 = DL + CR + LF
+        /*
+         * 3 = DL + CR + LF
+         * 2 = CRLF indicating end of headers
+         */
+        k = i + 1;
+        n = i->key.size() + i->value.size() + 3 + (k == j ? 2 : 0);
 
         if (n > max)
             break; // We can't fit any more full-line headers
@@ -352,9 +357,17 @@ Message::write_headers(char *buffer, size_t max)
         memcpy(buffer + x + 1, &LF, 1);
         x += 2;
 
-        k = i + 1;
         headers.erase(i);
         i = k;
+    }
+
+    /*
+     * Add the end-of-headers indicator, if all were written.
+     */
+    if (headers.empty()) {
+        memcpy(buffer + x, &CR, 1);
+        memcpy(buffer + x + 1, &LF, 1);
+        x += 2;
     }
 
     return x;
