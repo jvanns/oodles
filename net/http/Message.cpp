@@ -205,7 +205,7 @@ Message::from_buffer(const char *buffer, size_t max)
     
     if (!headers_received())
         used = read_headers(buffer, max);
-    
+
     if (used < max)
         used += read_body(buffer + used, max - used);
     
@@ -261,16 +261,28 @@ void
 Message::read_response_line(const char *buffer, size_t max)
 {
     static const char DL = ' ';
-    const string s(buffer, max);
+    string s(buffer, max);
     
     for (size_t i = 0, j = 0, k = 0 ; i < max ; ++i)  {
-        if (s[i] == DL || i + 1 == max) {
-            start_line[k++] = s.substr(j, i);
+        const bool end = i + 1 == max;
+        
+        if (s[i] == DL || end) {
+            start_line[k++] = s.substr(j, i + (end ? 1 : 0) - j);
             j = i + 1;
         }
     }
+
+    int i = start_line[0].size() - (protocol.size() + 1),
+        j = start_line[2].size() - (protocol.size() + 1);
+
+    if (i < 0) // If negative, indicates start_line cannot be Response
+        s = start_line[2].substr(protocol.size() + 1, j);
+    else if (j < 0) // If negative, indicates start_line cannot be Request
+        s = start_line[0].substr(protocol.size() + 1, i);
+    else
+        ; // TODO
     
-    version = atof(start_line[0].substr(protocol.size()).c_str());
+    version = atof(s.c_str());
 }
 
 size_t
@@ -290,11 +302,12 @@ Message::read_headers(const char *buffer, size_t max) throw (HeaderError)
         else if (buffer[i - 1] != CR)
             throw HeaderError("Message::identify_header", 0,
                               "Expected CRLF terminator but none found.");
-        
-        if (j == 0) { // The Response start-line.
-            read_response_line(buffer, i - 2);
-        } else { // A Message header
-            const char *d = static_cast<const char*>(memchr(buffer+j, DL, i-j));
+
+        if (j == 0) { // The start-line.
+            read_response_line(buffer, i - 1);
+        } else if (!body_offset) { // A Message header
+            const char *p = buffer + j;
+            const char *d = static_cast<const char*>(memchr(p, DL, i - j));
 
             if (!d)
                 throw HeaderError("Message::identify_header", 0,
@@ -303,12 +316,13 @@ Message::read_headers(const char *buffer, size_t max) throw (HeaderError)
             Header h;
             vector<Header>::iterator b(headers.begin()), e(headers.end());
 
-            h.key.assign(buffer + j, d - buffer);
-            h.value.assign(d + 1, (buffer + i) - (d + 1));
+            h.key.assign(p, d - p);
+            h.value.assign(d + 1, i - j - (h.key.size() + 2));
+
             headers.insert(lower_bound(b, e, h), h);
         }
 
-        j = i++;
+        j = 1 + i++;
     }
 
     return i;
