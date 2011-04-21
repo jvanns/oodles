@@ -258,7 +258,7 @@ Message::read_body(const char *buffer, size_t max)
 }
 
 void
-Message::read_response_line(const char *buffer, size_t max)
+Message::read_start_line(const char *buffer, size_t max)
 {
     static const char DL = ' ';
     string s(buffer, max);
@@ -304,7 +304,7 @@ Message::read_headers(const char *buffer, size_t max) throw (HeaderError)
                               "Expected CRLF terminator but none found.");
 
         if (j == 0) { // The start-line.
-            read_response_line(buffer, i - 1);
+            read_start_line(buffer, i - 1);
         } else if (!body_offset) { // A Message header
             const char *p = buffer + j;
             const char *d = static_cast<const char*>(memchr(p, DL, i - j));

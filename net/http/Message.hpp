@@ -57,7 +57,7 @@ class Message
 
         /* Message construction from network buffer (recv) */
         size_t read_body(const char *buffer, size_t max);
-        void read_response_line(const char *buffer, size_t max);
+        void read_start_line(const char *buffer, size_t max);
         size_t read_headers(const char *buffer,size_t max) throw (HeaderError);
 
         /* Message deconstruction to network buffer (send) */
