@@ -52,7 +52,7 @@ class Message
         
         /* Member functions/methods */
         size_t pending() const;
-        bool headers_sent() const { return headers.empty(); }
+        bool headers_sent() const { return body_offset > 0; }
         bool headers_received() const { return body_offset > 0; }
 
         /* Message construction from network buffer (recv) */
