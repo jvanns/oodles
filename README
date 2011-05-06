@@ -61,3 +61,4 @@ use iperf in client mode to send the file to the protocol-handler server
 instance due to the bespoke TCPFEX protocol the server expects (it will
 abort() due to a failed assert() if you do!).
 
+NOTE: 'protocol-handler' writes the TCPFEX transferred files to disk, iperf does not. To benchmark the two together (with buffer sizes larger than the page size, 4K) you must comment-out the write() call in protocol-handler.cpp to ensure the same behavior.
