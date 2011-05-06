@@ -67,7 +67,7 @@ const string Message::protocol("HTTP");
 
 Message::Message(int fd, size_t size) :
     fd(fd),
-    mode(Inbound),
+    mode(-1),
     version(0),
     buffered(0),
     body_offset(0),
@@ -98,14 +98,11 @@ Message::response_phrase() const
 void
 Message::request(const string &method, const string &URI)
 {
-    mode = Outbound;
     version = 1.1f; // Always use 1.1 in Oodles
     
     start_line[0] = method;
     start_line[1] = URI.empty() ? "*" : URI;
     start_line[2] = protocol + "/" + to_string<float>(version);
-
-    body_offset = start_line.size() + 4; // 4 = 2x DL + CR + LF
 }
 
 const string&
@@ -129,14 +126,11 @@ Message::request_method() const
 void
 Message::respond(uint16_t code, const string &phrase)
 {
-    mode = Outbound;
     version = 1.1f; // Always use 1.1 in Oodles
     
     start_line[0] = protocol + "/" + to_string<float>(version);
     start_line[1] = to_string<uint16_t>(code);
     start_line[2] = phrase;
-
-    body_offset = start_line.size() + 4; // 4 = 2x DL + CR + LF
 }
 
 size_t
@@ -168,7 +162,6 @@ Message::add_header(const string &key, const string &value)
         return false; // Header indexed by key already exists
     
     headers.insert(x, Header(key, value));
-    body_offset += key.size() + value.size() + 3; // 3 = DL + CR + LF
 
     return true;
 }
@@ -194,7 +187,7 @@ Message::to_buffer(char *buffer, size_t max)
         used += write_body(buffer + used, max - used);
 
     buffered += used;
-
+    
     return used;
 }
 
@@ -205,12 +198,12 @@ Message::from_buffer(const char *buffer, size_t max)
     
     if (!headers_received())
         used = read_headers(buffer, max);
-
+    
     if (used < max)
         used += read_body(buffer + used, max - used);
     
     buffered += used;
-    
+
     return used;
 }
 
@@ -218,11 +211,9 @@ size_t
 Message::pending() const
 {
     size_t n = 0;
-    const string &t1 = start_line[0]; // Token 1 of trigram start-line
     
-    if (t1.substr(0, protocol.size() - 1) == protocol) {
-        /* Receiving Response */
-        const uint16_t code = atoi(start_line[2].c_str());
+    if (mode == Inbound) {
+        const uint16_t code = atoi(start_line[1].c_str());
         
         if (!(code < 200 || code == 204 || code == 304)) { // Refer to RFC2616
             const string &h = find_header("content-length");
@@ -236,8 +227,7 @@ Message::pending() const
                  */
             }
         }
-    } else {
-        /* Sending Request */
+    } else if (mode == Outbound) {
         n = body_size;
     }
     
@@ -262,13 +252,21 @@ Message::read_start_line(const char *buffer, size_t max)
 {
     static const char DL = ' ';
     string s(buffer, max);
+    bool last = false;
+
+    mode = Inbound;
     
     for (size_t i = 0, j = 0, k = 0 ; i < max ; ++i)  {
-        const bool end = i + 1 == max;
-        
-        if (s[i] == DL || end) {
-            start_line[k++] = s.substr(j, i + (end ? 1 : 0) - j);
-            j = i + 1;
+        if (s[i] == DL || last) {
+            start_line[k++] = s.substr(j, (last ? max : i) - j);
+
+            if (k < 3) {
+                if (k == 2)
+                    last = true;
+                
+                j = i + 1;
+            } else
+                i = max;
         }
     }
 
@@ -281,7 +279,7 @@ Message::read_start_line(const char *buffer, size_t max)
         s = start_line[0].substr(protocol.size() + 1, i);
     else
         ; // TODO
-    
+
     version = atof(s.c_str());
 }
 
@@ -291,7 +289,7 @@ Message::read_headers(const char *buffer, size_t max) throw (HeaderError)
     static const char DL = ':';
     size_t i = 0, j = 0;
     
-    while (i < max && !headers_received()) {
+    while (!(headers_received() || i == max)) {
         if (buffer[i] != LF) {
             ++i;
             continue;
@@ -383,6 +381,8 @@ Message::write_headers(char *buffer, size_t max)
         memcpy(buffer + x + 1, &LF, 1);
         x += 2;
     }
+    
+    body_offset = x;
 
     return x;
 }
@@ -392,6 +392,8 @@ Message::write_start_line(char *buffer, size_t max)
 {
     static const char DL = ' ';
     size_t n = start_line.size() + 4, x = 0; // 4 = 2xDL + CR + LF
+    
+    mode = Outbound;
     
     if (max < n)
         return 0; // Only write a complete request line or none at all
