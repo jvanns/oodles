@@ -31,6 +31,12 @@ TypeError::TypeError(const string &from, int error, const char *format, ...)
     init(from, error, format); // va_end happens in here
 }
 
+RangeError::RangeError(const string &from, int error, const char *format, ...)
+{
+    va_start(list, format);
+    init(from, error, format); // va_end happens in here
+}
+
 // Net-specific exceptions
 namespace net {
 
