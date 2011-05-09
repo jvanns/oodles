@@ -62,6 +62,14 @@ class Session : public oodles::net::http::Session
 
 struct ClientContext : public oodles::net::CallerContext, public oodles::Linker
 {
+    /*
+     * A map of endpoint (server hostname and port#) to vector of 
+     * resource URIs. Normally this wouldn't be necessary because
+     * a single Session would be established to a server and it would
+     * only hold a list/vector of resource URIs - no need for a lookup.
+     * However, this context is used by all Client/Sessions instantiated
+     * in main() below.
+     */
     map<string, vector<string> > requests;
     
     void start(oodles::net::SessionHandler &s);
@@ -70,6 +78,12 @@ struct ClientContext : public oodles::net::CallerContext, public oodles::Linker
 
 struct ServerContext : public oodles::net::CallerContext, public oodles::Linker
 {
+    /*
+     * A map of resource URI (in this test case an HTML page on disk)
+     * to file descriptor. Cache (keep the FD open) the mapping so that
+     * subsequent requests for the same resource avoid additional opens
+     * etc
+     */
     map<string, int> resources;
     
     void start(oodles::net::SessionHandler &s);
@@ -169,7 +183,7 @@ ServerContext::size_from_fd(int fd)
     struct stat b;
     fstat(fd, &b);
     
-    return b.st_size;
+    return b.st_size; // Size is given as the value in 'content-length'.
 }
 
 } // anonymous
