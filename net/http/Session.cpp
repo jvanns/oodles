@@ -2,6 +2,7 @@
 #include "Session.hpp"
 #include "Message.hpp"
 #include "Protocol.hpp"
+#include "ResponseCodes.hpp"
 
 namespace oodles {
 namespace net {
@@ -32,9 +33,10 @@ void
 Session::send_response(uint16_t code, int data_fd, size_t data_size)
 {
     Protocol &p = *static_cast<Protocol*>(get_endpoint()->get_protocol());
+    static const ResponseCodes &messages = ResponseCodes::instance();
     Message *m = new Message(data_fd, data_size);
     
-    m->respond(code, "FIX ME");
+    m->respond(code, messages[code]);
     p.push_message(m);
 }
 
