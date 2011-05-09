@@ -27,6 +27,11 @@ struct TypeError : public NonFatalException
     TypeError(const std::string &from, int error, const char *format, ...);
 };
 
+struct RangeError : public NonFatalException
+{
+    RangeError(const std::string &from, int error, const char *format, ...);
+};
+
 // Net-specific exceptions
 namespace net {
 
@@ -45,6 +50,15 @@ struct DialogError : public NonFatalException
     DialogError(const std::string &from, int error, const char *format, ...);
 };
 
+// HTTP-specific exceptions
+namespace http {
+
+struct HeaderError : public NonFatalException
+{
+    HeaderError(const std::string &from, int error, const char *format, ...);
+};
+   
+} // http
 } // net
 
 // URL-specific exceptions

@@ -29,6 +29,7 @@ LDLIBS += $(LDLIBS_BOOST)
 
 # Compile oodles object files
 NET_CORE_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/core/*.cpp))
+NET_HTTP_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/http/*.cpp))
 NET_OOP_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard net/oop/*.cpp))
 SCHEDULER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard sched/*.cpp))
 CRAWLER_OBJECTS := $(patsubst %.cpp,%.o,$(wildcard crawl/*.cpp))
@@ -48,7 +49,8 @@ TESTS = test/html-parser \
 	test/allocator \
 	test/events \
 	test/protocol-handler \
-	test/oop-messages
+	test/oop-messages \
+	test/http-transfer
 
 # Production system components
 PROGRAMS = prog/scheduler \
@@ -108,6 +110,14 @@ test/oop-messages: test/oop-messages.o \
 	$(NET_CORE_OBJECTS) \
 	$(NET_OOP_OBJECTS) \
 	$(SCHEDULER_OBJECTS) ;\
+	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
+
+test/http-transfer: test/http-transfer.o \
+	$(COMMON_OBJECTS) \
+	$(URL_OBJECTS) \
+	$(UTILITY_OBJECTS) \
+	$(NET_CORE_OBJECTS) \
+	$(NET_HTTP_OBJECTS) ;\
 	$(CXX) $(LDFLAGS) -o bin/$@ $^ $(LDLIBS)
 
 prog/scheduler: prog/scheduler.o \
