@@ -151,6 +151,9 @@ Endpoint::async_recv(char *ptr, size_t max)
 
     if (!(ptr && max > 0))
         return;
+    
+    if (!recv_guard.try_lock())
+        return; // Ensure that duplicate calls aren't registered 
 
     socket().async_read_some(buffer(ptr, max),
                              bind(&Endpoint::raw_recv_callback,
@@ -167,6 +170,9 @@ Endpoint::async_send(const char *ptr, size_t max)
     if (!(ptr && max > 0))
         return;
 
+    if (!send_guard.try_lock())
+        return; // Ensure that duplicate calls aren't registered 
+    
     socket().async_write_some(buffer(ptr, max),
                               bind(&Endpoint::raw_send_callback,
                               shared_from_this(),
@@ -177,6 +183,8 @@ Endpoint::async_send(const char *ptr, size_t max)
 void
 Endpoint::raw_recv_callback(const error_code& e, size_t b)
 {
+    recv_guard.unlock();
+    
     if (!e && b > 0) {
         size_t n = inbound.producer().commit_buffer(b),
                u = protocol->buffer2message(inbound.consumer().data(), n);
@@ -205,12 +213,14 @@ Endpoint::raw_recv_callback(const error_code& e, size_t b)
 void
 Endpoint::raw_send_callback(const error_code& e, size_t b)
 {
+    send_guard.unlock();
+    
     if (!e && b > 0) {
         size_t n = 0;
        
         n = outbound.consumer().consume_buffer(b);
         protocol->bytes_transferred(b);
-        
+
         /*
          * Re-register any further writes and update running statistics
          */

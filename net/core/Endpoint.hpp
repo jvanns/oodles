@@ -5,6 +5,9 @@
 #include "Buffer.hpp"
 #include "common/page.hpp"
 
+// Boost mutex
+#include <boost/thread/mutex.hpp>
+
 // Boost.shared
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
@@ -89,18 +92,19 @@ class Endpoint : public boost::enable_shared_from_this<Endpoint>
 
             Info() : port(0) {}
         };
-        
+
         /* Member variables/attributes */
         Info local, remote;
         Buffer<NBS> inbound;
         Buffer<NBS> outbound;
         Metric recv_rate, send_rate;
+        boost::mutex recv_guard, send_guard;
         
         Dispatcher &dispatcher;
         SessionHandler *session;
         ProtocolHandler *protocol;
         boost::asio::ip::tcp::socket sock;
-
+        
         /* Member functions/methods */
         Endpoint(Dispatcher &d);
         Endpoint(const Endpoint &e);
