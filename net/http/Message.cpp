@@ -6,6 +6,7 @@
 #include <algorithm>
 
 // libc
+#include <string.h> // For memchr() etc.
 #include <assert.h> // For assert() etc.
 #include <strings.h> // For strncasecmp() etc.
 

@@ -8,6 +8,9 @@
 #include <vector>
 #include <string>
 
+// libc
+#include <stdint.h> // For uint16_t etc.
+
 namespace oodles {
 namespace net {
 namespace http {
