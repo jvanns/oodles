@@ -63,15 +63,14 @@ Protocol::bytes_transferred(size_t n)
             message_size = outgoing->size();
         }
 
-        done = buffered < message_size;
-
-        if (!done) {
+        if (buffered >= message_size) {
             delete outgoing;
             outgoing = NULL;
             buffered_messages.pop();
             buffered -= message_size;
-            done = buffered_messages.empty();
         }
+
+        done = !(buffered > 0 && !buffered_messages.empty());
     }
 
     transferred = buffered;
@@ -97,16 +96,16 @@ Protocol::message2buffer(char *buffer, size_t max)
         buffered = outgoing->to_buffer(buffer + used, max);
         used += buffered;
         max -= buffered;
-        done = max == 0;
         
         if (outgoing->complete()) {
-            done = max > 0 && !outbound_messages.empty();
             buffered_messages.push(outgoing);
             outbound_messages.pop();
             outgoing = NULL;
         }
+        
+        done = !(max > 0 && !outbound_messages.empty());
     }
-
+    
     return used;
 }
 
